@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const MedicineSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -11,23 +15,24 @@ const MedicineSchema = new mongoose.Schema({
   },
   unit: {
     type: String,
-    required: true
+    required: true,
   },
   instruction: {
     type: String,
-    required: true
+    required: true,
   },
-  uses: {               //công dụng
+  uses: {
+    //công dụng
     type: String,
-    required: true
+    required: true,
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   packaging: {
     type: String,
-    required: true
+    required: true,
   },
   images: [
     {
@@ -37,15 +42,15 @@ const MedicineSchema = new mongoose.Schema({
   ],
   effect: {
     type: String,
-    required: true
+    required: true,
   },
   isRx: {
     type: Boolean,
-    required: true
+    required: true,
   },
   drugUser: {
     type: String,
-    required: true
+    required: true,
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
