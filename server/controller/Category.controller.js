@@ -6,36 +6,122 @@ import Joi from "joi";
 import { generateID } from "../utils/generateID.js";
 
 export const addCategory = asyncHandler(async (req, res) => {
-  const { error } = validate(req.body);
+  try {
+    const { error } = validate(req.body);
 
-  if (error) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
-  }
+    if (error) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+      );
+    }
 
-  const categoryExits = await Category.findOne({ name: req.body.name });
+    const categoryExits = await Category.findOne({ name: req.body.name });
 
-  if (categoryExits) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, "Danh mục đã tồn tại"));
-  }
+    if (categoryExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Danh mục đã tồn tại")
+      );
+    }
 
-  let id = await generateID(Category);
+    let id = await generateID(Category);
 
-  const newCategory = new Category({
-    id,
-    ...req.body,
-  });
+    const newCategory = new Category({
+      id,
+      ...req.body,
+    });
 
-  const category = await newCategory.save();
+    const category = await newCategory.save();
 
-  res
-    .status(StatusCode.CREATED)
-    .json(
+    res.json(
       jsonGenerate(StatusCode.CREATED, "Thêm danh mục thành công", category)
     );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const getCategories = asyncHandler(async (req, res) => {
+  try {
+    const categories = await Category.find();
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách danh mục thành công",
+        categories
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const getCategory = asyncHandler(async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục")
+      );
+    }
+
+    res.json(jsonGenerate(StatusCode.OK, "Lấy danh mục thành công", category));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const updateCategory = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const category = await Category.findById(id);
+
+    if (!category) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục")
+      );
+    }
+    const { error } = validate(req.body);
+
+    if (error) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+      );
+    }
+
+    const categoryExits = await Category.findOne({ name: req.body.name });
+
+    if (categoryExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Danh mục đã tồn tại")
+      );
+    }
+
+    await Category.findByIdAndUpdate(id, req.body);
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật danh mục thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const deleteCategory = asyncHandler(async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục")
+      );
+    }
+
+    await Category.findByIdAndDelete(req.params.id);
+
+    res.json(jsonGenerate(StatusCode.OK, "Xóa danh mục thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
 });
 
 const validate = (data) => {
