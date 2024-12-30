@@ -12,6 +12,9 @@ const AccountSchema = new mongoose.Schema({
     required: [true, "Please provide a password"],
     minlength: 6,
   },
+  cartData: {
+    type: Object,
+  },
   createAt: {
     type: Date,
     default: Date.now,

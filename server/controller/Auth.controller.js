@@ -23,7 +23,12 @@ export const signup = asyncHandler(async (req, res) => {
       return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Email đã tồn tại"));
     }
 
-    const user = await Account.create({ email, password });
+    let cart = {};
+    for (let i = 0; i < 300; i++) {
+      cart[i] = 0;
+    }
+
+    const user = await Account.create({ email, password, cartData: cart });
     await Customer.create({ accountId: user._id });
 
     const populatedUser = await Customer.findOne({
