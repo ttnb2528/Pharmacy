@@ -7,6 +7,7 @@ import BrandRouter from "./Brand.route.js";
 import CategoryRouter from "./Category.route.js";
 import SupplierRouter from "./Supplier.route.js";
 import ManufactureRouter from "./Manufacture.route.js";
+import ShiftWorkRouter from "./ShiftWork.route.js";
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use("/brand", BrandRouter);
 app.use("/category", CategoryRouter);
 app.use("/supplier", SupplierRouter);
 app.use("/manufacture", ManufactureRouter);
+app.use("/shiftWork", ShiftWorkRouter);
 
 export default app;
