@@ -90,6 +90,14 @@ export const updateBrand = asyncHandler(async (req, res) => {
       );
     }
 
+    const brandExits = await Brand.findOne({ name: req.body.name });
+
+    if (brandExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Thương hiệu đã tồn tại")
+      );
+    }
+
     await Brand.findByIdAndUpdate(id, req.body);
 
     res.json(jsonGenerate(StatusCode.OK, "Cập nhật thương hiệu thành công"));
