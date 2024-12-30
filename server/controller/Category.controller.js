@@ -90,7 +90,10 @@ export const updateCategory = asyncHandler(async (req, res) => {
       );
     }
 
-    const categoryExits = await Category.findOne({ name: req.body.name });
+    const categoryExits = await Category.findOne({
+      name: req.body.name,
+      _id: { $ne: id },
+    });
 
     if (categoryExits) {
       return res.json(

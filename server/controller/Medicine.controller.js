@@ -67,7 +67,9 @@ export const deleteMedicine = asyncHandler(async (req, res) => {
 
 export const updateMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
+
   const medicine = await Medicine.findById(id);
+
   if (!medicine) {
     return res
       .status(StatusCode.NOT_FOUND)
@@ -75,13 +77,26 @@ export const updateMedicine = asyncHandler(async (req, res) => {
   }
 
   const { error } = validate(req.body);
+
   if (error) {
     return res
       .status(StatusCode.BAD_REQUEST)
       .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
   }
 
+  const medicineExist = await Medicine.findOne({
+    name: req.body.name,
+    _id: { $ne: id },
+  });
+
+  if (medicineExist) {
+    return res
+      .status(StatusCode.BAD_REQUEST)
+      .json(jsonGenerate(StatusCode.BAD_REQUEST, "Tên thuốc đã tồn tại"));
+  }
+
   await Medicine.findByIdAndUpdate(id, req.body);
+
   res
     .status(StatusCode.OK)
     .json(jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công"));

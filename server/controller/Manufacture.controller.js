@@ -81,19 +81,36 @@ export const getManufacture = asyncHandler(async (req, res) => {
 export const updateManufacture = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
+
     const manufacture = await Manufacture.findById(id);
+
     if (!manufacture) {
       return res.json(
         jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy nơi sản xuất")
       );
     }
+
     const { error } = validate(req.body);
+
     if (error) {
       return res.json(
         jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
       );
     }
+
+    const manufactureExits = await Manufacture.findOne({
+      name: req.body.name,
+      _id: { $ne: id },
+    });
+
+    if (manufactureExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Nơi sản xuất đã tồn tại")
+      );
+    }
+
     await Manufacture.findByIdAndUpdate(id, req.body);
+
     res.json(jsonGenerate(StatusCode.OK, "Cập nhật nơi sản xuất thành công"));
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));

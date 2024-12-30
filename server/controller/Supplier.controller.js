@@ -96,6 +96,17 @@ export const updateSupplier = asyncHandler(async (req, res) => {
       );
     }
 
+    const supplierExits = await Supplier.findOne({
+      name: req.body.name,
+      _id: { $ne: id },
+    });
+
+    if (supplierExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Nhà cung cấp đã tồn tại")
+      );
+    }
+
     await Supplier.findByIdAndUpdate(id, req.body);
 
     res.json(

@@ -90,7 +90,10 @@ export const updateBrand = asyncHandler(async (req, res) => {
       );
     }
 
-    const brandExits = await Brand.findOne({ name: req.body.name });
+    const brandExits = await Brand.findOne({
+      name: req.body.name,
+      _id: { $ne: id },
+    });
 
     if (brandExits) {
       return res.json(

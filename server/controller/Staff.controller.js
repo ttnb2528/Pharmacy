@@ -112,7 +112,10 @@ export const updateStaff = asyncHandler(async (req, res) => {
       );
     }
 
-    const staffExits = await Staff.findOne({ username: req.body.username });
+    const staffExits = await Staff.findOne({
+      username: req.body.username,
+      _id: { $ne: id },
+    });
 
     if (staffExits) {
       return res.json(
