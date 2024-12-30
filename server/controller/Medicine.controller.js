@@ -26,6 +26,67 @@ export const addMedicine = asyncHandler(async (req, res) => {
     .json(jsonGenerate(StatusCode.CREATED, "Thêm thuốc thành công", medicine));
 });
 
+export const getMedicines = asyncHandler(async (req, res) => {
+  const medicines = await Medicine.find();
+  res
+    .status(StatusCode.OK)
+    .json(
+      jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+    );
+});
+
+export const getMedicine = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const medicine = await Medicine.findById(id);
+  if (!medicine) {
+    return res
+      .status(StatusCode.NOT_FOUND)
+      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+  }
+  res
+    .status(StatusCode.OK)
+    .json(
+      jsonGenerate(StatusCode.OK, "Lấy thông tin thuốc thành công", medicine)
+    );
+});
+
+export const deleteMedicine = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const medicine = await Medicine.findById(id);
+  if (!medicine) {
+    return res
+      .status(StatusCode.NOT_FOUND)
+      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+  }
+
+  await Medicine.findByIdAndDelete(id);
+  res
+    .status(StatusCode.OK)
+    .json(jsonGenerate(StatusCode.OK, "Xóa thuốc thành công"));
+});
+
+export const updateMedicine = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const medicine = await Medicine.findById(id);
+  if (!medicine) {
+    return res
+      .status(StatusCode.NOT_FOUND)
+      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+  }
+
+  const { error } = validate(req.body);
+  if (error) {
+    return res
+      .status(StatusCode.BAD_REQUEST)
+      .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
+  }
+
+  await Medicine.findByIdAndUpdate(id, req.body);
+  res
+    .status(StatusCode.OK)
+    .json(jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công"));
+});
+
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên thuốc"),
