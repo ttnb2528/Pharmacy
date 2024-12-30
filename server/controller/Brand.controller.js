@@ -6,36 +6,114 @@ import Joi from "joi";
 import { generateID } from "../utils/generateID.js";
 
 export const addBrand = asyncHandler(async (req, res) => {
-  const { error } = validate(req.body);
+  try {
+    const { error } = validate(req.body);
 
-  if (error) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
-  }
+    if (error) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+      );
+    }
 
-  const brandExits = await Brand.findOne({ name: req.body.name });
+    const brandExits = await Brand.findOne({ name: req.body.name });
 
-  if (brandExits) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, "Thương hiệu đã tồn tại"));
-  }
+    if (brandExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Thương hiệu đã tồn tại")
+      );
+    }
 
-  let id = await generateID(Brand);
+    let id = await generateID(Brand);
 
-  const newBrand = new Brand({
-    id,
-    ...req.body,
-  });
+    const newBrand = new Brand({
+      id,
+      ...req.body,
+    });
 
-  const brand = await newBrand.save();
+    const brand = await newBrand.save();
 
-  res
-    .status(StatusCode.CREATED)
-    .json(
+    res.json(
       jsonGenerate(StatusCode.CREATED, "Thêm thương hiệu thành công", brand)
     );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const getBrands = asyncHandler(async (req, res) => {
+  try {
+    const brands = await Brand.find();
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách thương hiệu thành công",
+        brands
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const getBrand = asyncHandler(async (req, res) => {
+  try {
+    const brand = await Brand.findById(req.params.id);
+
+    if (!brand) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thương hiệu")
+      );
+    }
+
+    res.json(jsonGenerate(StatusCode.OK, "Lấy thương hiệu thành công", brand));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const updateBrand = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const brand = await Brand.findById(id);
+
+    if (!brand) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thương hiệu")
+      );
+    }
+    const { error } = validate(req.body);
+
+    if (error) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+      );
+    }
+
+    await Brand.findByIdAndUpdate(id, req.body);
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật thương hiệu thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
+});
+
+export const deleteBrand = asyncHandler(async (req, res) => {
+  try {
+    const brand = await Brand.findById(req.params.id);
+
+    if (!brand) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thương hiệu")
+      );
+    }
+
+    await Brand.findByIdAndDelete(req.params.id);
+
+    res.json(jsonGenerate(StatusCode.OK, "Xóa thương hiệu thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+  }
 });
 
 const validate = (data) => {
