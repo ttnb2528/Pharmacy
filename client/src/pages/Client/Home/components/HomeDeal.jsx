@@ -1,0 +1,159 @@
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { useEffect, useState } from "react";
+import moment from "moment";
+import ItemDeal from "@/pages/component/ProductItem/ItemDeal.jsx";
+
+const HomeDeal = () => {
+  const [remainingTime, setRemainingTime] = useState(moment.duration(0));
+
+  const all_products = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  function SampleNextArrow(props) {
+    const { className, onClick } = props;
+
+    return (
+      <div
+        className={className}
+        // style={{ ...style, display: "block", background: "red" }}
+        onClick={onClick}
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          fillRule="evenodd"
+          clipRule="evenodd"
+        >
+          <path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm-3 5.753l6.44 5.247-6.44 5.263.678.737 7.322-6-7.335-6-.665.753z" />
+        </svg>
+      </div>
+    );
+  }
+
+  function SamplePrevArrow(props) {
+    const { className, onClick } = props;
+    return (
+      <div
+        className={className}
+        // style={{ ...style, display: "block", background: "green" }}
+        onClick={onClick}
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          fillRule="evenodd"
+          clipRule="evenodd"
+        >
+          <path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm3 5.753l-6.44 5.247 6.44 5.263-.678.737-7.322-6 7.335-6 .665.753z" />
+        </svg>
+      </div>
+    );
+  }
+  var settings = {
+    dots: false,
+    infinite: true,
+    speed: 1250,
+    lazyLoad: true,
+    slidesToShow: 5,
+    slidesToScroll: 5,
+    arrows: true,
+    autoplay: false,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          lazyLoad: true,
+          infinite: true,
+          dots: false,
+          arrows: true,
+          autoplay: true,
+          autoplaySpeed: 2000,
+          pauseOnHover: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          lazyLoad: true,
+          initialSlide: 2,
+          arrows: true,
+          autoplay: true,
+          autoplaySpeed: 2000,
+          pauseOnHover: true,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          lazyLoad: true,
+          arrows: true,
+          autoplay: true,
+          autoplaySpeed: 2000,
+          pauseOnHover: true,
+        },
+      },
+    ],
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = moment();
+      const midnight = moment().endOf("day");
+      const diff = moment.duration(midnight.diff(now));
+
+      setRemainingTime(diff);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div className="my-10 bg-white">
+      <div className="px-6 pt-6 pb-9 bg-[#fff8f9]">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold text-[#c31731]">
+            Săn Deal Chớp Nhoáng
+          </h1>
+          <div className="flex justify-end items-center text-white">
+            <h5 className="font-bold text-black text-2xl">Kết Thúc trong:</h5>
+            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+              {remainingTime.hours().toString().padStart(2, "0")}
+            </h5>
+            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+              {remainingTime.minutes().toString().padStart(2, "0")}
+            </h5>
+            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+              {remainingTime.seconds().toString().padStart(2, "0")}
+            </h5>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <Slider {...settings}>
+            {all_products.map((product, i) => {
+              // if (product.sale > 0) {
+              return <ItemDeal key={i} />;
+              // } else {
+              //   return null;
+              // }
+            })}
+          </Slider>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HomeDeal;
