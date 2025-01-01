@@ -8,7 +8,7 @@ export const Layout = () => {
       <div className="w-full bg-[rgb(38,119,61)] sticky z-30 top-0">
         <Navbar />
       </div>
-      <div className="content">
+      <div className="w-[80vw] mx-auto flex flex-col">
         <Outlet />
       </div>
       <div className="footer">

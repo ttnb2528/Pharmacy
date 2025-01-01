@@ -1,9 +1,12 @@
+import HomeBanner from "./components/HomeBanner.jsx";
 
 
 const Home = () => {
   return (
-    <div>Home</div>
-  )
-}
+    <div className="mt-4">
+      <HomeBanner />
+    </div>
+  );
+};
 
-export default Home
+export default Home;
