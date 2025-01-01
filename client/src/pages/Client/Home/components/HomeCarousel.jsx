@@ -9,7 +9,7 @@ import banner4 from "@/assets/banner/banner4.jpg";
 const HomeCarousel = () => {
   const banners = [banner1, banner2, banner3, banner4];
   const settings = {
-    dots: false,
+    dots: true,
     infinity: true,
     speed: 500,
     slidesToShow: 1,
@@ -19,18 +19,11 @@ const HomeCarousel = () => {
     autoplaySpeed: 2500,
   };
   return (
-    <div className="xl:block lg:block md:block">
-      <Slider
-        {...settings}
-        className="xl:w-[56rem] lg:w-[50rem] md:w-[46rem] sm:w-[36rem] sm:block"
-      >
+    <div>
+      <Slider {...settings}>
         {banners.map((banner, index) => (
           <div key={index}>
-            <img
-              src={banner}
-              alt="banner"
-              className="w-full rounded-lg h-[19rem]"
-            />
+            <img src={banner} alt="banner" className="w-full rounded-lg" />
           </div>
         ))}
       </Slider>
