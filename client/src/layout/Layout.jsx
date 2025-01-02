@@ -11,7 +11,7 @@ export const Layout = () => {
       <div className="w-[80vw] mx-auto flex flex-col">
         <Outlet />
       </div>
-      <div className="footer">
+      <div className="">
         <Footer />
       </div>
     </div>
