@@ -1,4 +1,5 @@
 import HomeBanner from "./components/HomeBanner.jsx";
+import HomeBestSelling from "./components/HomeBestSelling.jsx";
 import HomeDeal from "./components/HomeDeal.jsx";
 
 const Home = () => {
@@ -6,6 +7,7 @@ const Home = () => {
     <div className="mt-4">
       <HomeBanner />
       <HomeDeal />
+      <HomeBestSelling />
     </div>
   );
 };

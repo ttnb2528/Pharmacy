@@ -120,8 +120,8 @@ const HomeDeal = () => {
   }, []);
 
   return (
-    <div className="my-10 bg-white">
-      <div className="px-6 pt-6 pb-9 bg-[#fff8f9]">
+    <div className="my-10  rounded-lg overflow-hidden bg-[#fff8f9] px-3">
+      <div className="px-6 pt-6 pb-9 ">
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold text-[#c31731]">
             Săn Deal Chớp Nhoáng

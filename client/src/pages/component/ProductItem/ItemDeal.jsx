@@ -22,7 +22,7 @@ const ItemDeal = () => {
   };
   return (
     <div className="relative p-2" onMouseDown={handleMouseDown}>
-      <div className="product-card">
+      <div className="product-card  hover:border hover:border-red-300 hover:rounded-lg">
         <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
           <div className="product-card-image">
             <div className="relative">
@@ -60,7 +60,9 @@ const ItemDeal = () => {
           <div className="flex justify-center items-center my-3">
             <Button
               className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
-              onClick={() => alert("add to cart")}
+              onClick={() => {
+                alert("add to cart");
+              }}
             >
               Thêm giỏ hàng
             </Button>

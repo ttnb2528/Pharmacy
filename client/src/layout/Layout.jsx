@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export const Layout = () => {
   return (
-    <div className="h-[100vh] flex flex-col w-full">
+    <div className="h-full flex flex-col w-full bg-[#e5e5e5]">
       <div className="w-full bg-[#26773d] sticky z-30 top-0">
         <Navbar />
       </div>
