@@ -1,6 +1,7 @@
 import HomeBanner from "./components/HomeBanner.jsx";
 import HomeBestSelling from "./components/HomeBestSelling.jsx";
 import HomeDeal from "./components/HomeDeal.jsx";
+import HomeProductForGroup from "./components/HomeProductForGroup.jsx";
 
 const Home = () => {
   return (
@@ -8,6 +9,7 @@ const Home = () => {
       <HomeBanner />
       <HomeDeal />
       <HomeBestSelling />
+      <HomeProductForGroup />
     </div>
   );
 };

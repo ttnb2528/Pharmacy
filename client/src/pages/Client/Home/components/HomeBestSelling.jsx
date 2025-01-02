@@ -106,7 +106,7 @@ const HomeBestSelling = () => {
   };
   return (
     <div>
-      <div className="product_carousel bg-white rounded-lg px-3">
+      <div className="product_carousel bg-white rounded-lg px-3 mb-10">
         <div className="px-6 pt-6 pb-9 ">
           <div className="product_carousel-header mb-5">
             <span className="product_carousel-title text-3xl font-bold">
