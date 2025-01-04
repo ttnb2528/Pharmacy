@@ -1,7 +1,7 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Item from "@/pages/component/ProductItem/Item.jsx";
+import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { useState } from "react";
 

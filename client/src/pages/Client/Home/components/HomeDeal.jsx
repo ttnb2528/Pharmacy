@@ -3,7 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import ItemDeal from "@/pages/component/ProductItem/ItemDeal.jsx";
+import ItemDeal from "@/pages/Client/Product/ProductItem/ItemDeal.jsx";
 
 const HomeDeal = () => {
   const [remainingTime, setRemainingTime] = useState(moment.duration(0));

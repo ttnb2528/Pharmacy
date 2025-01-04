@@ -1,7 +1,7 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Item from "@/pages/component/ProductItem/Item.jsx";
+import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 const HomeSuggest = () => {
   const suggestProducts = [1, 2, 3, 4, 5];
 
