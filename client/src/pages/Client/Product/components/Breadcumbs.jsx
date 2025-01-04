@@ -15,7 +15,7 @@ const Breadcrumbs = (props) => {
   const { category, product } = props;
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="my-4">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>

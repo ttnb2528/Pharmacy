@@ -1,4 +1,5 @@
 import Breadcrumbs from "./components/Breadcumbs.jsx";
+import ListProduct from "./components/ListProduct.jsx";
 
 const Product = (props) => {
   const { title } = props;
@@ -6,6 +7,7 @@ const Product = (props) => {
   return (
     <div>
       <Breadcrumbs category={title} />
+      <ListProduct />
     </div>
   );
 };
