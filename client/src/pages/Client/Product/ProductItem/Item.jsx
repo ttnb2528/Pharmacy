@@ -1,9 +1,9 @@
 import test_product_image1 from "@/assets/test_product_image1.jpg";
 import { Button } from "@/components/ui/button.jsx";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
-const ItemDeal = () => {
+const Item = () => {
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = (e) => {
@@ -20,6 +20,12 @@ const ItemDeal = () => {
       e.preventDefault();
     }
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
   return (
     <div className=" p-2" onMouseDown={handleMouseDown}>
       <div className="product-card  hover:border hover:border-red-300 hover:rounded-lg">
@@ -68,4 +74,4 @@ const ItemDeal = () => {
   );
 };
 
-export default ItemDeal;
+export default Item;
