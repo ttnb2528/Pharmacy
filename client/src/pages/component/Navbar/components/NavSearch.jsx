@@ -18,9 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button.jsx";
+import { useState } from "react";
+import Login from "@/pages/Client/Home/components/Login.jsx";
 
 const NavSearch = () => {
+  const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
+
+  const handleShowLogin = () => {
+    setShowLogin(true);
+  };
   return (
     <div className="flex flex-wrap justify-between items-center relative gap-10">
       <div>
@@ -212,12 +219,16 @@ const NavSearch = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="bg-white rounded-full h-10 w-32 flex justify-center items-center gap-2 px-3">
+      <div
+        className="bg-white rounded-full h-10 w-32 flex justify-center items-center gap-2 px-3"
+        onClick={handleShowLogin}
+      >
         <FaUserCircle />
         <span className="hover:opacity-85 transition-all duration-200 cursor-pointer">
           Đăng nhập
         </span>
       </div>
+      {showLogin && <Login close={() => setShowLogin(false)}/>}
     </div>
   );
 };
