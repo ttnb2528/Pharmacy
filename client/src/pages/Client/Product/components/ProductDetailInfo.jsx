@@ -1,0 +1,239 @@
+import { Button } from "@/components/ui/button.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
+import { useState } from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
+
+const ProductDetailInfo = () => {
+  const [qty, setQty] = useState(1);
+
+  const handleDecrease = () => {
+    if (qty > 1) {
+      setQty(qty - 1);
+    }
+  };
+
+  const handleIncrease = () => {
+    setQty(qty + 1);
+  };
+  return (
+    <div>
+      <div className="flex flex-col">
+        <div className="flex flex-col px-4 md:px-0">
+          <div className="grid grid-cols-[1fr,calc(24rem/16)] gap-4 md:grid-cols-1 mb-2">
+            <h1
+              title="Sữa bột ít đường Calosure Gold (900g)"
+              className="line-clamp-3 text-base font-semibold text-neutral-900 md:text-xl md:font-bold"
+            >
+              Sữa bột ít đường Calosure Gold (900g)
+            </h1>
+          </div>
+
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <div className="flex content-start items-center space-x-1 py-[calc(2rem/16)]">
+              <p className="text-sm leading-5 text-neutral-600">P22808</p>
+              <span className="h-1 w-1 rounded-full bg-neutral-600"></span>
+              <span className="text-sm leading-5">
+                Thương hiệu: Calosure Gold
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-row items-center md:mb-1">
+            <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
+              Giảm 10%
+            </span>
+            <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+              519.800&nbsp;₫
+            </del>
+          </div>
+
+          <div className="text-xl font-bold md:mb-2 md:text-[28px]">
+            467.820&nbsp;₫/Lon
+          </div>
+
+          <p className="text-[12px] leading-[20px] font-normal text-neutral-700 md:text-sm mb-1.5 md:mb-1">
+            Giá đã bao gồm thuế. Phí vận chuyển và các chi phí khác (nếu có) sẽ
+            được thể hiện khi đặt hàng.
+          </p>
+
+          <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
+            <span className="text-xs font-semibold text-gold-500 md:text-sm">
+              Tích lũy từ 4.678 P-Xu vàng
+            </span>
+            <div>
+              <span className="inline-flex align-[-0.175em] justify-center max-h-full max-w-full h-3 w-3 items-center text-neutral-700 md:h-4 md:w-4">
+                <svg
+                  viewBox="0 0 25 25"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12.5 2.5C7 2.5 2.5 7 2.5 12.5C2.5 18 7 22.5 12.5 22.5C18 22.5 22.5 18 22.5 12.5C22.5 7 18 2.5 12.5 2.5ZM12.5 18.75C11.81 18.75 11.25 18.19 11.25 17.5C11.25 16.81 11.81 16.25 12.5 16.25C13.19 16.25 13.75 16.81 13.75 17.5C13.75 18.19 13.19 18.75 12.5 18.75ZM14.5288 12.615C13.9075 13.1488 13.75 13.3287 13.75 13.75C13.75 14.4412 13.19 15 12.5 15C11.81 15 11.25 14.4412 11.25 13.75C11.25 12.1325 12.2437 11.28 12.9025 10.7162C13.5237 10.185 13.6812 10.0037 13.6812 9.58375C13.6812 9.355 13.6813 8.75 12.5013 8.75C11.9563 8.78 11.375 9.03 10.9288 9.45125C10.4275 9.92375 9.635 9.9 9.16125 9.4C8.6875 8.8975 8.71 8.10625 9.2125 7.6325C10.09 6.80625 11.2337 6.315 12.4362 6.2525H12.44C14.705 6.2525 16.1812 7.59125 16.1812 9.585C16.1812 11.2013 15.1875 12.0538 14.53 12.6163L14.5288 12.615Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex content-center justify-between mb-3 md:mb-4">
+            <div className="flex items-center justify-start space-x-1 ">
+              <div className="flex items-center justify-start">
+                <div className="h-6 w-6 ">
+                  <span className="inline-flex align-[-0.125em] justify-center max-h-full max-w-full w-4 h-4 text-neutral-700">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="25"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 25 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M17.22 2a6.2 6.2 0 0 0-4.72 2.16A6.2 6.2 0 0 0 7.78 2a6.26 6.26 0 0 0-4.55 10.58l8.55 8.9a1 1 0 0 0 1.44 0l8.55-8.9h.01A6.26 6.26 0 0 0 17.22 2Z"
+                      ></path>
+                    </svg>
+                  </span>
+                </div>
+                <div className="flex items-center justify-start space-x-1 text-sm">
+                  <p className="text-neutral-900">40.9k</p>
+                </div>
+              </div>
+              <span className="h-[12px] w-[1px] bg-neutral-500"></span>
+              <p className="text-sm text-neutral-900">Đã bán 6.6k</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col space-y-4 mb-5">
+            <div className="flex gap-10 items-center">
+              <label className="font-medium text-lg">Sẵn có:</label>
+              <span className="text-left text-green-400 font-semibold text-lg">
+                Còn hàng
+              </span>
+            </div>
+            <div className="flex gap-10">
+              <label className="font-medium text-lg">Số lượng:</label>
+              <div className="w-36 flex">
+                <Button
+                  className="rounded-l-full rounded-r-none bg-green-500 hover:bg-green-600"
+                  onClick={handleDecrease}
+                >
+                  <FaMinus style={{ width: "12px", height: "12px" }} />
+                </Button>
+                <Input
+                  className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
+                  value={qty}
+                />
+                <Button
+                  className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
+                  onClick={handleIncrease}
+                >
+                  <FaPlus style={{ width: "12px", height: "12px" }} />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="mb-5">
+            <Button className="w-full bg-green-500 hover:bg-green-600">
+              <span className="text-sm font-semibold text-white">
+                Thêm vào giỏ hàng
+              </span>
+            </Button>
+          </div>
+
+          <Separator />
+
+          <div className="my-3 md:mb-4">
+            <div className="space-y-3">
+              <span className="w-fit text-sm font-semibold text-neutral-900">
+                Phân loại sản phẩm
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <Button className="relative flex justify-center outline-none font-semibold bg-white border border-solid disabled:border-neutral-200 disabled:text-neutral-600 disabled:!bg-white text-sm px-4 py-2 items-center rounded-lg h-8 min-w-[82px] md:h-8 text-neutral-900 hover:text-white hover:bg-green-600 md:hover:border-green-600 md:hover:text-neutral-200">
+                  <span>Lon</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="-mx-4 mb-4 grid gap-4 md:mx-0">
+            <div className="grid gap-2">
+              <div className="grid grid-flow-col justify-between pb-2 pe-4 md:pe-0">
+                <h4 className="text-base leading-[24px] relative whitespace-nowrap bg-green-500 px-4 font-semibold text-white">
+                  Khuyến mãi
+                  <span className="absolute right-0 top-0 block h-0 w-0 border-b-[12px] border-r-[8px] border-t-[12px] border-white border-b-transparent border-t-transparent"></span>
+                </h4>
+              </div>
+              <div className="grid gap-2 px-4 md:px-0">
+                <div className="grid grid-flow-col items-start justify-start gap-1.5">
+                  <div className="relative h-6 w-6 shrink-0">
+                    <img
+                      className="object-cover"
+                      src="https://prod-cdn.pharmacity.io/e-com/images/ecommerce/20240222060820-0-Group.png"
+                      alt="Icon of Deal Giảm 10%"
+                      loading="lazy"
+                      width="500"
+                      height="500"
+                      sizes="(max-width: 768px) 3rem, 3rem"
+                    />
+                  </div>
+                  <p className="text-[12px] leading-[20px] first-letter:uppercase md:text-sm">
+                    <span className="inline pe-1 font-semibold">
+                      Deal Giảm 10%
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="gap-3 md:gap-4 mb-3 grid md:mb-4">
+            <div className="grid gap-3 md:gap-2">
+              <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
+                <p className="text-[14px] leading-[20px] font-semibold md:text-base">
+                  Danh mục
+                </p>
+                <div className="md:text-base">Sữa bột</div>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
+                <p className="text-[14px] leading-[20px] font-semibold md:text-base">
+                  Công dụng
+                </p>
+                <div className="md:text-base">
+                  Sữa bột ít đường Calosure Gold dành cho người trung niên, lớn
+                  tuổi có vấn đề về tiêu hóa, tim mạch và xương khớp
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
+                <p className="text-[14px] leading-[20px] font-semibold md:text-base">
+                  Nhà sản xuất
+                </p>
+                <div className="md:text-base">VitaDairy</div>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
+                <p className="text-[14px] leading-[20px] font-semibold md:text-base">
+                  Quy cách
+                </p>
+                <div className="md:text-base">900g</div>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
+                <p className="text-[14px] leading-[20px] font-semibold md:text-base">
+                  Lưu ý
+                </p>
+                <div className="md:text-base">
+                  Mọi thông tin trên đây chỉ mang tính chất tham khảo. Đọc kỹ
+                  hướng dẫn sử dụng trước khi dùng
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetailInfo;
