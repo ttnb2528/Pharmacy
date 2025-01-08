@@ -34,7 +34,7 @@ const ProductDetailRight = () => {
               <div className="flex flex-col">
                 <h1 className="text-lg font-medium">Miễn phí vận chuyển</h1>
                 <span className="text-neutral-500">
-                  Cho hóa đơn từ 300.000&nbsp;₫
+                  Cho mọi đơn hàng từ 0đ
                 </span>
               </div>
             </div>

@@ -205,12 +205,12 @@ const NavSearch = () => {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup className="flex justify-between mb-3">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/cart")}>
               <Button className="bg-white text-[#f48120] border-[#f48120] border hover:bg-[#f48120] hover:text-white transition-all duration-300">
                 Xem giỏ hàng
               </Button>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/checkout")}>
               <Button className="bg-[#0e562e] hover:bg-[#227748]">
                 Thanh toán
               </Button>
@@ -228,7 +228,7 @@ const NavSearch = () => {
           Đăng nhập
         </span>
       </div>
-      {showLogin && <Login close={() => setShowLogin(false)}/>}
+      {showLogin && <Login close={() => setShowLogin(false)} />}
     </div>
   );
 };
