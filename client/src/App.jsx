@@ -6,6 +6,14 @@ import Product from "./pages/Client/Product/Product.jsx";
 import ProductDisplay from "./pages/Client/Product/ProductDisplay.jsx";
 import Cart from "./pages/Client/Cart/Cart.jsx";
 import Checkout from "./pages/Client/Cart/Checkout.jsx";
+import Account from "./pages/Client/Account/Account.jsx";
+import PersonalInfo from "./pages/Client/Account/components/PersonalInfo.jsx";
+import OrderHistory from "./pages/Client/Account/components/OrderHistory.jsx";
+import Coupons from "./pages/Client/Account/components/Coupons.jsx";
+import Addresses from "./pages/Client/Account/components/Addresses.jsx";
+import PointsHistory from "./pages/Client/Account/components/PointsHistory.jsx";
+import PointsPolicy from "./pages/Client/Account/components/PointsPolicy.jsx";
+import UpdatePassword from "./pages/Client/Account/components/UpdatePassword.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -60,6 +68,19 @@ const App = () => {
         {
           path: "/checkout",
           element: <Checkout />,
+        },
+        {
+          path: "/account",
+          element: <Account />,
+          children: [
+            { path: "info", element: <PersonalInfo /> },
+            { path: "history", element: <OrderHistory /> },
+            { path: "coupons", element: <Coupons /> },
+            { path: "addresses", element: <Addresses /> },
+            { path: "points", element: <PointsHistory /> },
+            { path: "policy", element: <PointsPolicy /> },
+            { path: "info/update-password", element: <UpdatePassword /> },
+          ],
         },
       ],
     },
