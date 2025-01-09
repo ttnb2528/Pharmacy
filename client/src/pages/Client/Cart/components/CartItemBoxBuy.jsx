@@ -10,8 +10,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CartItemBoxBuy = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
 
@@ -121,7 +123,10 @@ const CartItemBoxBuy = () => {
               </p>
             </div>
           </div>
-          <Button className="bg-green-500 hover:bg-green-600 text-lg font-bold">
+          <Button
+            className="bg-green-500 hover:bg-green-600 text-lg font-bold"
+            onClick={() => navigate("/checkout")}
+          >
             Mua hàng
             <span className="ms-1 md:inline inline">(3)</span>
           </Button>

@@ -5,6 +5,7 @@ import { Layout } from "./layout/Layout.jsx";
 import Product from "./pages/Client/Product/Product.jsx";
 import ProductDisplay from "./pages/Client/Product/ProductDisplay.jsx";
 import Cart from "./pages/Client/Cart/Cart.jsx";
+import Checkout from "./pages/Client/Cart/Checkout.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -55,6 +56,10 @@ const App = () => {
         {
           path: "/cart",
           element: <Cart />,
+        },
+        {
+          path: "/checkout",
+          element: <Checkout />,
         },
       ],
     },
