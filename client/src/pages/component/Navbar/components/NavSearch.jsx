@@ -18,12 +18,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button.jsx";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Login from "@/pages/Client/Home/components/Login.jsx";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
+import { FaRegUserCircle } from "react-icons/fa";
+import { LuNotepadText } from "react-icons/lu";
+import { GrMapLocation } from "react-icons/gr";
+import { IoIosLogOut } from "react-icons/io";
+import userAvatar from "@/assets/user_avatar.jpg";
+import { apiClient } from "@/lib/api-client.js";
+import { LOGOUT_ROUTE } from "@/API/index.api.js";
 
 const NavSearch = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
+  const { userData } = useContext(PharmacyContext);
+
+  console.log(userData);
 
   const handleShowLogin = () => {
     setShowLogin(true);
@@ -39,12 +51,13 @@ const NavSearch = () => {
       <div className="relative flex-1">
         <input
           type="text"
-          className="w-full h-8 rounded border-none bg-white p-2 outline-none"
+          className="w-full h-10 rounded border-none bg-white p-2 outline-none"
           placeholder="Tìm kiếm sản phẩm..."
         />
-        <FaSearch className="absolute right-2 top-2" />
+        <FaSearch className="absolute right-3 top-3" />
       </div>
 
+      {/* cart */}
       <DropdownMenu>
         <DropdownMenuTrigger className="text-[#fff] py-[2px] flex border-none">
           <div className="bg-[#0e562e] rounded px-[10px] py-[2px] mx-auto flex items-center h-10 w-32 box-border cursor-pointer">
@@ -219,15 +232,105 @@ const NavSearch = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div
-        className="bg-white rounded-full h-10 w-32 flex justify-center items-center gap-2 px-3"
-        onClick={handleShowLogin}
-      >
-        <FaUserCircle />
-        <span className="hover:opacity-85 transition-all duration-200 cursor-pointer">
-          Đăng nhập
-        </span>
-      </div>
+      {/* user */}
+      {userData ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div
+              // variant="outline"
+              className="bg-white rounded-full h-10 flex w-40 items-center gap-2 px-3 focus-visible:ring-0"
+            >
+              <img
+                src={userAvatar}
+                alt="avatar user"
+                className="h-8 w-8 rounded-full object-cover"
+              />
+              <div className="line-clamp-1 flex-1 text-left text-xs font-bold">
+                {userData.name ? `Chào, ${userData.name}` : "Chào, Khach Hang"}
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 right-10 top-1 relative ">
+            <DropdownMenuGroup className="space-y-2">
+              <DropdownMenuItem
+                className="flex items-center"
+                onClick={() => navigate("/account/info")}
+              >
+                <FaRegUserCircle /> Thông tin cá nhân
+              </DropdownMenuItem>
+
+              <Separator />
+
+              <DropdownMenuItem
+                className="flex items-center"
+                onClick={() => navigate("/account/history")}
+              >
+                <LuNotepadText /> Lịch sử đơn hàng
+              </DropdownMenuItem>
+
+              <Separator />
+
+              <DropdownMenuItem
+                className="flex items-center"
+                onClick={() => navigate("/account/coupons")}
+              >
+                <svg
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-6 h-6 "
+                  height="1em"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M2 9a3 3 0 1 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 1 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                  <path d="M9 9h.01"></path>
+                  <path d="m15 9-6 6"></path>
+                  <path d="M15 15h.01"></path>
+                </svg>
+                Mã giảm giá
+              </DropdownMenuItem>
+
+              <Separator />
+
+              <DropdownMenuItem
+                className="flex items-center"
+                onClick={() => navigate("/account/addresses")}
+              >
+                <GrMapLocation />
+                Sổ tay địa chỉ
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              className="flex items-center"
+              onClick={async () => {
+                localStorage.removeItem("token");
+                await apiClient.post(LOGOUT_ROUTE);
+                window.location.reload();
+              }}
+            >
+              <IoIosLogOut />
+              Đăng xuất
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div
+          className="bg-white rounded-full h-10 w-32 flex justify-center items-center gap-2 px-3"
+          onClick={handleShowLogin}
+        >
+          <FaUserCircle />
+          <span className="hover:opacity-85 transition-all duration-200 cursor-pointer">
+            Đăng nhập
+          </span>
+        </div>
+      )}
       {showLogin && <Login close={() => setShowLogin(false)} />}
     </div>
   );

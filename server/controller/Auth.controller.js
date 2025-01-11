@@ -76,9 +76,11 @@ export const login = asyncHandler(async (req, res) => {
       const user = populatedUser.toObject();
       delete user.accountId.password;
 
-      generateToken(res, userExist._id);
+      const token = generateToken(res, userExist._id);
 
-      res.json(jsonGenerate(StatusCode.OK, "Đăng nhập thành công", user));
+      res.json(
+        jsonGenerate(StatusCode.OK, "Đăng nhập thành công", { user, token })
+      );
 
       return;
     } else {

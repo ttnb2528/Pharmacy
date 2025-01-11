@@ -1,14 +1,99 @@
+import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input";
+import { apiClient } from "@/lib/api-client.js";
+import { useAppStore } from "@/store/index.js";
+import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
+import { toast } from "sonner";
 
 const Login = ({ close }) => {
+  const { setUserInfo } = useAppStore();
+
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+
+  const isButtonDisabled = isLogin
+    ? !email || !password
+    : !email || !password || !confirmPassword;
+
+  const validateLogin = () => {
+    if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      toast.error("Email không hợp lệ");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Mật khẩu không được để trống");
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      if (validateLogin()) {
+        const res = await apiClient.post(LOGIN_ROUTE, { email, password });
+        console.log(res.data);
+        if (res.status === 200 && res.data.status === 200) {
+          setUserInfo(res.data.data);
+          localStorage.setItem("token", res.data.data.token);
+
+          window.location.replace("/");
+        } else {
+          toast.error(res.data.message);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const validateSignup = () => {
+    if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      toast.error("Email không hợp lệ");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Mật khẩu không được để trống");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Mật khẩu không khớp");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    try {
+      if (validateSignup()) {
+        const res = await apiClient.post(SIGNUP_ROUTE, { email, password });
+        if (res.status === 200 && res.data.status === 201) {
+          toast.success(res.data.message);
+          setUserInfo(res.data.data);
+          setIsLogin(true);
+        }
+        // console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 bottom-0 right-0 bg-black/30 flex justify-center items-center">
       <div
         className="grid focus-visible:outline-0 md:block px-4 md:px-6 pt-28 pb-6 left-0 fixed bottom-0 right-0 top-0 z-50 w-full 
-                    gap-4 border bg-background shadow-lg duration-200 md:left-[50%] md:h-fit md:max-h-[90%] md:w-full md:translate-x-[-50%] 
-                    md:rounded-lg overflow-x-hidden border-white md:top-[15%] md:max-w-[413px] md:translate-y-0 md:border-neutral-200 md:pt-6"
+                    gap-4 border bg-background shadow-lg duration-200 md:left-[50%] md:h-fit md:max-h-[95%] md:w-full md:translate-x-[-50%] 
+                    md:rounded-lg overflow-x-hidden border-white md:top-[5%] md:max-w-[413px] md:translate-y-0 md:border-neutral-200 md:pt-6"
       >
         <IoIosClose
           className="absolute right-2 top-4 text-5xl"
@@ -16,9 +101,10 @@ const Login = ({ close }) => {
         />
         <div className="mb-5">
           <h2 className="text-2xl font-bold uppercase pb-3">XIN CHÀO,</h2>
-          <span>Vui lòng nhập số điện thoại để tiếp tục</span>
+          {/* <span>Vui lòng nhập số điện thoại để tiếp tục</span> */}
+          <span>Vui lòng nhập email, mật khẩu để tiếp tục</span>
         </div>
-        <form className="space-y-4">
+        {/* <form className="space-y-4">
           <div className="space-y-2">
             <label className="leading-none w-fit font-semibold">
               Số điện thoại
@@ -40,6 +126,93 @@ const Login = ({ close }) => {
           <Button
             type="submit"
             className="relative flex justify-center outline-none font-semibold border-0 w-full text-base px-5 py-2.5 h-12 items-center rounded-lg cursor-not-allowed bg-neutral-100 hover:bg-neutral-100 hover:text-neutral-600 focus:ring-neutral-100 text-neutral-600"
+          >
+            <span>Tiếp tục</span>
+          </Button>
+        </form> */}
+
+        <form className="space-y-5">
+          <div className="space-y-2">
+            <div>
+              <label className="leading-none w-fit font-semibold">Email</label>
+            </div>
+
+            <div className="relative flex">
+              <Input
+                className="w-full border border-neutral-500 text-neutral-900 rounded-lg placeholder:text-neutral-600 font-semibold outline-none text-lg p-4 h-13.5"
+                placeholder="Nhập email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={handleEmailChange}
+              />
+            </div>
+
+            <div>
+              <label className="leading-none w-fit font-semibold">
+                Mật khẩu
+              </label>
+            </div>
+
+            <div className="relative flex">
+              <Input
+                className="w-full border border-neutral-500 text-neutral-900 rounded-lg placeholder:text-neutral-600 font-semibold outline-none text-lg p-4 h-13.5"
+                placeholder="Nhập mật khẩu"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
+            </div>
+
+            {!isLogin && (
+              <>
+                <div>
+                  <label className="leading-none w-fit font-semibold">
+                    Nhập lại mật khẩu
+                  </label>
+                </div>
+
+                <div className="relative flex">
+                  <Input
+                    className="w-full border border-neutral-500 text-neutral-900 rounded-lg placeholder:text-neutral-600 font-semibold outline-none text-lg p-4 h-13.5"
+                    placeholder="Nhập mật khẩu"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                  />
+                </div>
+              </>
+            )}
+
+            {isLogin ? (
+              <div className="relative flex justify-end text-xs my-2">
+                Chưa có tài khoản?,
+                <span
+                  className="text-green-600 cursor-pointer ml-1"
+                  onClick={() => setIsLogin(false)}
+                >
+                  đăng ký ngay
+                </span>
+              </div>
+            ) : (
+              <div className="relative flex justify-end text-xs my-2">
+                Đã có tài khoản?,
+                <span
+                  className="text-green-600 cursor-pointer ml-1"
+                  onClick={() => setIsLogin(true)}
+                >
+                  đăng nhập ngay
+                </span>
+              </div>
+            )}
+          </div>
+
+          <Button
+            disabled={isButtonDisabled}
+            className="relative flex justify-center outline-none font-semibold border-0 w-full text-base px-5 py-2.5 h-12 items-center rounded-lg disabled:bg-neutral-100 disabled:text-neutral-700 bg-green-500 hover:bg-green-600 focus:ring-neutral-100 text-white"
+            onClick={isLogin ? handleLogin : handleSignup}
           >
             <span>Tiếp tục</span>
           </Button>

@@ -14,6 +14,20 @@ export const getCustomers = asyncHandler(async (req, res) => {
   }
 });
 
+export const getUserInfo = asyncHandler(async (req, res) => {
+  const userData = await Account.findById(req.user._id);
+
+  if (!userData) {
+    return res.status(404).send("không tìm thấy thông tin người dùng");
+  }
+
+  const populatedUser = await Customer.findOne({
+    accountId: req.user._id,
+  }).populate("accountId");
+
+  res.json(jsonGenerate(StatusCode.OK, "Thành công", populatedUser));
+});
+
 export const getCustomerById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;

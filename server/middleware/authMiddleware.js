@@ -22,8 +22,6 @@ export const authenticate = asyncHandler(async (req, res, next) => {
         throw new Error("Not authorize, invalid user.");
       }
 
-      console.log(req.user);
-
       next();
     } catch (error) {
       res.status(401);

@@ -3,6 +3,7 @@ import {
   deleteCustomer,
   getCustomerById,
   getCustomers,
+  getUserInfo,
   updateCustomer,
 } from "../controller/User.controller.js";
 import {
@@ -13,6 +14,7 @@ import {
 
 const router = express.Router();
 
+router.get("/getUserInfo", authenticate, getUserInfo);
 router.get("/:id", authenticate, getCustomerById);
 router.put("/profile/:id", authenticate, updateCustomer);
 
