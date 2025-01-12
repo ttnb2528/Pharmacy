@@ -29,8 +29,13 @@ const PharmacyContextProvider = (props) => {
     fetchUserData();
   }, []);
 
+  const updateUserData = (newUserData) => {
+    setUserData(newUserData);
+  };
+
   const contextValue = {
     userData,
+    updateUserData
   };
 
   return (

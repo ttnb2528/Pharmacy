@@ -1,8 +1,14 @@
+import { useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { apiClient } from "@/lib/api-client.js";
+import Loading from "@/pages/component/Loading.jsx";
+
+// UI Components
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
-
-import { useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -20,15 +26,102 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.jsx";
+import { toast } from "sonner";
 
-import { FaChevronRight } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+// Icon
+import { FaChevronRight, FaPlus, FaTrash } from "react-icons/fa";
+
+// Router
+import {
+  ADD_PROFILE_IMAGE_ROUTE,
+  REMOVE_PROFILE_IMAGE_ROUTE,
+} from "@/API/index.api.js";
 
 const PersonalInfo = () => {
+  const { userData, updateUserData } = useContext(PharmacyContext);
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
   const [date, setDate] = useState(new Date());
+
+  const fileInputRef = useRef(null);
+
+  // Data state
+  const [name, setName] = useState(userData?.name || "");
+  const [gender, setGender] = useState(userData?.gender || "");
+  const [phone, setPhone] = useState(userData?.phone || "");
+  const [email, setEmail] = useState(userData?.accountId?.email || "");
+  const [avatar, setAvatar] = useState(userData?.avatar || "");
+
+  const [hovered, setHovered] = useState(false);
+
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    setIsLoading(true);
+    try {
+      const file = e.target.files[0];
+
+      if (file) {
+        console.log(file);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", import.meta.env.VITE_PROFILE_PRESET);
+        console.log(formData);
+
+        const res = await fetch(import.meta.env.VITE_CLOUDINARY_IMAGE_URL, {
+          method: "POST",
+          body: formData,
+        });
+
+        console.log(res);
+
+        if (res.status === 200) {
+          const data = await res.json();
+
+          const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, {
+            avatar: data.secure_url,
+          });
+
+          console.log(response);
+
+          if (response.status === 200 && response.data.status === 200) {
+            toast.success("Ảnh đã được cập nhật");
+            updateUserData({ ...userData, avatar: data.secure_url });
+          } else {
+            toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    setIsLoading(true);
+    try {
+      const res = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE);
+      if (res.status === 200) {
+        updateUserData({ ...userData, avatar: null });
+        toast.success("Ảnh đã được xóa");
+        setAvatar(null);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
+      {isLoading && <Loading />}
       <div>
         <div className="items-center space-x-4 mb-4 hidden md:block">
           <div className="flex-1">
@@ -46,26 +139,62 @@ const PersonalInfo = () => {
               <span className="text-sm font-semibold text-neutral-900">
                 Ảnh đại diện
               </span>
-              <div className="mt-2 flex items-center gap-6">
+              <div
+                className="mt-2 flex items-center gap-6 relative "
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+              >
                 {/* logic set image */}
-                <img src="" alt="image" />
+                <Avatar className="w-20 h-20">
+                  {userData?.avatar ? (
+                    <AvatarImage
+                      src={userData?.avatar}
+                      alt="User avatar"
+                      className="object-cover w-full h-full bg-black"
+                    />
+                  ) : (
+                    // <AvatarFallback className="border border-green-400 bg-green-400 text-white">
+                    //   <span className="text-xl font-bold">
+                    //     {userData?.name ? userData.name : "KH"}
+                    //   </span>
+                    // </AvatarFallback>
+
+                    <div className="uppercase h-20 w-20 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
+                      {userData?.name ? userData.name : "KH"}
+                    </div>
+                  )}
+                </Avatar>
+                {hovered && (
+                  <div
+                    className="absolute inset-0 top-1 flex items-center w-20 h-20 justify-center bg-black/50 ring-fuchsia-50 rounded-full"
+                    onClick={
+                      userData?.avatar
+                        ? handleDeleteImage
+                        : handleFileInputClick
+                    }
+                  >
+                    {userData?.avatar ? (
+                      <FaTrash className="text-white text-xl cursor-pointer" />
+                    ) : (
+                      <FaPlus className="text-white text-xl cursor-pointer" />
+                    )}
+                  </div>
+                )}
                 <div>
                   <div className="mb-2 flex">
-                    <button
-                      data-size="sm"
-                      type="button"
-                      className="relative flex justify-center outline-none font-semibold bg-neutral-200 border-0 hover:bg-neutral-300 focus:ring-neutral-300 text-neutral-900 h-9 items-center rounded-lg p-4 text-sm"
-                      onClick={() => {
-                        document.getElementById("picture").click();
-                      }}
+                    <Button
+                      className="bg-neutral-300 text-neutral-900 hover:bg-neutral-200"
+                      onClick={handleFileInputClick}
                     >
                       <span>Cập nhật ảnh mới</span>
-                    </button>
+                    </Button>
                     <input
+                      ref={fileInputRef}
                       id="picture"
                       className="hidden"
                       accept=".jpg, .jpeg, .png, .heic, .heif"
                       type="file"
+                      onChange={handleAvatarChange}
                     ></input>
                   </div>
                   <div className="grid text-sm font-medium text-neutral-700">
@@ -131,29 +260,45 @@ const PersonalInfo = () => {
                       </Select>
                     </div>
                   </div>
-                  <div className="col-span-1 grid gap-4 border-l border-divider pl-5">
-                    <div className="flex justify-between">
+
+                  <div className="col-span-1 grid gap-3 border-l border-divider pl-5">
+                    {/* <div className="flex justify-between">
                       <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
                         <p className="">Số điện thoại</p>
                         <p className="font-medium text-neutral-600 break-all">
                           **** *** 764
                         </p>
                       </div>
+                    </div> */}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Số điện thoại</Label>
+                      <Input id="phone" placeholder="Số điện thoại" />
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" placeholder="Email" />
+                    </div>
+
+                    {/* <div className="flex justify-between">
                       <div className="flex-1">
                         <Label htmlFor="email">Email</Label>
                         <Input id="email" placeholder="Email" />
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="flex justify-between">
                       <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
                         <p className="">Mật khẩu</p>
                         <div className="text-sm font-medium">Tạo mật khẩu</div>
                       </div>
-                      <div className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal" onClick={() => navigate("/account/info/update-password")}>
+                      <div
+                        className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
+                        onClick={() =>
+                          navigate("/account/info/update-password")
+                        }
+                      >
                         <span className="cursor-pointer text-green-500">
                           Cập nhật
                         </span>

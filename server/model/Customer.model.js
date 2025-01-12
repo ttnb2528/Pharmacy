@@ -21,6 +21,10 @@ const CustomerSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  avatar: {
+    type: String,
+    default: null,
+  },
   address: [
     {
       type: String,

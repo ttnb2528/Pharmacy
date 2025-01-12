@@ -1,9 +1,11 @@
 import express from "express";
 import {
+  addProfileImage,
   deleteCustomer,
   getCustomerById,
   getCustomers,
   getUserInfo,
+  removeProfileImage,
   updateCustomer,
 } from "../controller/User.controller.js";
 import {
@@ -14,6 +16,8 @@ import {
 
 const router = express.Router();
 
+router.post("/add-profile-image", authenticate, addProfileImage);
+router.delete("/remove-profile-image", authenticate, removeProfileImage);
 router.get("/getUserInfo", authenticate, getUserInfo);
 router.get("/:id", authenticate, getCustomerById);
 router.put("/profile/:id", authenticate, updateCustomer);

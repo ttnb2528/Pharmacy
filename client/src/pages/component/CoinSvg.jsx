@@ -8,7 +8,7 @@ const CoinSvg = () => {
         x="0px"
         y="0px"
         viewBox="0 0 2122 2122"
-        style={{ "enable-background": "new 0 0 2122 2122" }}
+        style={{ "enableBackground": "new 0 0 2122 2122" }}
         xmlSpace="preserve"
       >
         <g>

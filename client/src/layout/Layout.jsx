@@ -3,6 +3,7 @@ import Navbar from "@/pages/component/Navbar/Navbar.jsx";
 import { Outlet } from "react-router-dom";
 
 export const Layout = () => {
+
   return (
     <div className="h-full flex flex-col w-full bg-[#e5e5e5]">
       <div className="w-full bg-[#26773d] z-30 ">
