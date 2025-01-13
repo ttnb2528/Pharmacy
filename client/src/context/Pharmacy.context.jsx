@@ -20,7 +20,11 @@ const PharmacyContextProvider = (props) => {
     const fetchUserData = async () => {
       try {
         const resUser = await apiClient.get(GET_USER_INFO);
-        setUserData(resUser.data.data);
+        if (resUser.status === 200) {
+          setUserData(resUser.data.data);
+        } else if (resUser.status === 500) {
+          setUserData(null);
+        }
       } catch (error) {
         console.error("Lỗi khi lấy thông tin người dùng:", error);
       }
@@ -35,7 +39,7 @@ const PharmacyContextProvider = (props) => {
 
   const contextValue = {
     userData,
-    updateUserData
+    updateUserData,
   };
 
   return (

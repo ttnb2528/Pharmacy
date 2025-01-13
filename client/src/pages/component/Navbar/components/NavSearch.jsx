@@ -34,8 +34,6 @@ const NavSearch = () => {
   const navigate = useNavigate();
   const { userData } = useContext(PharmacyContext);
 
-  console.log(userData);
-
   const handleShowLogin = () => {
     setShowLogin(true);
   };

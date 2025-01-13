@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import Account from "../model/Account.model.js";
 import Staff from "../model/Staff.model.js";
 import asyncHandler from "./asyncHandler.js";
+import { jsonGenerate } from "../utils/helpers.js";
+import { StatusCode } from "../utils/constants.js";
 
 export const authenticate = asyncHandler(async (req, res, next) => {
   let token;
@@ -18,20 +20,21 @@ export const authenticate = asyncHandler(async (req, res, next) => {
       }
 
       if (!req.user) {
-        res.status(401);
-        throw new Error("Not authorize, invalid user.");
+        return res.json(
+          jsonGenerate(StatusCode.UNAUTHORIZED, "Not authorize, invalid user.")
+        );
       }
 
       next();
     } catch (error) {
-      res.status(401);
-      console.log(error);
-
-      throw new Error("Not authorize, token failed.");
+      return res.json(
+        jsonGenerate(StatusCode.UNAUTHORIZED, "Not authorize, token failed.")
+      );
     }
   } else {
-    res.status(401);
-    throw new Error("Not authorize, no token.");
+    return res.json(
+      jsonGenerate(StatusCode.UNAUTHORIZED, "Not authorize, no token.")
+    );
   }
 });
 

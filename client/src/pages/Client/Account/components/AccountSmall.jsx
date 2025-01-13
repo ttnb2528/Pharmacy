@@ -16,6 +16,7 @@ import { LuNotepadText } from "react-icons/lu";
 import { GrMapLocation } from "react-icons/gr";
 import { PiMedal } from "react-icons/pi";
 import { PiHandCoins } from "react-icons/pi";
+import { getInitials } from "@/utils/getInitialName.jsx";
 
 const AccountSmall = () => {
   const { userData } = useContext(PharmacyContext);
@@ -35,7 +36,7 @@ const AccountSmall = () => {
                   />
                 ) : (
                   <div className="uppercase h-16 w-16 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
-                    {userData?.name ? userData.name : "KH"}
+                    {userData?.name ? getInitials(userData.name) : "KH"}
                   </div>
                 )}
               </Avatar>

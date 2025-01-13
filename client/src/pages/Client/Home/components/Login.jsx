@@ -2,6 +2,7 @@ import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/api-client.js";
+import Loading from "@/pages/component/Loading.jsx";
 import { useAppStore } from "@/store/index.js";
 import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 const Login = ({ close }) => {
   const { setUserInfo } = useAppStore();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,6 +39,7 @@ const Login = ({ close }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (validateLogin()) {
         const res = await apiClient.post(LOGIN_ROUTE, { email, password });
@@ -52,6 +55,8 @@ const Login = ({ close }) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,6 +78,7 @@ const Login = ({ close }) => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (validateSignup()) {
         const res = await apiClient.post(SIGNUP_ROUTE, { email, password });
@@ -85,11 +91,14 @@ const Login = ({ close }) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="fixed top-0 left-0 bottom-0 right-0 bg-black/30 flex justify-center items-center">
+      {isLoading && <Loading />}
       <div
         className="grid focus-visible:outline-0 md:block px-4 md:px-6 pt-28 pb-6 left-0 fixed bottom-0 right-0 top-0 z-50 w-full 
                     gap-4 border bg-background shadow-lg duration-200 md:left-[50%] md:h-fit md:max-h-[95%] md:w-full md:translate-x-[-50%] 

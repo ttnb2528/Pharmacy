@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
@@ -35,25 +35,54 @@ import { FaChevronRight, FaPlus, FaTrash } from "react-icons/fa";
 import {
   ADD_PROFILE_IMAGE_ROUTE,
   REMOVE_PROFILE_IMAGE_ROUTE,
+  UPDATE_USER_ROUTE,
 } from "@/API/index.api.js";
+import { normalizeWhitespace } from "@/utils/normalizeWhiteSpace.jsx";
+import { getInitials } from "@/utils/getInitialName.jsx";
 
 const PersonalInfo = () => {
   const { userData, updateUserData } = useContext(PharmacyContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState("");
 
   const fileInputRef = useRef(null);
 
   // Data state
-  const [name, setName] = useState(userData?.name || "");
-  const [gender, setGender] = useState(userData?.gender || "");
-  const [phone, setPhone] = useState(userData?.phone || "");
-  const [email, setEmail] = useState(userData?.accountId?.email || "");
-  const [avatar, setAvatar] = useState(userData?.avatar || "");
+  const [name, setName] = useState("Khach hang");
+  const [gender, setGender] = useState("");
+  const [phone, setPhone] = useState("");
+  const [avatar, setAvatar] = useState("");
 
   const [hovered, setHovered] = useState(false);
+
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    gender: "",
+    phone: "",
+    date: "",
+  });
+
+  useEffect(() => {
+    if (userData) {
+      setName(userData?.name || "Khach hang");
+      setGender(userData?.gender || "");
+      setPhone(userData?.phone || "");
+      setDate(userData?.date || "");
+    }
+
+    if (userData?.avatar) {
+      setAvatar(userData.avatar);
+    }
+
+    setInitialValues({
+      name: userData?.name || "Khach hang",
+      gender: userData?.gender || "",
+      phone: userData?.phone || "",
+      date: userData?.date || "",
+    });
+  }, [userData]);
 
   const handleFileInputClick = () => {
     fileInputRef.current.click();
@@ -119,6 +148,63 @@ const PersonalInfo = () => {
     }
   };
 
+  const isDisabled = () => {
+    // So sánh giá trị hiện tại với giá trị ban đầu
+    return (
+      name === initialValues.name &&
+      phone === initialValues.phone &&
+      gender === initialValues.gender &&
+      date === initialValues.date
+    );
+  };
+
+  const handleNormalize = () => {
+    let updatedName = name;
+    let updatedPhone = phone;
+
+    if (name !== initialValues.name) {
+      updatedName = normalizeWhitespace(name)[0];
+    }
+
+    if (phone !== initialValues.phone) {
+      updatedPhone = normalizeWhitespace(phone)[0];
+    }
+
+    return { updatedName, updatedPhone };
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { updatedName, updatedPhone } = handleNormalize();
+    setIsLoading(true);
+    try {
+      const res = await apiClient.put(`${UPDATE_USER_ROUTE}/${userData._id}`, {
+        name: updatedName,
+        phone: updatedPhone,
+        gender,
+        date,
+      });
+
+      console.log(res);
+      if (res.status === 200 || res.data.status === 200) {
+        toast.success("Cập nhật thông tin thành công");
+        updateUserData({
+          ...userData,
+          name: updatedName,
+          phone: updatedPhone,
+          gender,
+          date,
+        });
+      } else {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
       {isLoading && <Loading />}
@@ -148,7 +234,7 @@ const PersonalInfo = () => {
                 <Avatar className="w-20 h-20">
                   {userData?.avatar ? (
                     <AvatarImage
-                      src={userData?.avatar}
+                      src={avatar}
                       alt="User avatar"
                       className="object-cover w-full h-full bg-black"
                     />
@@ -160,7 +246,7 @@ const PersonalInfo = () => {
                     // </AvatarFallback>
 
                     <div className="uppercase h-20 w-20 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
-                      {userData?.name ? userData.name : "KH"}
+                      {userData?.name ? getInitials(userData.name) : "KH"}
                     </div>
                   )}
                 </Avatar>
@@ -210,7 +296,12 @@ const PersonalInfo = () => {
                   <div className="col-span-1 grid gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="fullName">Họ và tên</Label>
-                      <Input id="fullName" placeholder="Họ và Tên" />
+                      <Input
+                        id="fullName"
+                        placeholder="Họ và Tên"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -228,9 +319,11 @@ const PersonalInfo = () => {
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {date ? (
-                                format(date, "dd/MM/yyyy", { locale: vi })
+                                format(date, "dd/MM/yyyy", {
+                                  locale: vi,
+                                })
                               ) : (
-                                <span>Chọn ngày</span>
+                                <span>Ngày sinh</span>
                               )}
                             </Button>
                           </PopoverTrigger>
@@ -248,7 +341,7 @@ const PersonalInfo = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="gender">Giới Tính</Label>
-                      <Select>
+                      <Select onValueChange={setGender} value={gender}>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn giới tính" />
                         </SelectTrigger>
@@ -273,12 +366,30 @@ const PersonalInfo = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="phone">Số điện thoại</Label>
-                      <Input id="phone" placeholder="Số điện thoại" />
+                      <Input
+                        id="phone"
+                        placeholder="Số điện thoại"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" placeholder="Email" />
+                    <div className="flex justify-between">
+                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
+                        <p>Email</p>
+                        <p className="font-medium text-neutral-600 break-all">
+                          {userData?.accountId?.email || "Chưa cập nhật"}
+                        </p>
+                      </div>
+                      <div
+                        className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
+                        onClick={() => navigate("/account/info/update-email")}
+                      >
+                        <span className="cursor-pointer text-green-500">
+                          Cập nhật
+                        </span>
+                        <FaChevronRight className="mt-1 text-green-500" />
+                      </div>
                     </div>
 
                     {/* <div className="flex justify-between">
@@ -307,7 +418,13 @@ const PersonalInfo = () => {
                     </div>
                   </div>
                 </div>
-                <Button className="mt-10">Lưu thay đổi</Button>
+                <Button
+                  disabled={isDisabled()}
+                  className="mt-10 bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700"
+                  onClick={handleSubmit}
+                >
+                  Lưu thay đổi
+                </Button>
               </form>
             </div>
           </div>

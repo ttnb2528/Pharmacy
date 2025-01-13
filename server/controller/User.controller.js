@@ -49,12 +49,6 @@ export const getCustomerById = asyncHandler(async (req, res) => {
 export const updateCustomer = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { error } = validate(req.body);
-    if (error) {
-      return res.json(
-        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
-      );
-    }
 
     const customer = await Customer.findById(id);
 
