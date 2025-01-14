@@ -14,6 +14,7 @@ import Addresses from "./pages/Client/Account/components/Addresses.jsx";
 import PointsHistory from "./pages/Client/Account/components/PointsHistory.jsx";
 import PointsPolicy from "./pages/Client/Account/components/PointsPolicy.jsx";
 import UpdatePassword from "./pages/Client/Account/components/UpdatePassword.jsx";
+import NotFound from "./pages/component/NotFound.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -83,6 +84,10 @@ const App = () => {
           ],
         },
       ],
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);
 
