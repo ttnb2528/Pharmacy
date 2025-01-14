@@ -26,10 +26,10 @@ const months = [
 
 const VietnameseCalendar = ({ selected, onSelect, ...props }) => {
   const [month, setMonth] = useState(
-    selected ? selected.getMonth() : new Date().getMonth()
+    selected instanceof Date ? selected.getMonth() : new Date().getMonth()
   );
   const [year, setYear] = useState(
-    selected ? selected.getFullYear() : new Date().getFullYear()
+    selected instanceof Date ? selected.getFullYear() : new Date().getFullYear()
   );
 
   const handleMonthChange = (value) => {
