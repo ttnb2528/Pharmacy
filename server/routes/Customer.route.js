@@ -7,6 +7,7 @@ import {
   getUserInfo,
   removeProfileImage,
   updateCustomer,
+  updatePassword,
 } from "../controller/User.controller.js";
 import {
   authenticate,
@@ -21,6 +22,7 @@ router.delete("/remove-profile-image", authenticate, removeProfileImage);
 router.get("/getUserInfo", authenticate, getUserInfo);
 router.get("/:id", authenticate, getCustomerById);
 router.put("/profile/:id", authenticate, updateCustomer);
+router.put("/update-password/:id", authenticate, updatePassword);
 
 // ROLE: Admin and Staff
 router.get("/", authenticate, authorize, getCustomers);

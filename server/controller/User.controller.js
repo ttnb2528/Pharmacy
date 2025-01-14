@@ -71,6 +71,28 @@ export const updateCustomer = asyncHandler(async (req, res) => {
   }
 });
 
+export const updatePassword = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    const account = await Account.findById(id);
+
+    if (!account) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy tài khoản")
+      );
+    }
+
+    account.password = password;
+    await account.save();
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật mật khẩu thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const addProfileImage = async (req, res, next) => {
   console.log(req.body);
   const { avatar } = req.body;
