@@ -43,7 +43,7 @@ const AccountSmall = () => {
 
               <div className="flex-1 text-sm font-medium">
                 <div className="text-neutral-900 text-base font-bold capitalize">
-                  Khach hang
+                  {userData?.name ? userData.name : "Khách hàng"}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   <div className="mt-1 flex w-fit items-center gap-1 rounded-full bg-orange-100 px-2 py-1 text-sm font-semibold">
