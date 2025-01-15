@@ -14,8 +14,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
+import AddressForm from "@/pages/component/AddressForm.jsx";
 
 const CheckoutInfo = () => {
   const allProducts = [1, 2, 3];
@@ -74,10 +75,10 @@ const CheckoutInfo = () => {
     }
   };
 
-  const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleAddressChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setNewAddress((prev) => ({ ...prev, [name]: value }));
+  // };
 
   const handleAddAddress = (e) => {
     e.preventDefault();
@@ -215,7 +216,9 @@ const CheckoutInfo = () => {
 
                     <Dialog open={isSelectOpen} onOpenChange={setIsSelectOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="none" className="text-green-500">Thay đổi</Button>
+                        <Button variant="none" className="text-green-500">
+                          Thay đổi
+                        </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
@@ -318,100 +321,15 @@ const CheckoutInfo = () => {
                             Nhập thông tin địa chỉ mới của bạn.
                           </DialogDescription>
                         </DialogHeader>
-                        <form onSubmit={handleAddAddress}>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="name" className="text-right">
-                                Họ tên
-                              </Label>
-                              <Input
-                                id="name"
-                                name="name"
-                                value={newAddress.name}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="phone" className="text-right">
-                                Số điện thoại
-                              </Label>
-                              <Input
-                                id="phone"
-                                name="phone"
-                                value={newAddress.phone}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="street" className="text-right">
-                                Địa chỉ
-                              </Label>
-                              <Textarea
-                                id="street"
-                                name="street"
-                                value={newAddress.street}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="ward" className="text-right">
-                                Phường/Xã
-                              </Label>
-                              <Input
-                                id="ward"
-                                name="ward"
-                                value={newAddress.ward}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="district" className="text-right">
-                                Quận/Huyện
-                              </Label>
-                              <Input
-                                id="district"
-                                name="district"
-                                value={newAddress.district}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="city" className="text-right">
-                                Thành phố
-                              </Label>
-                              <Input
-                                id="city"
-                                name="city"
-                                value={newAddress.city}
-                                onChange={handleAddressChange}
-                                className="col-span-3"
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => {
-                                setIsAddOpen(false);
-                                setIsSelectOpen(true);
-                              }}
-                            >
-                              Quay lại
-                            </Button>
-                            <Button
-                              type="submit"
-                              className="border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border"
-                            >
-                              Thêm địa chỉ
-                            </Button>
-                          </DialogFooter>
-                        </form>
+                        <AddressForm
+                          address={newAddress}
+                          setAddress={setNewAddress}
+                          handleSubmit={handleAddAddress}
+                          handleCancel={() => {
+                            setIsAddOpen(false);
+                            setIsSelectOpen(true);
+                          }}
+                        />
                       </DialogContent>
                     </Dialog>
                   </div>

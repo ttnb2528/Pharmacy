@@ -9,6 +9,7 @@ import SupplierRouter from "./Supplier.route.js";
 import ManufactureRouter from "./Manufacture.route.js";
 import ShiftWorkRouter from "./ShiftWork.route.js";
 import AddressRouter from "./Address.route.js";
+import LocationRouter from "./Location.route.js";
 import OTPRouter from "./OTP.route.js";
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/supplier", SupplierRouter);
 app.use("/manufacture", ManufactureRouter);
 app.use("/shiftWork", ShiftWorkRouter);
 app.use("/address", AddressRouter);
+app.use("/location", LocationRouter);
 
 app.use("/otp", OTPRouter);
 
