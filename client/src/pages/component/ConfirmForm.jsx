@@ -27,7 +27,7 @@ const ConfirmForm = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="px-4 py-2.5">
-          <Button type="button" variant="outline">
+          <Button type="button" variant="outline" onClick={onClose}>
             Quay lại
           </Button>
 
