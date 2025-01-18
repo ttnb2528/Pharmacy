@@ -1,4 +1,3 @@
-// AddressForm.jsx
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button.jsx";
@@ -25,23 +24,25 @@ import {
   GET_PROVINCES_ROUTE,
   GET_WARDS_ROUTE,
 } from "@/API/index.api.js";
+import Loading from "./Loading.jsx";
 
-const AddressForm = ({
+const EditAddressForm = ({
   open,
   onClose,
   address,
   setAddress,
   handleSubmit,
-  isEditing,
 }) => {
   // Fetch Location api
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
+        setIsLoading(true);
         const res = await apiClient.get(GET_PROVINCES_ROUTE);
 
         if (res.status === 200 && res.data.status === 200) {
@@ -51,80 +52,97 @@ const AddressForm = ({
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProvinces();
   }, []);
 
-  const handleProvinceChange = async (province) => {
-    setAddress((prev) => ({
-      ...prev,
-      provinceCityId: province.province_id,
-      provinceCity: province.province_name,
-      districtId: null,
-      district: "",
-      wardId: null,
-      ward: "",
-    }));
-    try {
-      console.log(province.province_id);
+  useEffect(() => {
+    if (address.province) {
+      const fetchDistricts = async () => {
+        try {
+          setIsLoading(true);
+          const res = await apiClient.get(
+            `${GET_DISTRICTS_ROUTE}/${address.provinceId}`
+          );
+          console.log(address.provinceId);
 
-      const res = await apiClient.get(
-        `${GET_DISTRICTS_ROUTE}/${province.province_id}`
-      );
-      if (res.status === 200 && res.data.status === 200) {
-        setDistricts(res.data.data);
-      } else {
-        setDistricts([]);
-      }
-    } catch (error) {
-      console.error(error);
+          console.log(res);
+
+          if (res.status === 200 && res.data.status === 200) {
+            setDistricts(res.data.data);
+          } else {
+            setDistricts([]);
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchDistricts();
     }
-  };
+  }, [address.province, address.provinceId]);
 
-  const handleDistrictChange = async (district) => {
-    setAddress((prev) => ({
-      ...prev,
-      districtId: district.district_id,
-      district: district.district_name,
-      wardId: null,
-      ward: "",
-    }));
-    try {
-      const res = await apiClient.get(
-        `${GET_WARDS_ROUTE}/${district.district_id}`
-      );
-      if (res.status === 200 && res.data.status === 200) {
-        setWards(res.data.data);
-      } else {
-        setWards([]);
-      }
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    if (address.district) {
+      const fetchWards = async () => {
+        try {
+          setIsLoading(true);
+          const res = await apiClient.get(
+            `${GET_WARDS_ROUTE}/${address.districtId}`
+          );
+
+          console.log(address.districtId);
+
+          if (res.status === 200 && res.data.status === 200) {
+            setWards(res.data.data);
+          } else {
+            setWards([]);
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchWards();
     }
-  };
+  }, [address.district, address.districtId]);
 
-  const handleWardChange = (ward) => {
-    setAddress((prev) => ({
-      ...prev,
-      wardId: ward.ward_id,
-      ward: ward.ward_name,
-    }));
-  };
+  const handleAddressChange = (name, value) => {
+    setAddress((prev) => {
+      const updatedAddress = { ...prev, [name]: value };
 
-  const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    setAddress((prev) => ({ ...prev, [name]: value }));
+      // Reset district and ward when province changes
+      if (name === "province") {
+        updatedAddress.district = "";
+        updatedAddress.districtId = null;
+        updatedAddress.ward = "";
+        updatedAddress.wardId = null;
+      }
+
+      // Reset ward when district changes
+      if (name === "district") {
+        updatedAddress.ward = "";
+        updatedAddress.wardId = null;
+      }
+
+      return updatedAddress;
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
+      {isLoading && <Loading />}
       <DialogContent className="sm:max-w-[425px] p-0">
         <DialogHeader className="px-4 py-2.5">
-          <DialogTitle>
-            {isEditing ? "Cập nhật địa chỉ" : "Thêm địa chỉ mới"}
-          </DialogTitle>
+          <DialogTitle>Cập nhật địa chỉ mới</DialogTitle>
           <DialogDescription>
             Nhập thông tin địa chỉ mới của bạn.
           </DialogDescription>
@@ -139,7 +157,7 @@ const AddressForm = ({
                 id="name"
                 name="name"
                 value={address.name}
-                onChange={handleAddressChange}
+                onChange={(e) => handleAddressChange("name", e.target.value)}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -148,19 +166,23 @@ const AddressForm = ({
                 id="phone"
                 name="phone"
                 value={address.phone}
-                onChange={handleAddressChange}
+                onChange={(e) => handleAddressChange("phone", e.target.value)}
               />
             </div>
 
             <Label>Địa chỉ</Label>
             <div>
               <Select
-                value={address.provinceCity}
+                value={address.province}
                 onValueChange={(value) => {
                   const selectedProvince = provinces.find(
-                    (p) => p.province_name === value
+                    (province) => province.province_name === value
                   );
-                  handleProvinceChange(selectedProvince);
+                  handleAddressChange("province", value);
+                  handleAddressChange(
+                    "provinceId",
+                    selectedProvince?.province_id
+                  );
                 }}
               >
                 <SelectTrigger>
@@ -184,13 +206,17 @@ const AddressForm = ({
             <div>
               <Select
                 value={address.district}
+                disabled={!address.province}
                 onValueChange={(value) => {
                   const selectedDistrict = districts.find(
-                    (d) => d.district_name === value
+                    (district) => district.district_name === value
                   );
-                  handleDistrictChange(selectedDistrict);
+                  handleAddressChange("district", value);
+                  handleAddressChange(
+                    "districtId",
+                    selectedDistrict?.district_id
+                  );
                 }}
-                disabled={!address.provinceCity}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn Quận/Huyện" />
@@ -213,11 +239,14 @@ const AddressForm = ({
             <div>
               <Select
                 value={address.ward}
-                onValueChange={(value) => {
-                  const selectedWard = wards.find((w) => w.ward_name === value);
-                  handleWardChange(selectedWard);
-                }}
                 disabled={!address.district}
+                onValueChange={(value) => {
+                  const selectedWard = wards.find(
+                    (ward) => ward.ward_name === value
+                  );
+                  handleAddressChange("ward", value);
+                  handleAddressChange("wardId", selectedWard?.ward_id);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn Phường/Xã" />
@@ -240,7 +269,9 @@ const AddressForm = ({
                 name="otherDetails"
                 placeholder="Số nhà, tên đường"
                 value={address.otherDetails}
-                onChange={handleAddressChange}
+                onChange={(e) =>
+                  handleAddressChange("otherDetails", e.target.value)
+                }
               />
             </div>
 
@@ -250,7 +281,7 @@ const AddressForm = ({
                   type="checkbox"
                   name="isDefault"
                   className="w-5 h-5"
-                  value={address.isDefault}
+                  checked={address.isDefault}
                   onChange={(e) =>
                     setAddress((prev) => ({
                       ...prev,
@@ -269,25 +300,16 @@ const AddressForm = ({
             Quay lại
           </Button>
 
-          {isEditing ? (
-            <Button
-              type="submit"
-              className="border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border"
-            >
-              Cập nhật địa chỉ
-            </Button>
-          ) : (
-            <Button
-              className="border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border"
-              onClick={handleSubmit}
-            >
-              Thêm địa chỉ
-            </Button>
-          )}
+          <Button
+            className="border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border"
+            onClick={handleSubmit}
+          >
+            Cập nhật địa chỉ
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default AddressForm;
+export default EditAddressForm;

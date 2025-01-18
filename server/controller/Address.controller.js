@@ -12,6 +12,23 @@ export const addAddress = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
       );
     }
+
+    const { isDefault } = req.body;
+
+    if (isDefault) {
+      const currentDefaultAddress = await Address.findOne({
+        customerId: req.user._id,
+        isDefault: true,
+      });
+
+      if (currentDefaultAddress) {
+        await Address.updateOne(
+          { _id: currentDefaultAddress._id },
+          { isDefault: false }
+        );
+      }
+    }
+
     const newAddress = new Address({
       customerId: req.user._id,
       ...req.body,
@@ -63,12 +80,29 @@ export const updateAddress = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
       );
     }
+
     const address = await Address.findById(id);
 
     if (!address) {
       return res.json(
         jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy địa chỉ")
       );
+    }
+
+    const { isDefault } = req.body;
+
+    if (isDefault) {
+      const currentDefaultAddress = await Address.findOne({
+        customerId: req.user._id,
+        isDefault: true,
+      });
+
+      if (currentDefaultAddress) {
+        await Address.updateOne(
+          { _id: currentDefaultAddress._id },
+          { isDefault: false }
+        );
+      }
     }
 
     await Address.findByIdAndUpdate(id, req.body);
@@ -105,9 +139,12 @@ const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên khách hàng"),
     phone: Joi.string().required().label("Số điện thoại"),
-    provinceCity: Joi.string().required().label("Tỉnh/Thành phố"),
+    province: Joi.string().required().label("Tỉnh/Thành phố"),
+    provinceId: Joi.string().required().label("ID Tỉnh/Thành phố"),
     district: Joi.string().required().label("Quận/Huyện"),
+    districtId: Joi.string().required().label("ID Quận/Huyện"),
     ward: Joi.string().required().label("Phường/Xã"),
+    wardId: Joi.string().required().label("ID Phường/Xã"),
     otherDetails: Joi.string().required().label("Số nhà, tên đường"),
   })
     .messages({

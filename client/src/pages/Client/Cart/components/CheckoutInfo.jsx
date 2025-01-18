@@ -16,7 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 // import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
-import AddressForm from "@/pages/component/AddressForm.jsx";
+import AddressForm from "@/pages/component/AddAddressForm.jsx";
 
 const CheckoutInfo = () => {
   const allProducts = [1, 2, 3];

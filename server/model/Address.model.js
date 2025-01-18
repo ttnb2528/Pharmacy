@@ -14,7 +14,7 @@ const AddressSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  provinceCity: {
+  province: {
     type: String,
     required: true,
   },
@@ -23,6 +23,18 @@ const AddressSchema = new mongoose.Schema({
     required: true,
   },
   ward: {
+    type: String,
+    required: true,
+  },
+  provinceId: {
+    type: String,
+    required: true,
+  },
+  districtId: {
+    type: String,
+    required: true,
+  },
+  wardId: {
     type: String,
     required: true,
   },

@@ -1,10 +1,16 @@
 // Component UI
-import { ADD_ADDRESS_ROUTE, DELETE_ADDRESS_ROUTE } from "@/API/index.api.js";
+import {
+  ADD_ADDRESS_ROUTE,
+  DELETE_ADDRESS_ROUTE,
+  GET_ALL_ADDRESSES_ROUTE,
+  UPDATE_ADDRESS_ROUTE,
+} from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
-import AddressForm from "@/pages/component/AddressForm.jsx";
+import AddAddressForm from "@/pages/component/AddAddressForm.jsx";
 import ConfirmForm from "@/pages/component/ConfirmForm.jsx";
+import EditAddressForm from "@/pages/component/EditAddressForm.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { useContext, useState } from "react";
 
@@ -19,13 +25,13 @@ const Addresses = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [newAddress, setNewAddress] = useState({
     name: "",
     phone: "",
     otherDetails: "",
-    provinceCityId: null,
-    provinceCity: "",
+    provinceId: null,
+    province: "",
     districtId: null,
     district: "",
     wardId: null,
@@ -36,18 +42,35 @@ const Addresses = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  const handleAddAddress = async (e) => {
+  const handleAddress = async (e) => {
     e.preventDefault();
 
     if (isEditing) {
       // Chế độ sửa
-      setAddressData((prevAddresses) =>
-        prevAddresses.map((address) =>
-          address._id === editingAddressId ? newAddress : address
-        )
-      );
-      setIsEditing(false);
-      setEditingAddressId(null);
+      try {
+        setIsLoading(true);
+        const res = await apiClient.put(
+          `${UPDATE_ADDRESS_ROUTE}/${selectedAddressId}`,
+          {
+            ...newAddress,
+          }
+        );
+
+        if (res.status === 200 && res.data.status === 200) {
+          const getAddresses = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
+          if (getAddresses.status === 200 && getAddresses.data.status === 200) {
+            setAddressData(getAddresses.data.data);
+          }
+          toast.success(res.data.message);
+        } else {
+          toast.error(res.data.message);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Có lỗi xảy ra khi cập nhật địa chỉ");
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       // Chế độ thêm
       try {
@@ -57,7 +80,10 @@ const Addresses = () => {
         });
 
         if (res.status === 200 && res.data.status === 201) {
-          setAddressData((prev) => [...prev, res.data.data]);
+          const getAddresses = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
+          if (getAddresses.status === 200 && getAddresses.data.status === 200) {
+            setAddressData(getAddresses.data.data);
+          }
           toast.success(res.data.message);
         } else {
           toast.error(res.data.message);
@@ -75,19 +101,22 @@ const Addresses = () => {
       phone: "",
       otherDetails: "",
       ward: "",
+      wardId: null,
       district: "",
-      provinceCity: "",
+      districtId: null,
+      province: "",
+      provinceId: null,
       isDefault: false,
     });
 
     setIsAddOpen(false);
+    setIsEditing(false);
   };
 
   const handleEditAddress = (address) => {
     setIsEditing(true);
-    setEditingAddressId(address._id);
     setNewAddress(address);
-    setIsAddOpen(true);
+    setSelectedAddressId(address._id);
   };
 
   const handleOpenAddDialog = () => {
@@ -96,14 +125,17 @@ const Addresses = () => {
       phone: "",
       otherDetails: "",
       ward: "",
+      wardId: null,
       district: "",
-      provinceCity: "",
+      districtId: null,
+      province: "",
+      provinceId: null,
       isDefault: false,
     });
     setIsAddOpen(true);
   };
 
-  const handleConfirmOpen = (address) => {
+  const handleConfirmDeleteOpen = (address) => {
     setConfirmDelete(true);
     setConfirmDeleteId(address._id);
   };
@@ -114,8 +146,6 @@ const Addresses = () => {
       const res = await apiClient.delete(
         `${DELETE_ADDRESS_ROUTE}/${addressId}`
       );
-
-      console.log(res);
 
       if (res.status === 200 && res.data.status === 200) {
         setAddressData((prev) =>
@@ -178,7 +208,7 @@ const Addresses = () => {
 
                     <div className="items-center justify-start space-y-2">
                       <span className="break-word mb-1 block flex-1">
-                        {`${address?.otherDetails}, ${address?.ward}, ${address?.district}, ${address?.provinceCity}`}
+                        {`${address?.otherDetails}, ${address?.ward}, ${address?.district}, ${address?.province}`}
                       </span>
                       <span className="mb-1 md:mr-2">
                         {address?.isDefault && (
@@ -199,7 +229,7 @@ const Addresses = () => {
                   </Button>
                   <Button
                     className="bg-transparent shadow-none text-neutral-900 hover:bg-transparent p-1"
-                    onClick={() => handleConfirmOpen(address)}
+                    onClick={() => handleConfirmDeleteOpen(address)}
                   >
                     <IoTrashOutline />
                   </Button>
@@ -209,14 +239,32 @@ const Addresses = () => {
           ))
         )}
       </div>
-      <AddressForm
-        open={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        address={newAddress}
-        setAddress={setNewAddress}
-        handleSubmit={handleAddAddress}
-        isEditing={isEditing}
-      />
+      {isAddOpen && (
+        <AddAddressForm
+          open={isAddOpen}
+          onClose={() => {
+            setIsAddOpen(false);
+            setIsEditing(false);
+          }}
+          address={newAddress}
+          setAddress={setNewAddress}
+          handleSubmit={handleAddress}
+        />
+      )}
+
+      {/* Edit address dialog */}
+      {isEditing && (
+        <EditAddressForm
+          open={isEditing}
+          onClose={() => {
+            setIsEditing(false);
+            setIsAddOpen(false);
+          }}
+          address={newAddress}
+          setAddress={setNewAddress}
+          handleSubmit={handleAddress}
+        />
+      )}
 
       {/* Confirm delete dialog */}
       <ConfirmForm
