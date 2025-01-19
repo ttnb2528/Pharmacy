@@ -10,6 +10,8 @@ import ManufactureRouter from "./Manufacture.route.js";
 import ShiftWorkRouter from "./ShiftWork.route.js";
 import AddressRouter from "./Address.route.js";
 import LocationRouter from "./Location.route.js";
+import CouponRouter from "./Coupon.route.js";
+import BatchRouter from "./Batch.route.js";
 import OTPRouter from "./OTP.route.js";
 
 const app = express();
@@ -25,6 +27,8 @@ app.use("/manufacture", ManufactureRouter);
 app.use("/shiftWork", ShiftWorkRouter);
 app.use("/address", AddressRouter);
 app.use("/location", LocationRouter);
+app.use("/coupon", CouponRouter);
+app.use("/batch", BatchRouter);
 
 app.use("/otp", OTPRouter);
 
