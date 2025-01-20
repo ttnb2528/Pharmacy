@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const CouponSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
   coupon_code: { type: String, required: true, unique: true },
   description: String,
   discount_type: {
@@ -19,7 +23,6 @@ const CouponSchema = new mongoose.Schema({
     enum: ["active", "inactive", "expired"],
     default: "active",
   },
-  notes: String,
 });
 
 const Coupon = mongoose.model("Coupon", CouponSchema);
