@@ -52,6 +52,19 @@ const MedicineSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  quantityStock: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  isDiscount: {
+    type: Boolean,
+    default: false,
+  },
+  percentDiscount: {
+    type: Number,
+    default: 0,
+  },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -62,6 +75,12 @@ const MedicineSchema = new mongoose.Schema({
     ref: "Brand",
     required: true,
   },
+  batches: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Batch",
+    },
+  ],
 });
 
 const Medicine = mongoose.model("Medicine", MedicineSchema);

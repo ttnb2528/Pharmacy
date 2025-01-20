@@ -1,4 +1,5 @@
 import Medicine from "../model/Medicine.model.js";
+import Batch from "../model/Batch.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -27,7 +28,35 @@ export const addMedicine = asyncHandler(async (req, res) => {
 });
 
 export const getMedicines = asyncHandler(async (req, res) => {
-  const medicines = await Medicine.find();
+  const medicines = await Medicine.find()
+    .populate("categoryId")
+    .populate("brandId");
+
+  for (let medicine of medicines) {
+    const batches = await Batch.find({ MedicineId: medicine._id })
+      .populate("SupplierId")
+      .populate("ManufactureId");
+    medicine._doc.batches = batches; // Gán kết quả vào medicine object
+  }
+
+  res
+    .status(StatusCode.OK)
+    .json(
+      jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+    );
+});
+
+export const getMedicinesByIsDiscount = asyncHandler(async (req, res) => {
+  const medicines = await Medicine.find({ isDiscount: true })
+    .populate("categoryId")
+    .populate("brandId");
+
+  for (let medicine of medicines) {
+    const batches = await Batch.find({ MedicineId: medicine._id })
+      .populate("SupplierId")
+      .populate("ManufactureId");
+    medicine._doc.batches = batches; // Gán kết quả vào medicine object
+  }
   res
     .status(StatusCode.OK)
     .json(
@@ -37,7 +66,16 @@ export const getMedicines = asyncHandler(async (req, res) => {
 
 export const getMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  const medicine = await Medicine.findById(id);
+  const medicine = await Medicine.findById(id)
+    .populate("categoryId")
+    .populate("brandId");
+
+  for (let medicine of medicines) {
+    const batches = await Batch.find({ MedicineId: medicine._id })
+      .populate("SupplierId")
+      .populate("ManufactureId");
+    medicine._doc.batches = batches; // Gán kết quả vào medicine object
+  }
   if (!medicine) {
     return res
       .status(StatusCode.NOT_FOUND)
