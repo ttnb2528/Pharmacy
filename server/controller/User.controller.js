@@ -176,6 +176,109 @@ export const deleteCustomer = asyncHandler(async (req, res) => {
   }
 });
 
+export const addToCart = asyncHandler(async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const userData = await Account.findOne({ _id: req.user._id });
+
+    if (!userData) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy khách hàng")
+      );
+    }
+
+    userData.cartData[productId] += quantity;
+    await Account.findOneAndUpdate({ _id: req.user._id }, userData);
+
+    res.json(jsonGenerate(StatusCode.OK, "Thêm vào giỏ hàng thành công"));
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const removeFromCart = asyncHandler(async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const userData = await Account.findOne({ _id: req.user._id });
+
+    if (!userData) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy khách hàng")
+      );
+    }
+
+    userData.cartData[productId] -= quantity;
+    await Account.findOneAndUpdate({ _id: req.user._id }, userData);
+
+    res.json(jsonGenerate(StatusCode.OK, "Xóa sản phẩm thành công"));
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const removeProductFromCart = asyncHandler(async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const userData = await Account.findOne({ _id: req.user._id });
+
+    if (!userData) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy khách hàng")
+      );
+    }
+
+    userData.cartData[productId] = 0;
+    await Account.findOneAndUpdate({ _id: req.user._id }, userData);
+
+    res.json(jsonGenerate(StatusCode.OK, "Xóa sản phẩm thành công"));
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const updateCart = asyncHandler(async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    
+    const userData = await Account.findOne({ _id: req.user._id });
+
+    if (!userData) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy khách hàng")
+      );
+    }
+
+    userData.cartData[productId] = quantity;
+    await Account.findOneAndUpdate({ _id: req.user._id }, userData);
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật giỏ hàng thành công"));
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const clearCart = asyncHandler(async (req, res) => {
+  try {
+    const userData = await Account.findOne({ _id: req.user._id });
+
+    if (!userData) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy khách hàng")
+      );
+    }
+
+    for (const key in userData.cartData) {
+      userData.cartData[key] = 0;
+    }
+
+    await Account.findOneAndUpdate({ _id: req.user._id }, userData);
+
+    res.json(jsonGenerate(StatusCode.OK, "Xóa giỏ hàng thành công"));
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Họ và tên"),
