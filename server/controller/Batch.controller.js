@@ -1,4 +1,5 @@
 import Batch from "../model/Batch.model.js";
+import Medicine from "../model/Medicine.model.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
@@ -40,6 +41,12 @@ export const createBatch = asyncHandler(async (req, res) => {
     });
 
     const batch = await newBatch.save();
+
+    await Medicine.findByIdAndUpdate(
+      req.body.MedicineId,
+      { $inc: { quantityStock: req.body.quantity } }, // Increase quantityStock
+      { new: true }
+    );
 
     return res.json(
       jsonGenerate(StatusCode.CREATED, "Tạo lô thành công", batch)
@@ -141,7 +148,6 @@ const validate = (data) => {
     dateOfManufacture: Joi.date().required().label("Ngày sản xuất"),
     expiryDate: Joi.date().required().label("Hạn sử dụng"),
     quantity: Joi.number().required().label("Số lượng"),
-    quantityStock: Joi.number().required().label("Số lượng tồn"),
     price: Joi.number().required().label("Giá bán"),
     retailPrice: Joi.number().required().label("Giá bán lẻ"),
     SupplierId: Joi.string().required().label("Nhà cung cấp"),
