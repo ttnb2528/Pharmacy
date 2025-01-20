@@ -32,7 +32,7 @@ import { LOGOUT_ROUTE } from "@/API/index.api.js";
 const NavSearch = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
-  const { userData } = useContext(PharmacyContext);
+  const { userData, cart, CalculateTotalItems } = useContext(PharmacyContext);
 
   const handleShowLogin = () => {
     setShowLogin(true);
@@ -61,7 +61,7 @@ const NavSearch = () => {
             <div className="relative mr-3 text-center">
               <FaShoppingCart className="text-[#fff] text-[20px]" />
               <span className="absolute top-[-3px] min-w-[15px] bg-white rounded-full text-[9px] left-[14px] font-bold text-[#4cb551]">
-                1
+                {CalculateTotalItems(cart)}
               </span>
             </div>
             Giỏ hàng
