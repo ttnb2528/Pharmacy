@@ -4,11 +4,32 @@ import "slick-carousel/slick/slick-theme.css";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import ItemDeal from "@/pages/Client/Product/ProductItem/ItemDeal.jsx";
+import Loading from "@/pages/component/Loading.jsx";
+import { GET_ALL_PRODUCTS_DISCOUNT_ROUTE } from "@/API/index.api.js";
+import { apiClient } from "@/lib/api-client.js";
 
 const HomeDeal = () => {
   const [remainingTime, setRemainingTime] = useState(moment.duration(0));
+  const [all_products, setAllProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const allProductsDiscount = async () => {
+      try {
+        const res = await apiClient.get(GET_ALL_PRODUCTS_DISCOUNT_ROUTE);
 
-  const all_products = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        if (res.status === 200 && res.data.status === 200) {
+          setAllProducts(res.data.data);
+        } else {
+          setAllProducts([]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    allProductsDiscount();
+  }, []);
+
   function SampleNextArrow(props) {
     const { className, onClick } = props;
 
@@ -51,9 +72,11 @@ const HomeDeal = () => {
       </div>
     );
   }
+
   var settings = {
     dots: false,
-    infinite: true,
+    className: all_products.length > 5 ? "" : "[&>div>div]:ml-0",
+    infinite: all_products.length > 5 ? true : false,
     speed: 1250,
     lazyLoad: true,
     slidesToShow: 5,
@@ -121,6 +144,7 @@ const HomeDeal = () => {
 
   return (
     <div className="my-10  rounded-lg overflow-hidden bg-[#fff8f9] px-3">
+      {isLoading && <Loading />}
       <div className="px-6 pt-6 pb-9 ">
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold text-[#c31731]">
@@ -142,9 +166,15 @@ const HomeDeal = () => {
 
         <div className="mt-8">
           <Slider {...settings}>
-            {all_products.map((product, i) => {
+            {all_products.map((product) => {
               // if (product.sale > 0) {
-              return <ItemDeal key={i} />;
+              return (
+                <ItemDeal
+                  key={product._id}
+                  product={product}
+                  setIsLoading={setIsLoading}
+                />
+              );
               // } else {
               //   return null;
               // }
