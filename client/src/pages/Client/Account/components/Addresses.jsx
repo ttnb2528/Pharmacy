@@ -270,8 +270,8 @@ const Addresses = () => {
       <ConfirmForm
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
-        handleDeleteAddress={handleDeleteAddress}
-        confirmDeleteId={confirmDeleteId}
+        handleConfirm={() => handleDeleteAddress(confirmDeleteId)}
+        type={"address"}
       />
     </div>
   );

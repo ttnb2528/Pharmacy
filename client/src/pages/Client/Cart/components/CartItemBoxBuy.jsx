@@ -1,30 +1,14 @@
 import { LuTicketPercent, LuX } from "react-icons/lu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useNavigate } from "react-router-dom";
+import SelectCoupon from "./SelectCoupon.jsx";
 
 const CartItemBoxBuy = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
-
-  const promotionCodes = [
-    { code: "SUMMER10", description: "Giảm 10% cho đơn hàng mùa hè" },
-    {
-      code: "FREESHIP",
-      description: "Miễn phí vận chuyển cho đơn hàng trên 500k",
-    },
-    { code: "NEWUSER", description: "Giảm 50k cho khách hàng mới" },
-  ];
 
   const handleApplyPromo = (code) => {
     setSelectedPromo(code);
@@ -46,38 +30,13 @@ const CartItemBoxBuy = () => {
               <LuTicketPercent className="w-6 h-6 text-green-500" />
               <p className="text-sm font-semibold">Khuyến mãi</p>
             </div>
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button className="p-0 bg-transparent shadow-none text-green-500 hover:bg-transparent">
-                  {selectedPromo ? "Đổi mã" : "Chọn Mã"}
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Mã Khuyến Mãi</SheetTitle>
-                  <SheetDescription>
-                    Chọn mã khuyến mãi để áp dụng cho đơn hàng của bạn.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="mt-4 space-y-4">
-                  {promotionCodes.map((promo, index) => (
-                    <div key={index} className="rounded-lg border p-3">
-                      <h3 className="font-semibold">{promo.code}</h3>
-                      <p className="text-sm text-gray-500">
-                        {promo.description}
-                      </p>
-                      <Button
-                        className="mt-2 bg-green-500 hover:bg-green-600"
-                        size="sm"
-                        onClick={() => handleApplyPromo(promo.code)}
-                      >
-                        Áp dụng
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </SheetContent>
-            </Sheet>
+
+            <SelectCoupon
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              selectedPromo={selectedPromo}
+              handleApplyPromo={handleApplyPromo}
+            />
           </div>
           {selectedPromo && (
             <div className="flex items-center justify-between bg-green-100 p-2 rounded-md">
