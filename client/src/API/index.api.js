@@ -8,6 +8,11 @@ export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
 
 export const CUSTOMER_ROUTES = "/api/v1/customer";
 export const GET_USER_INFO = `${CUSTOMER_ROUTES}/getUserInfo`;
+export const ADD_TO_CART_ROUTE = `${CUSTOMER_ROUTES}/addToCart`;
+export const REMOVE_FROM_CART_ROUTE = `${CUSTOMER_ROUTES}/removeFromCart`;
+export const REMOVE_PRODUCT_FROM_CART_ROUTE = `${CUSTOMER_ROUTES}/removeProductFromCart`;
+export const UPDATE_CART_ROUTE = `${CUSTOMER_ROUTES}/updateCart`;
+export const CLEAR_CART_ROUTE = `${CUSTOMER_ROUTES}/clearCart`;
 export const UPDATE_USER_ROUTE = `${CUSTOMER_ROUTES}/profile`;
 export const UPDATE_PASSWORD_ROUTE = `${CUSTOMER_ROUTES}/update-password`;
 export const ADD_PROFILE_IMAGE_ROUTE = `${CUSTOMER_ROUTES}/add-profile-image`;
@@ -24,3 +29,17 @@ export const LOCATION_ROUTES = "/api/v1/location";
 export const GET_PROVINCES_ROUTE = `${LOCATION_ROUTES}/getProvinces`;
 export const GET_DISTRICTS_ROUTE = `${LOCATION_ROUTES}/getDistricts`;
 export const GET_WARDS_ROUTE = `${LOCATION_ROUTES}/getWards`;
+
+export const COUPON_ROUTES = "/api/v1/coupon";
+export const CREATE_COUPON_ROUTE = `${COUPON_ROUTES}/createCoupon`;
+export const GET_COUPONS_ROUTE = `${COUPON_ROUTES}/getCoupons`;
+export const GET_COUPON_ROUTE = `${COUPON_ROUTES}/getCoupon/:id`;
+export const UPDATE_COUPON_ROUTE = `${COUPON_ROUTES}/updateCoupon/:id`;
+
+export const PRODUCT_ROUTES = "/api/v1/medicine";
+export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
+export const GET_ALL_PRODUCTS_DISCOUNT_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByIsDiscount`;
+export const GET_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/getMedicine/:id`;
+export const CREATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/addMedicine`;
+export const UPDATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/updateMedicine/:id`;
+export const DELETE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine/:id`;
