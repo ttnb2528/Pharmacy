@@ -5,3 +5,11 @@ export const CalculateProductWithSale = (price, sale) => {
 export const CalculateTotalPrice = (price, sale, quantity) => {
   return CalculateProductWithSale(price, sale) * quantity;
 };
+
+export const handleRenderPriceWithCoupon = (coupon) => {
+  if (coupon?.discount_type === "percentage") {
+    return `- ${coupon?.discount_value}%`;
+  } else {
+    return coupon?.discount_value;
+  }
+};

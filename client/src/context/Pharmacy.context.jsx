@@ -11,7 +11,7 @@ export const PharmacyContext = createContext(null);
 
 const getDefaultCart = () => {
   let cart = {};
-  for (let index = 0; index < 300 + 1; index++) {
+  for (let index = 1; index <= 300; index++) {
     cart[index] = 0;
   }
 
@@ -23,6 +23,7 @@ const PharmacyContextProvider = (props) => {
   const [addressData, setAddressData] = useState([]);
   const [couponData, setCouponData] = useState([]);
   const [cart, setCart] = useState(getDefaultCart());
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
@@ -31,8 +32,8 @@ const PharmacyContextProvider = (props) => {
         const resUser = await apiClient.get(GET_USER_INFO);
         if (resUser.status === 200) {
           setUserData(resUser.data.data);
-          setCart(resUser.data.data.accountId.cartData);
-        } else if (resUser.status === 500) {
+          setCart(resUser.data.data?.accountId?.cartData);
+        } else {
           setUserData(null);
         }
       } catch (error) {
@@ -101,6 +102,59 @@ const PharmacyContextProvider = (props) => {
     return totalItems;
   };
 
+  const CalculateTotalPriceTemp = (carts) => {
+    let totalPrice = 0;
+
+    for (const item in carts) {
+      if (carts[item] > 0) {
+        if (allProducts[item - 1]?.isDiscount) {
+          totalPrice +=
+            carts[item] *
+            (allProducts[item - 1]?.batches[0]?.price *
+              (1 - allProducts[item - 1]?.percentDiscount / 100));
+        } else {
+          totalPrice += carts[item] * allProducts[item - 1]?.batches[0]?.price;
+        }
+      }
+    }
+
+    return totalPrice;
+  };
+
+  const CalculatePriceWithSale = (carts) => {
+    let totalPrice = 0;
+
+    for (const item in carts) {
+      if (carts[item] > 0) {
+        totalPrice +=
+          carts[item] *
+          ((allProducts[item - 1]?.percentDiscount / 100) *
+            allProducts[item - 1]?.batches[0]?.price);
+      }
+    }
+
+    return totalPrice;
+  };
+
+  const CalculateTotalPrice = () => {
+    let totalPrice = 0;
+
+    if (selectedCoupon) {
+      if (selectedCoupon.discount_type === "percentage") {
+        totalPrice =
+          CalculateTotalPriceTemp(cart) *
+          (1 - selectedCoupon.discount_value / 100);
+      } else {
+        totalPrice =
+          CalculateTotalPriceTemp(cart) - selectedCoupon.discount_value;
+      }
+    } else {
+      totalPrice = CalculateTotalPriceTemp(cart);
+    }
+
+    return totalPrice;
+  };
+
   const contextValue = {
     userData,
     updateUserData,
@@ -110,7 +164,12 @@ const PharmacyContextProvider = (props) => {
     allProducts,
     cart,
     setCart,
+    selectedCoupon,
+    setSelectedCoupon,
     CalculateTotalItems,
+    CalculateTotalPriceTemp,
+    CalculatePriceWithSale,
+    CalculateTotalPrice,
   };
 
   return (

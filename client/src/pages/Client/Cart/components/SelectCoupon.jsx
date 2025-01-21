@@ -12,16 +12,18 @@ import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 const SelectCoupon = ({
   isOpen,
   setIsOpen,
-  selectedPromo,
-  handleApplyPromo,
+  selectedCoupon,
+  handleApplyCoupon,
 }) => {
   const { couponData } = useContext(PharmacyContext);
+
+  console.log(couponData);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button className="p-0 bg-transparent shadow-none text-green-500 hover:bg-transparent">
-          {selectedPromo ? "Đổi mã" : "Chọn Mã"}
+          {selectedCoupon ? "Đổi mã" : "Chọn Mã"}
         </Button>
       </SheetTrigger>
       <SheetContent>
@@ -39,7 +41,7 @@ const SelectCoupon = ({
               <Button
                 className="mt-2 bg-green-500 hover:bg-green-600"
                 size="sm"
-                onClick={() => handleApplyPromo(coupon.coupon_code)}
+                onClick={() => handleApplyCoupon(coupon)}
               >
                 Áp dụng
               </Button>

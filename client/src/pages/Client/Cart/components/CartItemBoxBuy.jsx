@@ -1,22 +1,33 @@
 import { LuTicketPercent, LuX } from "react-icons/lu";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useNavigate } from "react-router-dom";
 import SelectCoupon from "./SelectCoupon.jsx";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { convertVND } from "@/utils/ConvertVND.js";
+import { handleRenderPriceWithCoupon } from "@/utils/Calculate.js";
 
 const CartItemBoxBuy = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedPromo, setSelectedPromo] = useState(null);
+  const {
+    cart,
+    selectedCoupon,
+    setSelectedCoupon,
+    CalculateTotalItems,
+    CalculateTotalPriceTemp,
+    CalculatePriceWithSale,
+    CalculateTotalPrice,
+  } = useContext(PharmacyContext);
 
-  const handleApplyPromo = (code) => {
-    setSelectedPromo(code);
+  const handleApplyCoupon = (coupon) => {
+    setSelectedCoupon(coupon);
     setIsOpen(false);
   };
 
-  const handleRemovePromo = () => {
-    setSelectedPromo(null);
+  const handleRemoveCoupon = () => {
+    setSelectedCoupon(null);
   };
   return (
     <div
@@ -34,18 +45,20 @@ const CartItemBoxBuy = () => {
             <SelectCoupon
               isOpen={isOpen}
               setIsOpen={setIsOpen}
-              selectedPromo={selectedPromo}
-              handleApplyPromo={handleApplyPromo}
+              selectedCoupon={selectedCoupon}
+              handleApplyCoupon={handleApplyCoupon}
             />
           </div>
-          {selectedPromo && (
+          {selectedCoupon && (
             <div className="flex items-center justify-between bg-green-100 p-2 rounded-md">
-              <span className="text-sm text-green-700">{selectedPromo}</span>
+              <span className="text-sm text-green-700">
+                {selectedCoupon?.coupon_code}
+              </span>
               <Button
                 size="sm"
                 variant="ghost"
                 className="p-1 h-auto"
-                onClick={handleRemovePromo}
+                onClick={handleRemoveCoupon}
               >
                 <LuX className="w-4 h-4 text-green-700" />
               </Button>
@@ -59,17 +72,21 @@ const CartItemBoxBuy = () => {
             <div className="hidden grid-flow-col items-center justify-between gap-2 md:grid">
               <p className="text-sm text-neutral-900">Tạm tính</p>
               <p className="text-sm font-semibold text-neutral-900">
-                336.000&nbsp;₫
+                {convertVND(CalculateTotalPriceTemp(cart))}
               </p>
             </div>
             <div className="hidden grid-flow-col  items-center justify-between gap-2 md:grid">
               <p className="text-sm text-neutral-900">Giảm giá ưu đãi</p>
-              <p className="text-sm font-semibold text-neutral-900">-</p>
+              <p className="text-sm font-semibold text-neutral-900">
+                {selectedCoupon
+                  ? handleRenderPriceWithCoupon(selectedCoupon)
+                  : "-"}
+              </p>
             </div>
             <div className="hidden grid-flow-col  items-center justify-between gap-2 md:grid">
               <p className="text-sm text-neutral-900">Giảm giá sản phẩm</p>
               <p className="text-sm font-semibold text-neutral-900">
-                -37.500&nbsp;₫
+                - {convertVND(CalculatePriceWithSale(cart))}
               </p>
             </div>
             <Separator />
@@ -78,7 +95,7 @@ const CartItemBoxBuy = () => {
                 Tổng tiền
               </p>
               <p className="text-xl font-bold leading-8 text-red-500 no-underline md:text-2xl">
-                448.500&nbsp;₫
+                {convertVND(CalculateTotalPrice())}
               </p>
             </div>
           </div>
@@ -87,7 +104,7 @@ const CartItemBoxBuy = () => {
             onClick={() => navigate("/checkout")}
           >
             Mua hàng
-            <span className="ms-1 md:inline inline">(3)</span>
+            <span className="ms-1 md:inline inline">({CalculateTotalItems(cart)})</span>
           </Button>
         </div>
       </div>
