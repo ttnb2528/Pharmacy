@@ -1,5 +1,6 @@
 import {
   GET_ALL_ADDRESSES_ROUTE,
+  GET_ALL_CATEGORIES_ROUTE,
   GET_ALL_PRODUCTS_ROUTE,
   GET_COUPONS_ROUTE,
   GET_USER_INFO,
@@ -25,65 +26,107 @@ const PharmacyContextProvider = (props) => {
   const [cart, setCart] = useState(getDefaultCart());
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const resUser = await apiClient.get(GET_USER_INFO);
+  //       if (resUser.status === 200) {
+  //         setUserData(resUser.data.data);
+  //         setCart(resUser.data.data?.accountId?.cartData);
+  //       } else {
+  //         setUserData(null);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy thông tin người dùng:", error);
+  //     }
+  //   };
+
+  //   const fetchAddressData = async () => {
+  //     try {
+  //       const resAddress = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
+  //       if (resAddress.status === 200) {
+  //         setAddressData(resAddress.data.data);
+  //       } else if (resAddress.status === 500) {
+  //         setAddressData(null);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy thông tin địa chỉ:", error);
+  //     }
+  //   };
+
+  //   const fetchCouponData = async () => {
+  //     try {
+  //       const resCoupon = await apiClient.get(GET_COUPONS_ROUTE);
+  //       if (resCoupon.status === 200) {
+  //         setCouponData(resCoupon.data.data);
+  //       } else if (resCoupon.status === 500) {
+  //         setCouponData(null);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy thông tin mã giảm giá:", error);
+  //     }
+  //   };
+
+  //   const fetchAllProducts = async () => {
+  //     try {
+  //       const resProducts = await apiClient.get(GET_ALL_PRODUCTS_ROUTE);
+  //       if (resProducts.status === 200) {
+  //         setAllProducts(resProducts.data.data);
+  //       } else if (resProducts.status === 500) {
+  //         setAllProducts(null);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+  //     }
+  //   };
+
+  //   const fetchCategories = async () => {
+  //     try {
+  //       const resCategories = await apiClient.get(GET_ALL_CATEGORIES_ROUTE);
+  //       if (resCategories.status === 200) {
+  //         setCategories(resCategories.data.data);
+  //       } else if (resCategories.status === 500) {
+  //         setCategories(null);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy thông tin danh mục:", error);
+  //     }
+  //   };
+
+  //   fetchUserData();
+  //   fetchAddressData();
+  //   fetchCouponData();
+  //   fetchAllProducts();
+  //   fetchCategories();
+  // }, []);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const resUser = await apiClient.get(GET_USER_INFO);
-        if (resUser.status === 200) {
-          setUserData(resUser.data.data);
-          setCart(resUser.data.data?.accountId?.cartData);
-        } else {
-          setUserData(null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin người dùng:", error);
-      }
+    const fetchData = async () => {
+      setLoading(true); // Set loading to true before fetching data
+
+      // Fetch user, address, coupon, product, and category data
+      const [resUser, resAddress, resCoupon, resProducts, resCategories] =
+        await Promise.all([
+          apiClient.get(GET_USER_INFO),
+          apiClient.get(GET_ALL_ADDRESSES_ROUTE),
+          apiClient.get(GET_COUPONS_ROUTE),
+          apiClient.get(GET_ALL_PRODUCTS_ROUTE),
+          apiClient.get(GET_ALL_CATEGORIES_ROUTE),
+        ]);
+
+      // Set data and loading state
+      setUserData(resUser.data.data);
+      setAddressData(resAddress.data.data);
+      setCouponData(resCoupon.data.data);
+      setAllProducts(resProducts.data.data);
+      setCategories(resCategories.data.data);
+      setLoading(false); // Set loading to false after all data is fetched
     };
 
-    const fetchAddressData = async () => {
-      try {
-        const resAddress = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
-        if (resAddress.status === 200) {
-          setAddressData(resAddress.data.data);
-        } else if (resAddress.status === 500) {
-          setAddressData(null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin địa chỉ:", error);
-      }
-    };
-
-    const fetchCouponData = async () => {
-      try {
-        const resCoupon = await apiClient.get(GET_COUPONS_ROUTE);
-        if (resCoupon.status === 200) {
-          setCouponData(resCoupon.data.data);
-        } else if (resCoupon.status === 500) {
-          setCouponData(null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin mã giảm giá:", error);
-      }
-    };
-
-    const fetchAllProducts = async () => {
-      try {
-        const resProducts = await apiClient.get(GET_ALL_PRODUCTS_ROUTE);
-        if (resProducts.status === 200) {
-          setAllProducts(resProducts.data.data);
-        } else if (resProducts.status === 500) {
-          setAllProducts(null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin sản phẩm:", error);
-      }
-    };
-
-    fetchUserData();
-    fetchAddressData();
-    fetchCouponData();
-    fetchAllProducts();
+    fetchData();
   }, []);
 
   const updateUserData = (newUserData) => {
@@ -156,6 +199,7 @@ const PharmacyContextProvider = (props) => {
   };
 
   const contextValue = {
+    loading,
     userData,
     updateUserData,
     addressData,
@@ -170,6 +214,7 @@ const PharmacyContextProvider = (props) => {
     CalculateTotalPriceTemp,
     CalculatePriceWithSale,
     CalculateTotalPrice,
+    categories,
   };
 
   return (
