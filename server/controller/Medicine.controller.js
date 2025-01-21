@@ -64,6 +64,30 @@ export const getMedicinesByIsDiscount = asyncHandler(async (req, res) => {
     );
 });
 
+export const getMedicinesByCategory = asyncHandler(async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const medicines = await Medicine.find({ categoryId })
+      .populate("categoryId")
+      .populate("brandId");
+
+    for (let medicine of medicines) {
+      const batches = await Batch.find({ MedicineId: medicine._id })
+        .populate("SupplierId")
+        .populate("ManufactureId");
+      medicine._doc.batches = batches; // Gán kết quả vào medicine object
+    }
+
+    res
+      .status(StatusCode.OK)
+      .json(
+        jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+      );
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const getMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const medicine = await Medicine.findById(id)
