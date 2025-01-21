@@ -1,12 +1,27 @@
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import slugify from "slugify";
 
 const NavMenu = () => {
+  const { categories } = useContext(PharmacyContext);
   return (
     <div className="main-menu flex justify-between text-white mb-2">
-      <div className="cate-menu">
+      {categories.map((category) => (
+        <div className="cate-menu" key={category.id}>
+          <span className="root-cate">
+            <div className="cursor-pointer">
+              <Link to={`/${slugify(category.name, { lower: true })}`}>
+                <strong className="cate-title">{category.name}</strong>
+              </Link>
+            </div>
+          </span>
+        </div>
+      ))}
+      {/* <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/duoc-pham"}>
+            <Link to={"/Duoc-pham"}>
               <strong className="cate-title">Dược Phẩm</strong>
             </Link>
           </div>
@@ -16,7 +31,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/cham-soc-suc-khoe"}>
+            <Link to={"/Cham-soc-suc-khoe"}>
               <strong className="cate-title">Chăm sóc sức khoẻ</strong>
             </Link>
           </div>
@@ -26,7 +41,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/cham-soc-ca-nhan"}>
+            <Link to={"/Cham-soc-ca-nhan"}>
               <strong className="cate-title">Chăm sóc cá nhân</strong>
             </Link>
           </div>
@@ -36,7 +51,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/san-pham-tien-loi"}>
+            <Link to={"/San-pham-tien-loi"}>
               <strong className="cate-title">Sản phẩm tiện lợi</strong>
             </Link>
           </div>
@@ -46,7 +61,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/thuc-pham-chuc-nang"}>
+            <Link to={"/Thuc-pham-chuc-nang"}>
               <strong className="cate-title">thực phẩm chức năng</strong>
             </Link>
           </div>
@@ -56,7 +71,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/me-va-be"}>
+            <Link to={"/Me-va-Be"}>
               <strong className="cate-title">Mẹ và Bé</strong>
             </Link>
           </div>
@@ -66,7 +81,7 @@ const NavMenu = () => {
       <div className="cate-menu">
         <span className="root-cate">
           <div className="cursor-pointer">
-            <Link to={"/cham-soc-nhan-sac"}>
+            <Link to={"/Cham-soc-nhan-sac"}>
               <strong className="cate-title ">Chăm sóc nhan sắc</strong>
             </Link>
           </div>
@@ -81,7 +96,7 @@ const NavMenu = () => {
             </Link>
           </div>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 };
