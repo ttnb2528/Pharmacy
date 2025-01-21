@@ -15,8 +15,19 @@ import PointsHistory from "./pages/Client/Account/components/PointsHistory.jsx";
 import PointsPolicy from "./pages/Client/Account/components/PointsPolicy.jsx";
 import UpdatePassword from "./pages/Client/Account/components/UpdatePassword.jsx";
 import NotFound from "./pages/component/NotFound.jsx";
+import SearchResult from "./pages/Client/Product/SearchResult.jsx";
+import { useContext } from "react";
+import { PharmacyContext } from "./context/Pharmacy.context.jsx";
+import slugify from "slugify";
+import Loading from "./pages/component/Loading.jsx";
 
 const App = () => {
+  const { categories, loading } = useContext(PharmacyContext);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -26,41 +37,25 @@ const App = () => {
           path: "/",
           element: <Home />,
         },
-        {
-          path: "/duoc-pham",
-          element: <Product title="Dược Phẩm" />,
-        },
-        {
-          path: "/cham-soc-suc-khoe",
-          element: <Product title="Chăm Sóc Sức Khỏe" />,
-        },
-        {
-          path: "/cham-soc-ca-nhan",
-          element: <Product title="Chăm Sóc Cá Nhân" />,
-        },
-        {
-          path: "/me-va-be",
-          element: <Product title="Mẹ Và Bé" />,
-        },
-        {
-          path: "/san-pham-tien-loi",
-          element: <Product title="Sản Phẩm Tiện Lợi" />,
-        },
-        {
-          path: "/thuc-pham-chuc-nang",
-          element: <Product title="Thực Phẩm Chức Năng" />,
-        },
-        {
-          path: "/cham-soc-nhan-sac",
-          element: <Product title="Chăm Sóc Nhan Sắc" />,
-        },
-        {
-          path: "/thiet-bi-y-te",
-          element: <Product title="Thiết Bị Y Tế" />,
-        },
-        {
-          path: "/product/:id",
+        ...categories.map((category) => ({
+          path: `/${slugify(category?.name, { lower: false })}`,
+          element: (
+            <Product title={category?.name} categoryId={category?._id} />
+          ),
+          // children: [
+          //   {
+          //     path: ":productName",
+          //     element: <ProductDisplay />,
+          //   },
+          // ],
+        })),
+        ...categories.map((category) => ({
+          path: `/${slugify(category?.name, { lower: false })}/:productName`,
           element: <ProductDisplay />,
+        })),
+        {
+          path: "/search",
+          element: <SearchResult />,
         },
         {
           path: "/cart",
