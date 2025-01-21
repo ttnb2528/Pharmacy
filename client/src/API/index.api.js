@@ -1,7 +1,6 @@
 export const HOST = import.meta.env.VITE_SERVER_URL;
 
 export const AUTH_ROUTES = "/api/v1/auth";
-
 export const SIGNUP_ROUTE = `${AUTH_ROUTES}/signup`;
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
 export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
@@ -39,7 +38,11 @@ export const UPDATE_COUPON_ROUTE = `${COUPON_ROUTES}/updateCoupon/:id`;
 export const PRODUCT_ROUTES = "/api/v1/medicine";
 export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
 export const GET_ALL_PRODUCTS_DISCOUNT_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByIsDiscount`;
+export const GET_ALL_PRODUCT_BY_CATEGORY_ROUTE = `${PRODUCT_ROUTES}/getMedicineByCategory`;
 export const GET_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/getMedicine/:id`;
 export const CREATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/addMedicine`;
 export const UPDATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/updateMedicine/:id`;
 export const DELETE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine/:id`;
+
+export const CATEGORY_ROUTES = "/api/v1/category";
+export const GET_ALL_CATEGORIES_ROUTE = `${CATEGORY_ROUTES}/getCategories`;
