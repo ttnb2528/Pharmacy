@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button.jsx";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Login from "@/pages/Client/Home/components/Login.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
@@ -28,15 +28,63 @@ import { GrMapLocation } from "react-icons/gr";
 import { IoIosLogOut } from "react-icons/io";
 import { apiClient } from "@/lib/api-client.js";
 import { LOGOUT_ROUTE } from "@/API/index.api.js";
+import { Input } from "@/components/ui/input.jsx";
 
 const NavSearch = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
-  const { userData, cart, CalculateTotalItems } = useContext(PharmacyContext);
+  const { userData, cart, CalculateTotalItems, allProducts } =
+    useContext(PharmacyContext);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const inputRef = useRef(null);
 
   const handleShowLogin = () => {
     setShowLogin(true);
   };
+
+  const handleSearchChange = (event) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+
+    if (!newSearchTerm) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Tìm kiếm sản phẩm
+    const filteredProducts = allProducts.filter((product) => {
+      return product.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+    });
+    setSearchResults(filteredProducts);
+  };
+
+  const handleFocus = () => {
+    setShowResults(true);
+  };
+
+  // Xử lý click outside input
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target) &&
+        !event.target.closest(".search-suggestions")
+      ) {
+        console.log("click outside");
+
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="flex flex-wrap justify-between items-center relative gap-10">
       <div>
@@ -45,13 +93,61 @@ const NavSearch = () => {
         </Link>
       </div>
 
-      <div className="relative flex-1">
-        <input
-          type="text"
-          className="w-full h-10 rounded border-none bg-white p-2 outline-none"
+      <div className="relative flex-1" ref={inputRef}>
+        <Input
+          className="w-full h-10 rounded border-none bg-white focus-visible:ring-0 p-2 outline-none"
           placeholder="Tìm kiếm sản phẩm..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          onFocus={handleFocus}
         />
         <FaSearch className="absolute right-3 top-3" />
+        {showResults && (
+          <div className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions">
+            <ul>
+              {searchResults.map((product) => (
+                <li
+                  key={product.id}
+                  // className="py-2 px-4 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setShowResults(false);
+                    // navigate(`/product/${product.id}`);
+                  }}
+                >
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="py-2 px-4 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-8 h-8 rounded-md"
+                    />
+                    <span>{product.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {searchResults.length > 0 && (
+              <>
+                <Separator />
+                <div
+                  className="p-4 text-center"
+                  onClick={() => {
+                    const searchParams = new URLSearchParams();
+                    searchParams.set("keyword", searchTerm);
+                    navigate(`/search?${searchParams.toString()}`);
+                    setShowResults(false);
+                  }}
+                >
+                  <span className="text-[#f48120] font-semibold">
+                    Xem tất cả {searchResults.length} sản phẩm
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* cart */}
