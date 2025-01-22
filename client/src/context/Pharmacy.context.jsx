@@ -3,6 +3,7 @@ import {
   GET_ALL_CATEGORIES_ROUTE,
   GET_ALL_PRODUCTS_ROUTE,
   GET_COUPONS_ROUTE,
+  GET_PRODUCT_BY_BEST_SELLING_ROUTE,
   GET_USER_INFO,
 } from "@/API/index.api.js";
 import { apiClient } from "@/lib/api-client.js";
@@ -26,6 +27,7 @@ const PharmacyContextProvider = (props) => {
   const [cart, setCart] = useState(getDefaultCart());
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
+  const [productsBestSelling, setProductsBestSelling] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +52,7 @@ const PharmacyContextProvider = (props) => {
         const resAddress = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
         if (resAddress.status === 200) {
           setAddressData(resAddress.data.data);
-        } else if (resAddress.status === 500) {
+        } else {
           setAddressData(null);
         }
       } catch (error) {
@@ -63,7 +65,7 @@ const PharmacyContextProvider = (props) => {
         const resCoupon = await apiClient.get(GET_COUPONS_ROUTE);
         if (resCoupon.status === 200) {
           setCouponData(resCoupon.data.data);
-        } else if (resCoupon.status === 500) {
+        } else {
           setCouponData(null);
         }
       } catch (error) {
@@ -76,11 +78,26 @@ const PharmacyContextProvider = (props) => {
         const resProducts = await apiClient.get(GET_ALL_PRODUCTS_ROUTE);
         if (resProducts.status === 200) {
           setAllProducts(resProducts.data.data);
-        } else if (resProducts.status === 500) {
+        } else {
           setAllProducts(null);
         }
       } catch (error) {
         console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+      }
+    };
+
+    const fetchBestSellingProducts = async () => {
+      try {
+        const resBestSellingProducts = await apiClient.get(
+          GET_PRODUCT_BY_BEST_SELLING_ROUTE
+        );
+        if (resBestSellingProducts.status === 200) {
+          setProductsBestSelling(resBestSellingProducts.data.data);
+        } else {
+          setProductsBestSelling(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin sản phẩm bán chạy:", error);
       }
     };
 
@@ -89,7 +106,7 @@ const PharmacyContextProvider = (props) => {
         const resCategories = await apiClient.get(GET_ALL_CATEGORIES_ROUTE);
         if (resCategories.status === 200) {
           setCategories(resCategories.data.data);
-        } else if (resCategories.status === 500) {
+        } else {
           setCategories(null);
         }
       } catch (error) {
@@ -100,8 +117,9 @@ const PharmacyContextProvider = (props) => {
     fetchUserData();
     fetchAddressData();
     fetchCouponData();
-    fetchAllProducts();
     fetchCategories();
+    fetchAllProducts();
+    fetchBestSellingProducts();
     setLoading(false);
   }, []);
 
@@ -217,6 +235,7 @@ const PharmacyContextProvider = (props) => {
     setAddressData,
     couponData,
     allProducts,
+    productsBestSelling,
     cart,
     setCart,
     selectedCoupon,

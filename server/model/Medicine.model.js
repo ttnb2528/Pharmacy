@@ -57,6 +57,10 @@ const MedicineSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  sold: {
+    type: Number,
+    default: 0,
+  },
   isDiscount: {
     type: Boolean,
     default: false,

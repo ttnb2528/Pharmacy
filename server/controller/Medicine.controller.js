@@ -112,6 +112,37 @@ export const getMedicine = asyncHandler(async (req, res) => {
     );
 });
 
+export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
+  const medicines = await Medicine.find()
+    .sort({ sold: -1 })
+    .limit(10)
+    .populate("categoryId")
+    .populate("brandId");
+
+  for (let medicine of medicines) {
+    const batches = await Batch.find({ MedicineId: medicine._id })
+      .populate("SupplierId")
+      .populate("ManufactureId");
+    medicine._doc.batches = batches; 
+  }
+
+  if (!medicines) {
+    if (medicines.length === 0) {
+      medicines = await Medicine.aggregate([{ $sample: { size: 10 } }]);
+    }
+  }
+
+  res
+    .status(StatusCode.OK)
+    .json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách thuốc bán chạy nhất thành công",
+        medicines
+      )
+    );
+});
+
 export const deleteMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const medicine = await Medicine.findById(id);

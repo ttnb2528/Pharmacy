@@ -3,6 +3,7 @@ import {
   addMedicine,
   deleteMedicine,
   getMedicine,
+  getMedicineByBestSelling,
   getMedicines,
   getMedicinesByCategory,
   getMedicinesByIsDiscount,
@@ -15,6 +16,7 @@ router.post("/addMedicine", addMedicine);
 router.get("/getMedicines", getMedicines);
 router.get("/getMedicinesByIsDiscount", getMedicinesByIsDiscount);
 router.get("/getMedicineByCategory/:categoryId", getMedicinesByCategory);
+router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
 router.get("/getMedicine/:id", getMedicine);
 router.delete("/deleteMedicine/:id", deleteMedicine);
 router.put("/updateMedicine/:id", updateMedicine);

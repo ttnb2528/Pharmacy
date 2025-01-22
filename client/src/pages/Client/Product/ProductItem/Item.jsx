@@ -1,11 +1,15 @@
+import { ADD_TO_CART_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { apiClient } from "@/lib/api-client.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import slugify from "slugify";
 
-const Item = ({ product }) => {
+const Item = ({ product, setIsLoading }) => {
+  const { setCart } = useContext(PharmacyContext);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = (e) => {
@@ -37,6 +41,31 @@ const Item = ({ product }) => {
   );
   const productSlug = slugify(product?.name || "unknown-name", { lower: true });
   const path = `/${categorySlug}/${productSlug}`;
+
+  const AddToCart = async (productId) => {
+    try {
+      setIsLoading(true);
+      const res = await apiClient.post(ADD_TO_CART_ROUTE, {
+        productId: productId,
+        quantity: 1,
+      });
+
+      if (res.status === 200 && res.data.status === 200) {
+        setCart((prev) => {
+          return {
+            ...prev,
+            [productId]: prev[productId] + 1,
+          };
+        });
+      }
+
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className=" p-2" onMouseDown={handleMouseDown}>
@@ -100,9 +129,7 @@ const Item = ({ product }) => {
           <div className="flex justify-center items-center my-3">
             <Button
               className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
-              onClick={() => {
-                alert("add to cart");
-              }}
+              onClick={() => AddToCart(product.id)}
             >
               Thêm giỏ hàng
             </Button>

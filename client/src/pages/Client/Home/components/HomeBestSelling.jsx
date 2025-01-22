@@ -2,10 +2,13 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
+import { useContext, useState } from "react";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import Loading from "@/pages/component/Loading.jsx";
 
 const HomeBestSelling = () => {
-  const bestSellingProducts = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
+  const { productsBestSelling } = useContext(PharmacyContext);
+  const [isLoading, setIsLoading] = useState(false);
   function SampleNextArrow(props) {
     const { className, onClick } = props;
 
@@ -106,6 +109,7 @@ const HomeBestSelling = () => {
   };
   return (
     <div>
+      {isLoading && <Loading />}
       <div className="product_carousel bg-white rounded-lg px-3 mb-10">
         <div className="px-6 pt-6 pb-9 ">
           <div className="product_carousel-header mb-5">
@@ -116,8 +120,10 @@ const HomeBestSelling = () => {
 
           <div className="slider-container">
             <Slider {...settings}>
-              {bestSellingProducts.map((product, i) => {
-                return <Item key={i} />;
+              {productsBestSelling?.map((product, i) => {
+                return (
+                  <Item key={i} product={product} setIsLoading={setIsLoading} />
+                );
               })}
             </Slider>
           </div>

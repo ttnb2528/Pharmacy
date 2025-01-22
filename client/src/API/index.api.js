@@ -39,6 +39,7 @@ export const PRODUCT_ROUTES = "/api/v1/medicine";
 export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
 export const GET_ALL_PRODUCTS_DISCOUNT_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByIsDiscount`;
 export const GET_ALL_PRODUCT_BY_CATEGORY_ROUTE = `${PRODUCT_ROUTES}/getMedicineByCategory`;
+export const GET_PRODUCT_BY_BEST_SELLING_ROUTE = `${PRODUCT_ROUTES}/getMedicineByBestSelling`;
 export const GET_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/getMedicine/:id`;
 export const CREATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/addMedicine`;
 export const UPDATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/updateMedicine/:id`;
