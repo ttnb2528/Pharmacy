@@ -29,105 +29,107 @@ const PharmacyContextProvider = (props) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     try {
-  //       const resUser = await apiClient.get(GET_USER_INFO);
-  //       if (resUser.status === 200) {
-  //         setUserData(resUser.data.data);
-  //         setCart(resUser.data.data?.accountId?.cartData);
-  //       } else {
-  //         setUserData(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy thông tin người dùng:", error);
-  //     }
-  //   };
-
-  //   const fetchAddressData = async () => {
-  //     try {
-  //       const resAddress = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
-  //       if (resAddress.status === 200) {
-  //         setAddressData(resAddress.data.data);
-  //       } else if (resAddress.status === 500) {
-  //         setAddressData(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy thông tin địa chỉ:", error);
-  //     }
-  //   };
-
-  //   const fetchCouponData = async () => {
-  //     try {
-  //       const resCoupon = await apiClient.get(GET_COUPONS_ROUTE);
-  //       if (resCoupon.status === 200) {
-  //         setCouponData(resCoupon.data.data);
-  //       } else if (resCoupon.status === 500) {
-  //         setCouponData(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy thông tin mã giảm giá:", error);
-  //     }
-  //   };
-
-  //   const fetchAllProducts = async () => {
-  //     try {
-  //       const resProducts = await apiClient.get(GET_ALL_PRODUCTS_ROUTE);
-  //       if (resProducts.status === 200) {
-  //         setAllProducts(resProducts.data.data);
-  //       } else if (resProducts.status === 500) {
-  //         setAllProducts(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy thông tin sản phẩm:", error);
-  //     }
-  //   };
-
-  //   const fetchCategories = async () => {
-  //     try {
-  //       const resCategories = await apiClient.get(GET_ALL_CATEGORIES_ROUTE);
-  //       if (resCategories.status === 200) {
-  //         setCategories(resCategories.data.data);
-  //       } else if (resCategories.status === 500) {
-  //         setCategories(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy thông tin danh mục:", error);
-  //     }
-  //   };
-
-  //   fetchUserData();
-  //   fetchAddressData();
-  //   fetchCouponData();
-  //   fetchAllProducts();
-  //   fetchCategories();
-  // }, []);
-
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Set loading to true before fetching data
-
-      // Fetch user, address, coupon, product, and category data
-      const [resUser, resAddress, resCoupon, resProducts, resCategories] =
-        await Promise.all([
-          apiClient.get(GET_USER_INFO),
-          apiClient.get(GET_ALL_ADDRESSES_ROUTE),
-          apiClient.get(GET_COUPONS_ROUTE),
-          apiClient.get(GET_ALL_PRODUCTS_ROUTE),
-          apiClient.get(GET_ALL_CATEGORIES_ROUTE),
-        ]);
-
-      // Set data and loading state
-      setUserData(resUser.data.data);
-      setAddressData(resAddress.data.data);
-      setCouponData(resCoupon.data.data);
-      setAllProducts(resProducts.data.data);
-      setCategories(resCategories.data.data);
-      setLoading(false); // Set loading to false after all data is fetched
+    setLoading(true);
+    const fetchUserData = async () => {
+      try {
+        const resUser = await apiClient.get(GET_USER_INFO);
+        if (resUser.status === 200) {
+          setUserData(resUser.data.data);
+          setCart(resUser.data.data?.accountId?.cartData);
+        } else {
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin người dùng:", error);
+      }
     };
 
-    fetchData();
+    const fetchAddressData = async () => {
+      try {
+        const resAddress = await apiClient.get(GET_ALL_ADDRESSES_ROUTE);
+        if (resAddress.status === 200) {
+          setAddressData(resAddress.data.data);
+        } else if (resAddress.status === 500) {
+          setAddressData(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin địa chỉ:", error);
+      }
+    };
+
+    const fetchCouponData = async () => {
+      try {
+        const resCoupon = await apiClient.get(GET_COUPONS_ROUTE);
+        if (resCoupon.status === 200) {
+          setCouponData(resCoupon.data.data);
+        } else if (resCoupon.status === 500) {
+          setCouponData(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin mã giảm giá:", error);
+      }
+    };
+
+    const fetchAllProducts = async () => {
+      try {
+        const resProducts = await apiClient.get(GET_ALL_PRODUCTS_ROUTE);
+        if (resProducts.status === 200) {
+          setAllProducts(resProducts.data.data);
+        } else if (resProducts.status === 500) {
+          setAllProducts(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const resCategories = await apiClient.get(GET_ALL_CATEGORIES_ROUTE);
+        if (resCategories.status === 200) {
+          setCategories(resCategories.data.data);
+        } else if (resCategories.status === 500) {
+          setCategories(null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin danh mục:", error);
+      }
+    };
+
+    fetchUserData();
+    fetchAddressData();
+    fetchCouponData();
+    fetchAllProducts();
+    fetchCategories();
+    setLoading(false);
   }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoading(true); // Set loading to true before fetching data
+
+  //     // Fetch user, address, coupon, product, and category data
+  //     const [resUser, resAddress, resCoupon, resProducts, resCategories] =
+  //       await Promise.all([
+  //         apiClient.get(GET_USER_INFO),
+  //         apiClient.get(GET_ALL_ADDRESSES_ROUTE),
+  //         apiClient.get(GET_COUPONS_ROUTE),
+  //         apiClient.get(GET_ALL_PRODUCTS_ROUTE),
+  //         apiClient.get(GET_ALL_CATEGORIES_ROUTE),
+  //       ]);
+
+  //     // Set data and loading state
+  //     setUserData(resUser.data.data);
+  //     setAddressData(resAddress.data.data);
+  //     setCouponData(resCoupon.data.data);
+  //     setAllProducts(resProducts.data.data);
+  //     setCategories(resCategories.data.data);
+  //     setLoading(false); // Set loading to false after all data is fetched
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   const updateUserData = (newUserData) => {
     setUserData(newUserData);
@@ -150,14 +152,7 @@ const PharmacyContextProvider = (props) => {
 
     for (const item in carts) {
       if (carts[item] > 0) {
-        if (allProducts[item - 1]?.isDiscount) {
-          totalPrice +=
-            carts[item] *
-            (allProducts[item - 1]?.batches[0]?.price *
-              (1 - allProducts[item - 1]?.percentDiscount / 100));
-        } else {
-          totalPrice += carts[item] * allProducts[item - 1]?.batches[0]?.price;
-        }
+        totalPrice += carts[item] * allProducts[item - 1]?.batches[0]?.price;
       }
     }
 
@@ -179,20 +174,36 @@ const PharmacyContextProvider = (props) => {
     return totalPrice;
   };
 
+  const CalculatePriceAfterSale = (carts) => {
+    let totalPrice = 0;
+
+    for (const item in carts) {
+      if (carts[item] > 0) {
+        totalPrice +=
+          carts[item] *
+          (allProducts[item - 1]?.batches[0]?.price -
+            (allProducts[item - 1]?.percentDiscount / 100) *
+              allProducts[item - 1]?.batches[0]?.price);
+      }
+    }
+
+    return totalPrice;
+  };
+
   const CalculateTotalPrice = () => {
     let totalPrice = 0;
 
     if (selectedCoupon) {
       if (selectedCoupon.discount_type === "percentage") {
         totalPrice =
-          CalculateTotalPriceTemp(cart) *
+          CalculatePriceAfterSale(cart) *
           (1 - selectedCoupon.discount_value / 100);
       } else {
         totalPrice =
-          CalculateTotalPriceTemp(cart) - selectedCoupon.discount_value;
+          CalculatePriceAfterSale(cart) - selectedCoupon.discount_value;
       }
     } else {
-      totalPrice = CalculateTotalPriceTemp(cart);
+      totalPrice = CalculatePriceAfterSale(cart);
     }
 
     return totalPrice;

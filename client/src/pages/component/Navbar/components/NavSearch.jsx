@@ -1,5 +1,4 @@
 import logo from "@/assets/logo.png";
-import test_product_image from "@/assets/test_product_image.png";
 
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -27,18 +26,32 @@ import { LuNotepadText } from "react-icons/lu";
 import { GrMapLocation } from "react-icons/gr";
 import { IoIosLogOut } from "react-icons/io";
 import { apiClient } from "@/lib/api-client.js";
-import { LOGOUT_ROUTE } from "@/API/index.api.js";
+import {
+  LOGOUT_ROUTE,
+  REMOVE_PRODUCT_FROM_CART_ROUTE,
+} from "@/API/index.api.js";
 import { Input } from "@/components/ui/input.jsx";
+import { convertVND } from "@/utils/ConvertVND.js";
+import { CalculateProductWithSale } from "@/utils/Calculate.js";
+import { toast } from "sonner";
+import Loading from "../../Loading.jsx";
 
 const NavSearch = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
-  const { userData, cart, CalculateTotalItems, allProducts } =
-    useContext(PharmacyContext);
+  const {
+    userData,
+    cart,
+    setCart,
+    CalculateTotalItems,
+    CalculateTotalPriceTemp,
+    allProducts,
+  } = useContext(PharmacyContext);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [loading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
   const searchContainerRef = useRef(null);
 
@@ -86,8 +99,32 @@ const NavSearch = () => {
     };
   }, []);
 
+  const handleRemoveProduct = async (productId) => {
+    try {
+      setIsLoading(true);
+      const res = await apiClient.post(REMOVE_PRODUCT_FROM_CART_ROUTE, {
+        productId,
+      });
+
+      if (res.status === 200 && res.data.status === 200) {
+        setCart((prev) => ({
+          ...prev,
+          [productId]: 0,
+        }));
+        toast.success(res.data.message);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-wrap justify-between items-center relative gap-10">
+      {loading && <Loading />}
       <div>
         <Link to="/">
           <img src={logo} alt="" className="h-20 w-25 my-2 mr-6" />
@@ -168,165 +205,88 @@ const NavSearch = () => {
           </div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-[320px] right-20 relative">
-          <DropdownMenuLabel className="text-right">
-            Tổng tiền:{" "}
-            <span className="text-[#f48120] font-bold">100,000đ</span>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+        {cart && CalculateTotalItems(cart) > 0 ? (
+          <DropdownMenuContent className="w-[320px] right-20 relative">
+            <DropdownMenuLabel className="text-right">
+              Tổng tiền:
+              <span className="text-[#f48120] font-bold ml-1">
+                {convertVND(CalculateTotalPriceTemp(cart))}
+              </span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
 
-          <DropdownMenuGroup className="overflow-y-auto max-h-80 overflow-hidden">
-            <DropdownMenuItem className="cursor-pointer group">
-              <div className="flex gap-2 my-2">
-                <img
-                  src={test_product_image}
-                  alt="product"
-                  className="h-10 w-10"
-                  onClick={() => navigate("/abc")}
-                />
+            <DropdownMenuGroup className="overflow-y-auto max-h-80 overflow-hidden">
+              {allProducts.map(
+                (product, index) =>
+                  cart[product.id] > 0 && (
+                    <div key={product._id}>
+                      <DropdownMenuItem className="cursor-pointer group">
+                        <div className="flex gap-2 my-2 w-full">
+                          <img
+                            src={product?.images[0]}
+                            alt="product"
+                            className="h-10 w-10"
+                            onClick={() => navigate("/abc")}
+                          />
 
-                <div className="flex flex-col justify-center">
-                  <Link to="/abc">
-                    <span className="line-clamp-1 text-base">
-                      Dưỡng chất làm giảm rạn da Happy Event Stretch Mark
-                      Repairing Essence Tuýp 40g
-                    </span>
-                  </Link>
-                  <div className="flex">
-                    <span>2 x</span>
-                    <span className="ml-1 text-[#f48120]">100,000đ</span>
-                  </div>
-                </div>
-                <div
-                  className="hidden group-hover:block"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert("xóa sản phẩm");
-                  }}
-                >
-                  <FaTrash />
-                </div>
-              </div>
-            </DropdownMenuItem>
+                          <div className="flex flex-1 flex-col justify-center">
+                            <Link to="/abc">
+                              <span className="line-clamp-1 text-base">
+                                {product?.name}
+                              </span>
+                            </Link>
+                            <div className="flex">
+                              <span>{cart[product.id]} x</span>
+                              <span className="ml-1 text-[#f48120]">
+                                {convertVND(
+                                  CalculateProductWithSale(
+                                    product.batches[0].price,
+                                    product.percentDiscount
+                                  )
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            className=" hidden group-hover:block group-hover:text-green-500 mr-2"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleRemoveProduct(product.id);
+                            }}
+                          >
+                            <FaTrash />
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      {index < allProducts.length - 1 && <Separator />}
+                    </div>
+                  )
+              )}
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer group">
-              <div className="flex gap-2 my-2">
-                <img
-                  src={test_product_image}
-                  alt="product"
-                  className="h-10 w-10"
-                />
-                <div className="flex flex-col justify-center">
-                  <span className="line-clamp-1 text-base">
-                    Dưỡng chất làm giảm rạn da Happy Event Stretch Mark
-                    Repairing Essence Tuýp 40g
-                  </span>
-                  <div className="flex">
-                    <span>2 x</span>
-                    <span className="ml-1 text-[#f48120]">100,000đ</span>
-                  </div>
-                </div>
-                <div
-                  className="hidden group-hover:block"
-                  onClick={() => alert("xóa sản phẩm")}
-                >
-                  <FaTrash />
-                </div>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer group">
-              <div className="flex gap-2 my-2">
-                <img
-                  src={test_product_image}
-                  alt="product"
-                  className="h-10 w-10"
-                />
-                <div className="flex flex-col justify-center">
-                  <span className="line-clamp-1 text-base">
-                    Dưỡng chất làm giảm rạn da Happy Event Stretch Mark
-                    Repairing Essence Tuýp 40g
-                  </span>
-                  <div className="flex">
-                    <span>2 x</span>
-                    <span className="ml-1 text-[#f48120]">100,000đ</span>
-                  </div>
-                </div>
-                <div
-                  className="hidden group-hover:block"
-                  onClick={() => alert("xóa sản phẩm")}
-                >
-                  <FaTrash />
-                </div>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer group">
-              <div className="flex gap-2 my-2">
-                <img
-                  src={test_product_image}
-                  alt="product"
-                  className="h-10 w-10"
-                />
-                <div className="flex flex-col justify-center">
-                  <span className="line-clamp-1 text-base">
-                    Dưỡng chất làm giảm rạn da Happy Event Stretch Mark
-                    Repairing Essence Tuýp 40g
-                  </span>
-                  <div className="flex">
-                    <span>2 x</span>
-                    <span className="ml-1 text-[#f48120]">100,000đ</span>
-                  </div>
-                </div>
-                <div
-                  className="hidden group-hover:block"
-                  onClick={() => alert("xóa sản phẩm")}
-                >
-                  <FaTrash />
-                </div>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer group">
-              <div className="flex gap-2 my-2">
-                <img
-                  src={test_product_image}
-                  alt="product"
-                  className="h-10 w-10"
-                />
-                <div className="flex flex-col justify-center">
-                  <span className="line-clamp-1 text-base">
-                    Dưỡng chất làm giảm rạn da Happy Event Stretch Mark
-                    Repairing Essence Tuýp 40g
-                  </span>
-                  <div className="flex">
-                    <span>2 x</span>
-                    <span className="ml-1 text-[#f48120]">100,000đ</span>
-                  </div>
-                </div>
-                <div
-                  className="hidden group-hover:block"
-                  onClick={() => alert("xóa sản phẩm")}
-                >
-                  <FaTrash />
-                </div>
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup className="flex justify-between mb-3">
-            <DropdownMenuItem onClick={() => navigate("/cart")}>
-              <Button className="bg-white text-[#f48120] border-[#f48120] border hover:bg-[#f48120] hover:text-white transition-all duration-300">
-                Xem giỏ hàng
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/checkout")}>
-              <Button className="bg-[#0e562e] hover:bg-[#227748]">
-                Thanh toán
-              </Button>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
+
+            <DropdownMenuGroup className="flex justify-between mb-3">
+              <DropdownMenuItem onClick={() => navigate("/cart")}>
+                <Button className="bg-white text-[#f48120] border-[#f48120] border hover:bg-[#f48120] hover:text-white transition-all duration-300">
+                  Xem giỏ hàng
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/checkout")}>
+                <Button className="bg-[#0e562e] hover:bg-[#227748]">
+                  Thanh toán
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        ) : (
+          <DropdownMenuContent className="w-56 right-10 top-1 relative">
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="text-center justify-center">
+                <span>Giỏ hàng trống</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        )}
       </DropdownMenu>
 
       {/* user */}
