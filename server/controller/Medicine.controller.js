@@ -1,4 +1,5 @@
 import Medicine from "../model/Medicine.model.js";
+import Category from "../model/Category.model.js";
 import Batch from "../model/Batch.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
@@ -88,6 +89,53 @@ export const getMedicinesByCategory = asyncHandler(async (req, res) => {
   }
 });
 
+export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
+  const { categoryName } = req.params;
+
+  console.log(categoryName);
+
+  try {
+    // Find the category by name
+    const category = await Category.findOne({ name: categoryName });
+
+    console.log(category);
+
+    // If the category exists, find all medicines associated with it
+    if (category) {
+      const medicines = await Medicine.find({ categoryId: category._id });
+
+      console.log(medicines);
+      
+      res.json(
+        jsonGenerate(
+          StatusCode.OK,
+          `Lấy danh sách thuốc theo nhóm '${categoryName}' thành công`,
+          medicines
+        )
+      );
+    } else {
+      // If the category doesn't exist, send an error response
+      res.json(
+        jsonGenerate(
+          StatusCode.NOT_FOUND,
+          `Không tìm thấy nhóm '${categoryName}'`
+        )
+      );
+    }
+  } catch (error) {
+    // Handle any errors that occur during the query
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json(
+        jsonGenerate(
+          StatusCode.INTERNAL_SERVER_ERROR,
+          `Lấy danh sách thuốc theo nhóm '${categoryName}' thất bại`,
+          error
+        )
+      );
+  }
+});
+
 export const getMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const medicine = await Medicine.findById(id)
@@ -123,7 +171,7 @@ export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
     const batches = await Batch.find({ MedicineId: medicine._id })
       .populate("SupplierId")
       .populate("ManufactureId");
-    medicine._doc.batches = batches; 
+    medicine._doc.batches = batches;
   }
 
   if (!medicines) {

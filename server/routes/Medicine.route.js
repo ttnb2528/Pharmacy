@@ -6,6 +6,7 @@ import {
   getMedicineByBestSelling,
   getMedicines,
   getMedicinesByCategory,
+  getMedicinesByCategoryName,
   getMedicinesByIsDiscount,
   updateMedicine,
 } from "../controller/Medicine.controller.js";
@@ -16,6 +17,7 @@ router.post("/addMedicine", addMedicine);
 router.get("/getMedicines", getMedicines);
 router.get("/getMedicinesByIsDiscount", getMedicinesByIsDiscount);
 router.get("/getMedicineByCategory/:categoryId", getMedicinesByCategory);
+router.get("/getMedicinesByCategoryName/:categoryName", getMedicinesByCategoryName);
 router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
 router.get("/getMedicine/:id", getMedicine);
 router.delete("/deleteMedicine/:id", deleteMedicine);
