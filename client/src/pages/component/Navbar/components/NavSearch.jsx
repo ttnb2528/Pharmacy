@@ -40,6 +40,7 @@ const NavSearch = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const inputRef = useRef(null);
+  const searchContainerRef = useRef(null);
 
   const handleShowLogin = () => {
     setShowLogin(true);
@@ -68,19 +69,19 @@ const NavSearch = () => {
   // Xử lý click outside input
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Check if the click occurred outside the search container
       if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target) &&
-        !event.target.closest(".search-suggestions")
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target)
       ) {
-        console.log("click outside");
-
         setShowResults(false);
       }
     };
 
+    // Listen for clicks on the document
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
+      // Clean up the event listener when the component is unmounted
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
@@ -103,7 +104,10 @@ const NavSearch = () => {
         />
         <FaSearch className="absolute right-3 top-3" />
         {showResults && (
-          <div className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions">
+          <div
+            className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions"
+            ref={searchContainerRef}
+          >
             <ul>
               {searchResults.map((product) => (
                 <li
