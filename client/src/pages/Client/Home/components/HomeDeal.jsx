@@ -3,7 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import ItemDeal from "@/pages/Client/Product/ProductItem/ItemDeal.jsx";
+import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { GET_ALL_PRODUCTS_DISCOUNT_ROUTE } from "@/API/index.api.js";
 import { apiClient } from "@/lib/api-client.js";
@@ -169,7 +169,7 @@ const HomeDeal = () => {
             {all_products.map((product) => {
               // if (product.sale > 0) {
               return (
-                <ItemDeal
+                <Item
                   key={product._id}
                   product={product}
                   setIsLoading={setIsLoading}

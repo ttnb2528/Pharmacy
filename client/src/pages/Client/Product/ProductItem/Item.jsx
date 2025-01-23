@@ -94,10 +94,10 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
 
   return (
     <div className=" p-2" onMouseDown={handleMouseDown}>
-      <div className="product-card  hover:border hover:border-red-300 hover:rounded-lg">
+      <div className=" border border-green-500 rounded-lg hover:border hover:border-red-300 hover:rounded-lg">
         <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
           <div className="product-card-image">
-            <div>
+            <div className="relative">
               <Link
                 to={path}
                 onClick={(e) => {
@@ -113,7 +113,11 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
                   height="500"
                 />
               </Link>
-
+              {product.isDiscount && (
+                <span className="absolute top-2 left-2 bg-red-400 py-1 px-3 text-xs font-bold text-white rounded-xl">
+                  {product.percentDiscount}%
+                </span>
+              )}
               <div className="absolute bottom-0 left-0 flex h-6 w-full"></div>
             </div>
           </div>
