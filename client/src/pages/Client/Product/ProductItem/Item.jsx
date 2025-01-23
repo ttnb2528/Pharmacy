@@ -5,10 +5,12 @@ import { apiClient } from "@/lib/api-client.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import slugify from "slugify";
 
 const Item = ({ product, setIsLoading, setViewedProducts }) => {
+  // const { setSelectedProduct } = useContext(ProductContext);
+  const navigate = useNavigate();
   const { setCart } = useContext(PharmacyContext);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
@@ -76,6 +78,12 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
   };
 
   const handleProductClick = () => {
+    console.log("Product being passed:", product);
+
+    navigate(path, {
+      state: { product },
+    });
+
     const storedProducts =
       JSON.parse(localStorage.getItem("viewedProducts")) || [];
 
@@ -106,7 +114,7 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
         <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
           <div className="product-card-image">
             <div className="relative">
-              <Link to={path} onClick={handleClick}>
+              <div onClick={handleClick}>
                 <img
                   className="max-h-full max-w-full object-contain cursor-pointer"
                   src={product?.images[0]}
@@ -114,7 +122,7 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
                   width="500"
                   height="500"
                 />
-              </Link>
+              </div>
               {product.isDiscount && (
                 <span className="absolute top-2 left-2 bg-red-400 py-1 px-3 text-xs font-bold text-white rounded-xl">
                   {product.percentDiscount}%
