@@ -102,10 +102,13 @@ export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
 
     // If the category exists, find all medicines associated with it
     if (category) {
-      const medicines = await Medicine.find({ categoryId: category._id });
+      const medicines = await Medicine.find({ categoryId: category._id })
+        .limit(10)
+        .populate("categoryId")
+        .populate("brandId");
 
       console.log(medicines);
-      
+
       res.json(
         jsonGenerate(
           StatusCode.OK,

@@ -24,14 +24,21 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
     );
     if (distance > 5) {
       e.preventDefault();
+    } else {
+      handleProductClick();
     }
   };
 
   const location = useLocation();
+  const [prevPath, setPrevPath] = useState(location.pathname);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location]);
+    // Chỉ scroll to top khi đường dẫn thay đổi thực sự
+    if (location.pathname !== prevPath) {
+      window.scrollTo(0, 0);
+      setPrevPath(location.pathname);
+    }
+  }, [location, prevPath]);
 
   const categorySlug = slugify(
     product?.categoryId?.name || "unknown-category",
@@ -39,6 +46,7 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
       lower: true,
     }
   );
+
   const productSlug = slugify(product?.name || "unknown-name", { lower: true });
   const path = `/${categorySlug}/${productSlug}`;
 
@@ -98,13 +106,7 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
         <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
           <div className="product-card-image">
             <div className="relative">
-              <Link
-                to={path}
-                onClick={(e) => {
-                  handleClick(e);
-                  handleProductClick();
-                }}
-              >
+              <Link to={path} onClick={handleClick}>
                 <img
                   className="max-h-full max-w-full object-contain cursor-pointer"
                   src={product?.images[0]}
@@ -162,12 +164,21 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
             )}
           </div>
           <div className="flex justify-center items-center my-3">
-            <Button
-              className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
-              onClick={() => AddToCart(product.id)}
-            >
-              Thêm giỏ hàng
-            </Button>
+            {product?.batches.length > 0 && product?.quantityStock > 0 ? (
+              <Button
+                className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
+                onClick={() => AddToCart(product.id)}
+              >
+                Thêm giỏ hàng
+              </Button>
+            ) : (
+              <Button
+                className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
+                disabled
+              >
+                Tạm hết hàng
+              </Button>
+            )}
           </div>
         </div>
       </div>

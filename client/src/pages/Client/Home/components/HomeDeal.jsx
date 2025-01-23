@@ -130,17 +130,17 @@ const HomeDeal = () => {
     ],
   };
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const now = moment();
-      const midnight = moment().endOf("day");
-      const diff = moment.duration(midnight.diff(now));
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     const now = moment();
+  //     const midnight = moment().endOf("day");
+  //     const diff = moment.duration(midnight.diff(now));
 
-      setRemainingTime(diff);
-    }, 1000);
+  //     setRemainingTime(diff);
+  //   }, 1000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <div className="my-10  rounded-lg overflow-hidden bg-[#fff8f9] px-3">

@@ -23,6 +23,8 @@ const HomeProductForGroup = () => {
 
         if (response.status === 200 && response.data.status === 200) {
           setProductForGroups(response.data.data);
+        } else {
+          setProductForGroups([]);
         }
       } catch (error) {
         console.error(error);
@@ -38,7 +40,8 @@ const HomeProductForGroup = () => {
     infinite: false,
     lazyLoad: true,
     slidesToShow: 5,
-    rows: 2,
+    className: productForGroups.length > 5 ? "" : "[&>div>div]:ml-0",
+    rows: productForGroups.length > 5 ? 2 : 1,
 
     responsive: [
       {
