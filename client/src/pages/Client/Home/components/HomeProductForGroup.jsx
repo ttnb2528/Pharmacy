@@ -21,8 +21,6 @@ const HomeProductForGroup = () => {
           `${GET_ALL_PRODUCT_BY_CATEGORY_NAME_ROUTE}/${activeTab}`
         );
 
-        console.log(response);
-
         if (response.status === 200 && response.data.status === 200) {
           setProductForGroups(response.data.data);
         }
@@ -70,7 +68,6 @@ const HomeProductForGroup = () => {
       },
     ],
   };
-  
   return (
     <div>
       {isLoading && <Loading />}

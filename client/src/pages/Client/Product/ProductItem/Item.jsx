@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import slugify from "slugify";
 
-const Item = ({ product, setIsLoading }) => {
+const Item = ({ product, setIsLoading, setViewedProducts }) => {
   const { setCart } = useContext(PharmacyContext);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
@@ -67,13 +67,44 @@ const Item = ({ product, setIsLoading }) => {
     }
   };
 
+  const handleProductClick = () => {
+    const storedProducts =
+      JSON.parse(localStorage.getItem("viewedProducts")) || [];
+
+    // Kiểm tra nếu sản phẩm đã tồn tại
+    const isProductExists = storedProducts.some((p) => p.id === product.id);
+
+    if (!isProductExists) {
+      // Tạo mảng mới với sản phẩm mới ở cuối
+      let updatedProducts = [...storedProducts, product];
+
+      // Nếu vượt quá 10 sản phẩm, loại bỏ sản phẩm đầu tiên
+      if (updatedProducts.length > 10) {
+        updatedProducts = updatedProducts.slice(1);
+      }
+
+      // Cập nhật localStorage và dispatch một custom event
+      localStorage.setItem("viewedProducts", JSON.stringify(updatedProducts));
+      window.dispatchEvent(new CustomEvent("viewedProductsUpdated"));
+
+      // Cập nhật state nếu có
+      setViewedProducts?.(updatedProducts);
+    }
+  };
+
   return (
     <div className=" p-2" onMouseDown={handleMouseDown}>
       <div className="product-card  hover:border hover:border-red-300 hover:rounded-lg">
         <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
           <div className="product-card-image">
             <div>
-              <Link to={path} onClick={handleClick}>
+              <Link
+                to={path}
+                onClick={(e) => {
+                  handleClick(e);
+                  handleProductClick();
+                }}
+              >
                 <img
                   className="max-h-full max-w-full object-contain cursor-pointer"
                   src={product?.images[0]}
