@@ -221,7 +221,19 @@ const NavSearch = () => {
                 (product, index) =>
                   cart[product.id] > 0 && (
                     <div key={product._id}>
-                      <DropdownMenuItem className="cursor-pointer group">
+                      <DropdownMenuItem
+                        className="cursor-pointer group"
+                        onClick={() =>
+                          navigate(
+                            `/${slugify(product?.categoryId?.name, {
+                              lower: false,
+                            })}/${slugify(product?.name, {
+                              lower: false,
+                            })}`,
+                            { state: { product } }
+                          )
+                        }
+                      >
                         <div className="flex gap-2 my-2 w-full">
                           <img
                             src={product?.images[0]}
@@ -271,6 +283,7 @@ const NavSearch = () => {
                             className=" hidden group-hover:block group-hover:text-green-500 mr-2"
                             onClick={(e) => {
                               e.preventDefault();
+                              e.stopPropagation();
                               handleRemoveProduct(product.id);
                             }}
                           >
