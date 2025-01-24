@@ -1,11 +1,23 @@
+import { ADD_TO_CART_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
-import { useState } from "react";
+import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { apiClient } from "@/lib/api-client.js";
+import Loading from "@/pages/component/Loading.jsx";
+import {
+  CalculatePointEarned,
+  CalculateProductWithSale,
+} from "@/utils/Calculate.js";
+import { convertVND } from "@/utils/ConvertVND.js";
+import { useContext, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
+import { toast } from "sonner";
 
-const ProductDetailInfo = () => {
+const ProductDetailInfo = ({ product }) => {
+  const { setCart } = useContext(PharmacyContext);
   const [qty, setQty] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDecrease = () => {
     if (qty > 1) {
@@ -16,8 +28,33 @@ const ProductDetailInfo = () => {
   const handleIncrease = () => {
     setQty(qty + 1);
   };
+
+  const AddToCart = async (productId, quantity) => {
+    try {
+      setIsLoading(true);
+      const res = await apiClient.post(ADD_TO_CART_ROUTE, {
+        productId: productId,
+        quantity: quantity,
+      });
+
+      if (res.status === 200 && res.data.status === 200) {
+        setCart((prev) => {
+          return {
+            ...prev,
+            [productId]: prev[productId] + Number(quantity),
+          };
+        });
+        toast.success("Thêm vào giỏ hàng thành công");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div>
+      {isLoading && <Loading />}
       <div className="flex flex-col">
         <div className="flex flex-col px-4 md:px-0">
           <div className="grid grid-cols-[1fr,calc(24rem/16)] gap-4 md:grid-cols-1 mb-2">
@@ -25,31 +62,40 @@ const ProductDetailInfo = () => {
               title="Sữa bột ít đường Calosure Gold (900g)"
               className="line-clamp-3 text-base font-semibold text-neutral-900 md:text-xl md:font-bold"
             >
-              Sữa bột ít đường Calosure Gold (900g)
+              {product?.name}
             </h1>
           </div>
 
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <div className="flex content-start items-center space-x-1 py-[calc(2rem/16)]">
-              <p className="text-sm leading-5 text-neutral-600">P22808</p>
+              <p className="text-sm leading-5 text-neutral-600">
+                {product?.id}
+              </p>
               <span className="h-1 w-1 rounded-full bg-neutral-600"></span>
               <span className="text-sm leading-5">
-                Thương hiệu: Calosure Gold
+                Thương hiệu: {product?.brandId?.name}
               </span>
             </div>
           </div>
 
-          <div className="flex flex-row items-center md:mb-1">
-            <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
-              Giảm 10%
-            </span>
-            <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
-              519.800&nbsp;₫
-            </del>
-          </div>
+          {product?.isDiscount && (
+            <div className="flex flex-row items-center md:mb-1">
+              <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
+                Giảm {product?.percentDiscount}%
+              </span>
+              <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                {convertVND(product?.batches[0]?.price)}
+              </del>
+            </div>
+          )}
 
           <div className="text-xl font-bold md:mb-2 md:text-[28px]">
-            467.820&nbsp;₫/Lon
+            {convertVND(
+              CalculateProductWithSale(
+                product?.batches[0]?.price,
+                product?.percentDiscount
+              )
+            )}
           </div>
 
           <p className="text-[12px] leading-[20px] font-normal text-neutral-700 md:text-sm mb-1.5 md:mb-1">
@@ -59,7 +105,12 @@ const ProductDetailInfo = () => {
 
           <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
             <span className="text-xs font-semibold text-gold-500 md:text-sm">
-              Tích lũy từ 4.678 P-Xu vàng
+              Tích lũy{" "}
+              {CalculatePointEarned(
+                product?.batches[0]?.price,
+                product?.percentDiscount
+              )}{" "}
+              Xu
             </span>
             <div>
               <span className="inline-flex align-[-0.175em] justify-center max-h-full max-w-full h-3 w-3 items-center text-neutral-700 md:h-4 md:w-4">
@@ -77,7 +128,7 @@ const ProductDetailInfo = () => {
             </div>
           </div>
 
-          <div className="flex content-center justify-between mb-3 md:mb-4">
+          {/* <div className="flex content-center justify-between mb-3 md:mb-4">
             <div className="flex items-center justify-start space-x-1 ">
               <div className="flex items-center justify-start">
                 <div className="h-6 w-6 ">
@@ -103,13 +154,13 @@ const ProductDetailInfo = () => {
               <span className="h-[12px] w-[1px] bg-neutral-500"></span>
               <p className="text-sm text-neutral-900">Đã bán 6.6k</p>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col space-y-4 mb-5">
             <div className="flex gap-10 items-center">
               <label className="font-medium text-lg">Sẵn có:</label>
               <span className="text-left text-green-400 font-semibold text-lg">
-                Còn hàng
+                {product?.quantityStock > 0 ? "Còn hàng" : "Hết hàng"}
               </span>
             </div>
             <div className="flex gap-10">
@@ -124,6 +175,17 @@ const ProductDetailInfo = () => {
                 <Input
                   className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
                   value={qty}
+                  min={1}
+                  onKeyPress={(e) => {
+                    // Chỉ cho phép nhập số và các phím điều khiển
+                    if (!/[0-9]/.test(e.key) && e.key !== "Backspace") {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    const value = Math.min(Number(e.target.value), 20); // Giới hạn tối đa là 20
+                    setQty(value);
+                  }}
                 />
                 <Button
                   className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
@@ -135,7 +197,16 @@ const ProductDetailInfo = () => {
             </div>
           </div>
           <div className="mb-5">
-            <Button className="w-full bg-green-500 hover:bg-green-600">
+            <Button
+              className="w-full bg-green-500 hover:bg-green-600"
+              onClick={() => {
+                if (qty > 0) {
+                  AddToCart(product?.id, qty);
+                } else {
+                  toast.error("Số lượng phải lớn hơn 0");
+                }
+              }}
+            >
               <span className="text-sm font-semibold text-white">
                 Thêm vào giỏ hàng
               </span>
@@ -151,7 +222,7 @@ const ProductDetailInfo = () => {
               </span>
               <div className="flex flex-wrap gap-2">
                 <Button className="relative flex justify-center outline-none font-semibold bg-white border border-solid disabled:border-neutral-200 disabled:text-neutral-600 disabled:!bg-white text-sm px-4 py-2 items-center rounded-lg h-8 min-w-[82px] md:h-8 text-neutral-900 hover:text-white hover:bg-green-600 md:hover:border-green-600 md:hover:text-neutral-200">
-                  <span>Lon</span>
+                  <span>{product?.unit}</span>
                 </Button>
               </div>
             </div>
@@ -180,7 +251,7 @@ const ProductDetailInfo = () => {
                   </div>
                   <p className="text-[12px] leading-[20px] first-letter:uppercase md:text-sm">
                     <span className="inline pe-1 font-semibold">
-                      Deal Giảm 10%
+                      Deal Giảm {product?.percentDiscount}%
                     </span>
                   </p>
                 </div>
@@ -196,28 +267,27 @@ const ProductDetailInfo = () => {
                 <p className="text-[14px] leading-[20px] font-semibold md:text-base">
                   Danh mục
                 </p>
-                <div className="md:text-base">Sữa bột</div>
+                <div className="md:text-base">{product?.categoryId?.name}</div>
               </div>
               <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
                 <p className="text-[14px] leading-[20px] font-semibold md:text-base">
                   Công dụng
                 </p>
-                <div className="md:text-base">
-                  Sữa bột ít đường Calosure Gold dành cho người trung niên, lớn
-                  tuổi có vấn đề về tiêu hóa, tim mạch và xương khớp
-                </div>
+                <div className="md:text-base">{product?.uses}</div>
               </div>
               <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
                 <p className="text-[14px] leading-[20px] font-semibold md:text-base">
                   Nhà sản xuất
                 </p>
-                <div className="md:text-base">VitaDairy</div>
+                <div className="md:text-base">
+                  {product?.batches[0]?.ManufactureId?.name}
+                </div>
               </div>
               <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
                 <p className="text-[14px] leading-[20px] font-semibold md:text-base">
                   Quy cách
                 </p>
-                <div className="md:text-base">900g</div>
+                <div className="md:text-base">{product?.packaging}</div>
               </div>
               <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">
                 <p className="text-[14px] leading-[20px] font-semibold md:text-base">

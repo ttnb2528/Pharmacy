@@ -13,3 +13,7 @@ export const handleRenderPriceWithCoupon = (coupon) => {
     return coupon?.discount_value;
   }
 };
+
+export const CalculatePointEarned = (price, sale) => {
+  return CalculateProductWithSale(price, sale) / 100;
+};

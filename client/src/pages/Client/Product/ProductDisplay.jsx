@@ -25,15 +25,15 @@ const ProductDisplay = () => {
               <SwiperProduct productImage={product?.images} />
             </div>
             {/* info */}
-            <ProductDetailInfo />
+            <ProductDetailInfo product={product} />
           </div>
 
           <Separator />
 
-          <ProductDescription />
+          <ProductDescription product={product} />
         </div>
 
-        <ProductDetailRight />
+        <ProductDetailRight product={product} />
       </div>
 
       {/* <div className="flex flex-col md:flex-row gap-8">
