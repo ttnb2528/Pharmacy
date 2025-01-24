@@ -1,20 +1,50 @@
-import { Collapse, Input } from "antd";
-import { useState } from "react";
-import { Checkbox, Radio } from "antd";
+import { Collapse, Input, Checkbox, Radio } from "antd";
+import { useEffect, useState } from "react";
+import { FaRedo } from "react-icons/fa";
 
-const FilterProduct = () => {
+const FilterProduct = ({ products, onFilter, setIsLoading }) => {
   const [priceRange, setPriceRange] = useState(null);
   const [brands, setBrands] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [searchBrand, setSearchBrand] = useState("");
-  const [origins, setOrigins] = useState([]);
+  const [selectedOrigins, setSelectedOrigins] = useState([]);
   const [searchOrigin, setSearchOrigin] = useState("");
+  const [origins, setOrigins] = useState([]);
+
+  useEffect(() => {
+    // Extract unique brands from products
+    const uniqueBrands = Array.from(
+      new Set(products.map((product) => product.brandId.name))
+    );
+
+    setBrands(uniqueBrands);
+
+    // Extract unique origins from products
+    const uniqueOrigins = Array.from(
+      new Set(
+        products.map((product) => product?.batches[0]?.ManufactureId?.country)
+      )
+    );
+
+    setOrigins(uniqueOrigins);
+  }, [products]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      onFilter({ priceRange, selectedBrands, selectedOrigins });
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [priceRange, selectedBrands, selectedOrigins]);
 
   const handlePriceChange = (e) => {
     setPriceRange(e.target.value);
   };
 
   const handleBrandChange = (checkedValues) => {
-    setBrands(checkedValues);
+    setSelectedBrands(checkedValues);
   };
 
   const handleSearchBrandChange = (e) => {
@@ -22,56 +52,62 @@ const FilterProduct = () => {
   };
 
   const handleOriginChange = (checkedValues) => {
-    setOrigins(checkedValues);
-  };
-
-  const filterBrands = (brands, searchTerm) => {
-    if (!searchTerm) {
-      return brands;
-    }
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return brands.filter((brand) =>
-      brand.toLowerCase().includes(lowerSearchTerm)
-    );
+    setSelectedOrigins(checkedValues);
   };
 
   const handleSearchOriginChange = (e) => {
     setSearchOrigin(e.target.value);
   };
 
-  const filterOrigins = (origins, searchTerm) => {
-    if (!searchTerm) {
-      return origins;
+  const filterBrands = (brands, searchTerm) =>
+    !searchTerm
+      ? brands
+      : brands.filter((brand) =>
+          brand.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+  const filterOrigins = (origins, searchTerm) =>
+    !searchTerm
+      ? origins
+      : origins.filter((origin) =>
+          origin.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+  const isFilterApplied =
+    priceRange || selectedBrands.length > 0 || selectedOrigins.length > 0;
+
+  const handleResetFilter = () => {
+    if (priceRange) setPriceRange(null);
+
+    if (selectedBrands.length > 0) {
+      setSelectedBrands([]);
+      setSearchBrand("");
     }
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return origins.filter((origin) =>
-      origin.toLowerCase().includes(lowerSearchTerm)
-    );
+    if (selectedOrigins.length > 0) {
+      setSelectedOrigins([]);
+      setSearchOrigin("");
+    }
   };
 
   const items = [
     {
       key: "1",
       label: (
-        <>
-          <span className="text-lg font-bold text-gray-400">Khoảng giá</span>
-        </>
+        <span className="text-lg font-bold text-gray-400">Khoảng giá</span>
       ),
       children: (
         <Radio.Group onChange={handlePriceChange} value={priceRange}>
-          <Radio value="0-100">Dưới 100.000đ</Radio>
-          <Radio value="100-500">100.000đ - 500.000đ</Radio>
-          <Radio value="500-1000">500.000đ - 1.000.000đ</Radio>
-          <Radio value="1000">Trên 1.000.000đ</Radio>
+          <Radio value="0-100000">Dưới 100.000đ</Radio>
+          <Radio value="100000-500000">100.000đ - 500.000đ</Radio>
+          <Radio value="500000-1000000">500.000đ - 1.000.000đ</Radio>
+          <Radio value="1000000">Trên 1.000.000đ</Radio>
         </Radio.Group>
       ),
     },
     {
       key: "2",
       label: (
-        <>
-          <span className="text-lg font-bold text-gray-400">Thương hiệu</span>
-        </>
+        <span className="text-lg font-bold text-gray-400">Thương hiệu</span>
       ),
       children: (
         <>
@@ -85,24 +121,9 @@ const FilterProduct = () => {
             <Checkbox.Group
               onChange={handleBrandChange}
               className="flex flex-col space-y-2"
+              value={selectedBrands}
             >
-              {filterBrands(
-                [
-                  "Thương hiệu 1",
-                  "Thương hiệu 2",
-                  "Thương hiệu 3",
-                  "Thương hiệu 4",
-                  "Thương hiệu 5",
-                  "Thương hiệu 6",
-                  "Thương hiệu 7",
-                  "Thương hiệu 8",
-                  "Thương hiệu 9",
-                  "Thương hiệu 10",
-                  "Thương hiệu 11",
-                  "Thương hiệu 12",
-                ],
-                searchBrand
-              ).map((brand) => (
+              {filterBrands(brands, searchBrand).map((brand) => (
                 <Checkbox key={brand} value={brand} className="text-base">
                   {brand}
                 </Checkbox>
@@ -114,11 +135,7 @@ const FilterProduct = () => {
     },
     {
       key: "3",
-      label: (
-        <>
-          <span className="text-lg font-bold text-gray-400">Xuất xứ</span>
-        </>
-      ),
+      label: <span className="text-lg font-bold text-gray-400">Xuất xứ</span>,
       children: (
         <>
           <Input
@@ -131,24 +148,9 @@ const FilterProduct = () => {
             <Checkbox.Group
               onChange={handleOriginChange}
               className="flex flex-col space-y-2"
+              value={selectedOrigins}
             >
-              {filterOrigins(
-                [
-                  "Việt Nam",
-                  "Hoa Kỳ",
-                  "Hàn Quốc",
-                  "Nhật Bản",
-                  "Trung Quốc",
-                  "Pháp",
-                  "Đức",
-                  "Anh",
-                  "Nga",
-                  "Thái Lan",
-                  "Úc",
-                  "Canada",
-                ],
-                searchOrigin
-              ).map((origin) => (
+              {filterOrigins(origins, searchOrigin).map((origin) => (
                 <Checkbox key={origin} value={origin} className="text-base">
                   {origin}
                 </Checkbox>
@@ -162,18 +164,25 @@ const FilterProduct = () => {
 
   return (
     <div className="bg-white rounded-lg p-5 w-1/4 sticky top-3 h-fit">
-      <span className="text-xl font-bold">Bộ Lọc Nâng Cao</span>
+      <span className="text-xl font-bold">Bộ Lọc</span>
       <Collapse
         items={items}
         bordered={false}
         defaultActiveKey={["1"]}
         expandIconPosition="end"
       />
-      {/* Hiển thị các giá trị đã chọn (nếu cần) */}
+      {isFilterApplied && (
+        <div
+          className="mt-4 flex justify-end items-center text-sm font-semibold text-neutral-500 cursor-pointer"
+          onClick={handleResetFilter}
+        >
+          <FaRedo className="mr-2" /> <span>Thiết lập lại</span>
+        </div>
+      )}
       <div>
         <p>Khoảng giá: {priceRange}</p>
-        <p>Thương hiệu: {brands.join(", ")}</p>
-        <p>Xuất xứ: {origins.join(", ")}</p>
+        <p>Thương hiệu: {selectedBrands.join(", ")}</p>
+        <p>Xuất xứ: {selectedOrigins.join(", ")}</p>
       </div>
     </div>
   );
