@@ -35,6 +35,7 @@ import { convertVND } from "@/utils/ConvertVND.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { toast } from "sonner";
 import Loading from "../../Loading.jsx";
+import slugify from "slugify";
 
 const NavSearch = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -226,15 +227,34 @@ const NavSearch = () => {
                             src={product?.images[0]}
                             alt="product"
                             className="h-10 w-10"
-                            onClick={() => navigate("/abc")}
+                            onClick={() =>
+                              navigate(
+                                `/${slugify(product?.categoryId?.name, {
+                                  lower: false,
+                                })}/${slugify(product?.name, {
+                                  lower: false,
+                                })}`,
+                                { state: { product } }
+                              )
+                            }
                           />
 
                           <div className="flex flex-1 flex-col justify-center">
-                            <Link to="/abc">
-                              <span className="line-clamp-1 text-base">
-                                {product?.name}
-                              </span>
-                            </Link>
+                            <span
+                              className="line-clamp-1 text-base"
+                              onClick={() =>
+                                navigate(
+                                  `/${slugify(product?.categoryId?.name, {
+                                    lower: false,
+                                  })}/${slugify(product?.name, {
+                                    lower: false,
+                                  })}`,
+                                  { state: { product } }
+                                )
+                              }
+                            >
+                              {product?.name}
+                            </span>
                             <div className="flex">
                               <span>{cart[product.id]} x</span>
                               <span className="ml-1 text-[#f48120]">
