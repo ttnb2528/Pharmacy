@@ -107,7 +107,12 @@ export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
         .populate("categoryId")
         .populate("brandId");
 
-      console.log(medicines);
+      for (let medicine of medicines) {
+        const batches = await Batch.find({ MedicineId: medicine._id })
+          .populate("SupplierId")
+          .populate("ManufactureId");
+        medicine._doc.batches = batches; // Gán kết quả vào medicine object
+      }
 
       res.json(
         jsonGenerate(

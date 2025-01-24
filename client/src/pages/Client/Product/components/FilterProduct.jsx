@@ -179,11 +179,6 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
           <FaRedo className="mr-2" /> <span>Thiết lập lại</span>
         </div>
       )}
-      <div>
-        <p>Khoảng giá: {priceRange}</p>
-        <p>Thương hiệu: {selectedBrands.join(", ")}</p>
-        <p>Xuất xứ: {selectedOrigins.join(", ")}</p>
-      </div>
     </div>
   );
 };

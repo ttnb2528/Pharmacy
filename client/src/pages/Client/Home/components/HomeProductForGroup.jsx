@@ -95,13 +95,13 @@ const HomeProductForGroup = () => {
             </Button>
             <Button
               className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
-                activeTab === "Mẹ & Bé"
+                activeTab === "Mẹ và Bé"
                   ? "bg-[#0e562e] text-white font-medium"
                   : ""
               }`}
-              onClick={() => setActiveTab("Mẹ & Bé")}
+              onClick={() => setActiveTab("Mẹ và Bé")}
             >
-              Mẹ & Bé
+              Mẹ và Bé
             </Button>
             <Button
               className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
