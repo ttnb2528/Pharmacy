@@ -20,6 +20,7 @@ import { useContext } from "react";
 import { PharmacyContext } from "./context/Pharmacy.context.jsx";
 import slugify from "slugify";
 import Loading from "./pages/component/Loading.jsx";
+import OrderDetail from "./pages/Client/Account/components/OrderDetail.jsx";
 
 const App = () => {
   const { categories, loading } = useContext(PharmacyContext);
@@ -70,7 +71,8 @@ const App = () => {
           element: <Account />,
           children: [
             { path: "info", element: <PersonalInfo /> },
-            { path: "history", element: <OrderHistory /> },
+            { path: "history", element: <OrderHistory />, },
+            { path: "history/:orderId", element: <OrderDetail /> },
             { path: "coupons", element: <Coupons /> },
             { path: "addresses", element: <Addresses /> },
             { path: "points", element: <PointsHistory /> },
