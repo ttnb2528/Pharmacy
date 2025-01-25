@@ -7,12 +7,16 @@ import SelectCoupon from "./SelectCoupon.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { handleRenderPriceWithCoupon } from "@/utils/Calculate.js";
+import { useModalNotification } from "@/pages/component/Notification.jsx";
 
 const CartItemBoxBuy = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { showNotification, ModalNotificationComponent } =
+    useModalNotification();
   const {
     cart,
+    allProducts,
     selectedCoupon,
     setSelectedCoupon,
     CalculateTotalItems,
@@ -22,18 +26,38 @@ const CartItemBoxBuy = () => {
   } = useContext(PharmacyContext);
 
   const handleApplyCoupon = (coupon) => {
+    if (coupon.minimum_order_value > CalculateTotalPrice()) {
+      showNotification({
+        title: "Không thể áp dụng mã giảm giá",
+        message: "Đơn hàng của bạn chưa đạt điều kiện áp dụng mã giảm giá",
+        type: "error",
+      });
+      return;
+    }
     setSelectedCoupon(coupon);
     setIsOpen(false);
+    showNotification({
+      title: "Áp dụng mã giảm giá thành công",
+      message: `Mã giảm giá ${coupon.coupon_code} đã được áp dụng`,
+      type: "success",
+    });
   };
 
   const handleRemoveCoupon = () => {
     setSelectedCoupon(null);
+    showNotification({
+      title: "Đã xóa mã giảm giá",
+      message: "Mã giảm giá đã được xóa khỏi đơn hàng",
+      type: "info",
+    });
   };
+
   return (
     <div
       className="sticky top-[calc(var(--header-position-start-sticky)+12px)] hidden gap-4 md:grid"
       style={{ "--header-position-start-sticky": "0px" }}
     >
+      {/* Existing JSX code */}
       <div>
         <div className="flex flex-col space-y-3 rounded-sm bg-white px-4 md:p-3">
           <div className="grid w-full grid-flow-col items-center justify-between">
@@ -100,14 +124,18 @@ const CartItemBoxBuy = () => {
             </div>
           </div>
           <Button
-            className="bg-green-500 hover:bg-green-600 text-lg font-bold"
+            className="bg-green-500 hover:bg-green-600 text-lg font-bold disabled:bg-neutral-500"
             onClick={() => navigate("/checkout")}
+            disabled={allProducts?.some((p) => cart[p.id] > 20)}
           >
             Mua hàng
-            <span className="ms-1 md:inline inline">({CalculateTotalItems(cart)})</span>
+            <span className="ms-1 md:inline inline">
+              ({CalculateTotalItems(cart)})
+            </span>
           </Button>
         </div>
       </div>
+      {ModalNotificationComponent}
     </div>
   );
 };

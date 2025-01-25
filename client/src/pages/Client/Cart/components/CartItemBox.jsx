@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { FaShippingFast } from "react-icons/fa";
 import testProductImage from "@/assets/test_product_image1.jpg";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input.jsx";
 import { FaMinus, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import {
@@ -23,6 +23,7 @@ import {
 } from "@/utils/Calculate.js";
 import ConfirmForm from "@/pages/component/ConfirmForm.jsx";
 import { toast } from "sonner";
+import slugify from "slugify";
 
 const CartItemBox = () => {
   const { allProducts, cart, setCart, CalculateTotalItems } =
@@ -33,9 +34,42 @@ const CartItemBox = () => {
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [quantityInput, setQuantityInput] = useState({});
 
+  useEffect(() => {
+    const initialQuantities = {};
+    Object.keys(cart).forEach((productId) => {
+      initialQuantities[productId] = cart[productId];
+    });
+    setQuantityInput(initialQuantities);
+  }, [cart]);
+
+  const navigate = useNavigate();
+
   const handleIncreaseQuantity = async (product) => {
     try {
       setIsLoading(true);
+      const newQuantity = cart[product.id] + 1;
+      if (newQuantity > 20) {
+        toast.error("Số lượng sản phẩm tối đa là 20");
+        const res = await apiClient.post(UPDATE_CART_ROUTE, {
+          productId: product.id,
+          quantity: 20,
+        });
+
+        if (res.status === 200 && res.data.status === 200) {
+          setCart((prev) => ({
+            ...prev,
+            [product.id]: 20,
+          }));
+
+          setQuantityInput((prev) => ({
+            ...prev,
+            [product.id]: 20,
+          }));
+        }
+
+        return;
+      }
+
       const res = await apiClient.post(ADD_TO_CART_ROUTE, {
         productId: product.id,
         quantity: 1,
@@ -57,6 +91,29 @@ const CartItemBox = () => {
   const handleDecreaseQuantity = async (product) => {
     try {
       setIsLoading(true);
+      const newQuantity = cart[product.id] - 1;
+      if (newQuantity > 20) {
+        toast.error("Số lượng sản phẩm tối đa là 20");
+        const res = await apiClient.post(UPDATE_CART_ROUTE, {
+          productId: product.id,
+          quantity: 20,
+        });
+
+        if (res.status === 200 && res.data.status === 200) {
+          setCart((prev) => ({
+            ...prev,
+            [product.id]: 20,
+          }));
+
+          setQuantityInput((prev) => ({
+            ...prev,
+            [product.id]: 20,
+          }));
+        }
+
+        return;
+      }
+
       const res = await apiClient.post(REMOVE_FROM_CART_ROUTE, {
         productId: product.id,
         quantity: 1,
@@ -161,36 +218,61 @@ const CartItemBox = () => {
   };
 
   const handleQuantityChange = (productId, value) => {
-    setCart((prev) => ({
-      ...prev,
-      [productId]: value,
-    }));
+    // Chỉ cho phép nhập số
+    if (value && !/^\d{0,2}$/.test(value)) return;
+
     setQuantityInput((prev) => ({
       ...prev,
       [productId]: value,
     }));
-    console.log(quantityInput);
   };
 
   const handleQuantityUpdate = (product) => {
-    if (
-      parseInt(quantityInput[product.id]) === cart[product.id] ||
-      !quantityInput[product.id]
-    ) {
-      return;
-    }
-
     const newQuantity = parseInt(quantityInput[product.id]);
-    if (newQuantity === 0) {
-      handleConfirmDeleteOpen(product);
 
+    // Nếu giá trị là rỗng hoặc 0, hiện confirm delete
+    if (quantityInput[product.id] === "" || newQuantity === 0) {
+      handleConfirmDeleteOpen(product);
+      // Reset lại giá trị input về giá trị cũ trong cart
       setQuantityInput((prev) => ({
         ...prev,
         [product.id]: cart[product.id],
       }));
-    } else {
+      return;
+    }
+
+    // Nếu giá trị không hợp lệ, reset về giá trị cũ
+    if (isNaN(newQuantity)) {
+      setQuantityInput((prev) => ({
+        ...prev,
+        [product.id]: cart[product.id],
+      }));
+      return;
+    }
+
+    // Nếu số lượng > 20, giới hạn lại thành 20
+    if (newQuantity > 20) {
+      handleUpdateQuantity(product, 20);
+      setQuantityInput((prev) => ({
+        ...prev,
+        [product.id]: 20,
+      }));
+      return;
+    }
+
+    // Cập nhật số lượng nếu khác với giá trị hiện tại trong cart
+    if (newQuantity !== cart[product.id]) {
       handleUpdateQuantity(product, newQuantity);
     }
+  };
+
+  const handleNavigateToProduct = (product) => {
+    navigate(
+      `/${slugify(product?.categoryId?.name, {
+        lower: true,
+      })}/${slugify(product?.name, { lower: true })}`,
+      { state: { product } }
+    );
   };
   return (
     <div className="grid gap-4">
@@ -248,18 +330,22 @@ const CartItemBox = () => {
                       <div className="space-y-2">
                         <div className="grid grid-cols-[calc(68rem/16)_1fr] items-start gap-2">
                           <div className="relative h-[calc(68rem/16)] w-[calc(68rem/16)] rounded-sm border border-neutral-100">
-                            <Link to="/product/123">
+                            <div
+                              onClick={() => handleNavigateToProduct(product)}
+                            >
                               <img src={testProductImage} alt="" />
-                            </Link>
+                            </div>
                           </div>
 
                           <div className="flex h-full flex-col justify-between md:flex-row md:space-x-4">
                             <div className="grid flex-1 content-start gap-1">
-                              <Link to="/product/123">
+                              <div
+                                onClick={() => handleNavigateToProduct(product)}
+                              >
                                 <p className="line-clamp-2 text-sm font-semibold text-neutral-900">
                                   {product.name}
                                 </p>
-                              </Link>
+                              </div>
                               <div className="dropdown text-sm text-neutral-500">
                                 Mã sản phẩm: {product.id}
                               </div>
@@ -303,21 +389,13 @@ const CartItemBox = () => {
                                       />
                                     </Button>
                                     <Input
-                                      pattern="[0-9]*"
-                                      onKeyPress={(event) => {
-                                        if (!/[0-9]/.test(event.key)) {
-                                          event.preventDefault();
-                                        }
-                                        if (event.key === "Enter") {
-                                          event.target.blur();
+                                      className="border-none focus-visible:ring-0 shadow-none w-10 font-semibold text-center"
+                                      value={quantityInput[product.id] || ""}
+                                      onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                          handleQuantityUpdate(product);
                                         }
                                       }}
-                                      className="border-none focus-visible:ring-0 shadow-none w-10 font-semibold text-center"
-                                      // value={cart[product.id]}
-                                      value={
-                                        quantityInput[product.id] ??
-                                        cart[product.id]
-                                      }
                                       onChange={(e) =>
                                         handleQuantityChange(
                                           product.id,
@@ -327,6 +405,7 @@ const CartItemBox = () => {
                                       onBlur={() =>
                                         handleQuantityUpdate(product)
                                       }
+                                      maxLength={2}
                                     />
                                     <Button
                                       className="bg-neutral-300 rounded-full p-1 h-6 w-6 hover:bg-neutral-200"

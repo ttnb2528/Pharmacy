@@ -29,12 +29,24 @@ const ProductDetailInfo = ({ product }) => {
     setQty(qty + 1);
   };
 
+  const handleQuantityChange = (value) => {
+    // Chỉ cho phép nhập số
+    if (value && !/^\d{0,2}$/.test(value)) return;
+
+    setQty(value);
+  };
+
   const AddToCart = async (productId, quantity) => {
     try {
       setIsLoading(true);
+      if (quantity > 20) {
+        toast.error("Số lượng sản phẩm tối đa là 20");
+        setIsLoading(false);
+        return;
+      }
       const res = await apiClient.post(ADD_TO_CART_ROUTE, {
         productId: productId,
-        quantity: quantity,
+        quantity: Number(quantity),
       });
 
       if (res.status === 200 && res.data.status === 200) {
@@ -44,6 +56,7 @@ const ProductDetailInfo = ({ product }) => {
             [productId]: prev[productId] + Number(quantity),
           };
         });
+
         toast.success("Thêm vào giỏ hàng thành công");
       }
     } catch (error) {
@@ -176,16 +189,7 @@ const ProductDetailInfo = ({ product }) => {
                   className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
                   value={qty}
                   min={1}
-                  onKeyPress={(e) => {
-                    // Chỉ cho phép nhập số và các phím điều khiển
-                    if (!/[0-9]/.test(e.key) && e.key !== "Backspace") {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={(e) => {
-                    const value = Math.min(Number(e.target.value), 20); // Giới hạn tối đa là 20
-                    setQty(value);
-                  }}
+                  onChange={(e) => handleQuantityChange(e.target.value)}
                 />
                 <Button
                   className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
