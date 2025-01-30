@@ -75,7 +75,7 @@ const Checkout = () => {
       }
 
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
-        accountId: userData.accountId._id,
+        AccountId: userData.accountId._id,
         nameCustomer: selectedAddress?.name,
         total: CalculateTotalPrice(),
         type: "online",
@@ -96,7 +96,11 @@ const Checkout = () => {
         toast.success(res.data.message);
         window.location.href = "/";
       } else {
-        toast.error(res.data.message);
+        showNotification({
+          title: "Sản phẩm hết hàng",
+          message: res.data.message,
+          type: "warning",
+        });
       }
     } catch (error) {
       console.error("Lỗi khi tạo đơn hàng:", error);

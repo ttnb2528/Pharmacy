@@ -180,18 +180,21 @@ const ProductDetailInfo = ({ product }) => {
               <label className="font-medium text-lg">Số lượng:</label>
               <div className="w-36 flex">
                 <Button
+                  disabled={!(product?.quantityStock > 0)}
                   className="rounded-l-full rounded-r-none bg-green-500 hover:bg-green-600"
                   onClick={handleDecrease}
                 >
                   <FaMinus style={{ width: "12px", height: "12px" }} />
                 </Button>
                 <Input
+                  disabled={!(product?.quantityStock > 0)}
                   className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
                   value={qty}
                   min={1}
                   onChange={(e) => handleQuantityChange(e.target.value)}
                 />
                 <Button
+                  disabled={!(product?.quantityStock > 0)}
                   className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
                   onClick={handleIncrease}
                 >
@@ -202,7 +205,7 @@ const ProductDetailInfo = ({ product }) => {
           </div>
           <div className="mb-5">
             <Button
-              className="w-full bg-green-500 hover:bg-green-600"
+              className="w-full bg-green-500 hover:bg-green-600 disabled:text-neutral-200 disabled:bg-neutral-500"
               onClick={() => {
                 if (qty > 0) {
                   AddToCart(product?.id, qty);
@@ -210,9 +213,12 @@ const ProductDetailInfo = ({ product }) => {
                   toast.error("Số lượng phải lớn hơn 0");
                 }
               }}
+              disabled={!(product?.quantityStock > 0)}
             >
-              <span className="text-sm font-semibold text-white">
-                Thêm vào giỏ hàng
+              <span className="text-sm font-semibold text-white ">
+                {product?.quantityStock > 0
+                  ? "Thêm vào giỏ hàng"
+                  : "Tạm hết hàng"}
               </span>
             </Button>
           </div>

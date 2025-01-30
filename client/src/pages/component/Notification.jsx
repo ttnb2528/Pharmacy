@@ -21,6 +21,7 @@ export const ModalNotification = ({
     success: <CheckCircle2 className="h-6 w-6 text-green-500" />,
     error: <XCircle className="h-6 w-6 text-red-500" />,
     info: <AlertCircle className="h-6 w-6 text-blue-500" />,
+    warning: <AlertCircle className="h-6 w-6 text-yellow-500" />,
   };
 
   return (
