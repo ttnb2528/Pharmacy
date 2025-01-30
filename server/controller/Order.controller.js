@@ -9,6 +9,8 @@ import Joi from "joi";
 import { generateID } from "../utils/generateID.js";
 import LoyaltyProgram from "../model/LoyaltyProgram.model.js";
 import PointHistory from "../model/PointHistory.model.js";
+import Coupon from "../model/Coupon.model.js";
+import CouponUsage from "../model/CouponUsage.model.js";
 
 export const createOrder = asyncHandler(async (req, res) => {
   try {
@@ -67,6 +69,58 @@ export const createOrder = asyncHandler(async (req, res) => {
             `Opp có vẻ như sản phẩm ${medicine.name} tạm hết hàng rồi! Xin lỗi vì sự bất tiện này!`
           )
         );
+      }
+    }
+
+    // Xử lý coupon nếu có
+    if (data.coupon) {
+      const coupon = await Coupon.findOne({
+        coupon_code: data.coupon,
+        status: "active",
+        end_date: { $gt: new Date() },
+        quantity: { $gt: 0 },
+      });
+
+      if (!coupon) {
+        return res.json(
+          jsonGenerate(StatusCode.BAD_REQUEST, "Mã giảm giá không hợp lệ")
+        );
+      }
+
+      // Kiểm tra số lần sử dụng của user
+      const couponUsage = await CouponUsage.findOne({
+        couponId: coupon._id,
+        accountId: req.user._id,
+      });
+
+      if (couponUsage && couponUsage.usageCount >= coupon.maximum_uses) {
+        return res.json(
+          jsonGenerate(
+            StatusCode.BAD_REQUEST,
+            "Bạn đã hết lượt sử dụng mã giảm giá này"
+          )
+        );
+      }
+
+      // Cập nhật số lượng và lịch sử sử dụng
+      await Coupon.findByIdAndUpdate(coupon._id, { $inc: { quantity: -1 } });
+
+      if (couponUsage) {
+        await CouponUsage.findByIdAndUpdate(couponUsage._id, {
+          $inc: { usageCount: 1 },
+          lastUsedDate: new Date(),
+        });
+
+        console.log("Update coupon usage");
+      } else {
+        console.log("Create coupon usage");
+
+        await CouponUsage.create({
+          couponId: coupon._id,
+          accountId: req.user._id,
+          usageCount: 1,
+          lastUsedDate: new Date(),
+        });
       }
     }
 
@@ -245,14 +299,82 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
       );
     }
 
-    let points = 0;
-    if (req.body.status === "processing") {
+    // Nếu đơn hàng bị hủy (cancelled)
+    if (req.body.status === "cancelled") {
+      // Lấy chi tiết đơn hàng
+      const orderDetail = await OrderDetail.findOne({ orderId: order._id });
+      
+      // Hoàn trả số lượng sản phẩm
+      const bulkOps = orderDetail.items.map((item) => ({
+        updateOne: {
+          filter: { _id: item.productId },
+          update: {
+            $inc: {
+              quantityStock: item.quantity,
+              sold: -item.quantity,
+            },
+          },
+        },
+      }));
+      
+      await Medicine.bulkWrite(bulkOps);
+
+      // Nếu đơn hàng có sử dụng coupon
+      if (order.coupon) {
+        // Tăng lại số lượng coupon
+        await Coupon.findOneAndUpdate(
+          { coupon_code: order.coupon },
+          { $inc: { quantity: 1 } }
+        );
+
+        // Giảm lượt sử dụng coupon của user
+        const coupon = await Coupon.findOne({ coupon_code: order.coupon });
+        if (coupon) {
+          const couponUsage = await CouponUsage.findOne({
+            couponId: coupon._id,
+            accountId: order.AccountId,
+          });
+
+          if (couponUsage) {
+            if (couponUsage.usageCount > 1) {
+              await CouponUsage.findByIdAndUpdate(couponUsage._id, {
+                $inc: { usageCount: -1 },
+              });
+            } else {
+              // Nếu chỉ sử dụng 1 lần thì xóa luôn record
+              await CouponUsage.findByIdAndDelete(couponUsage._id);
+            }
+          }
+        }
+      }
+
+      // Nếu đơn hàng đã được tích điểm, hoàn lại điểm
+      const pointHistory = await PointHistory.findOne({ orderId: order._id });
+      if (pointHistory) {
+        await LoyaltyProgram.findOneAndUpdate(
+          { AccountId: order.AccountId },
+          {
+            $inc: {
+              points: -pointHistory.change,
+              totalSpending: -order.total,
+            },
+          }
+        );
+
+        // Xóa lịch sử tích điểm của đơn hàng này
+        await PointHistory.findByIdAndDelete(pointHistory._id);
+      }
+
+      // Cập nhật status của đơn hàng thành cancelled
+      await Order.findByIdAndUpdate(order._id, { status: "cancelled" });
+      
+    } else if (req.body.status === "processing") {
+      // Giữ nguyên logic xử lý cho trạng thái processing
       const existingPointHistory = await PointHistory.findOne({
         orderId: order._id,
       });
       if (existingPointHistory) {
         await Order.findByIdAndUpdate(order._id, { status: req.body.status });
-
         return res.json(
           jsonGenerate(
             StatusCode.CONTINUE,
@@ -264,6 +386,7 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
       const { total, AccountId } = order;
       const loyaltyProgram = await LoyaltyProgram.findOne({ AccountId });
 
+      let points = 0;
       if (loyaltyProgram) {
         switch (loyaltyProgram.rank) {
           case "Bạc":
@@ -299,17 +422,15 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
           createdAt: new Date(),
           description: `Tích điểm từ đơn hàng ${order.id}`,
         });
-
-        return res.json(
-          jsonGenerate(StatusCode.OK, "Cập nhật trạng thái đơn hàng thành công")
-        );
       }
     } else {
+      // Các trạng thái khác chỉ cần cập nhật
       await Order.findByIdAndUpdate(order._id, { status: req.body.status });
-      return res.json(
-        jsonGenerate(StatusCode.OK, "Cập nhật trạng thái đơn hàng thành công")
-      );
     }
+
+    return res.json(
+      jsonGenerate(StatusCode.OK, "Cập nhật trạng thái đơn hàng thành công")
+    );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }

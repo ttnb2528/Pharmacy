@@ -16,7 +16,7 @@ const SelectCoupon = ({
   handleApplyCoupon,
 }) => {
   const { couponData } = useContext(PharmacyContext);
-  
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -40,8 +40,9 @@ const SelectCoupon = ({
                 className="mt-2 bg-green-500 hover:bg-green-600"
                 size="sm"
                 onClick={() => handleApplyCoupon(coupon)}
+                disabled={!coupon.canUse}
               >
-                Áp dụng
+                {coupon.canUse ? "Áp dụng" : "Đã hết lượt sử dụng"}
               </Button>
             </div>
           ))}

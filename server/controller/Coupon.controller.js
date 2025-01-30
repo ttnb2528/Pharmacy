@@ -4,6 +4,7 @@ import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 import Joi from "joi";
 import { generateID } from "../utils/generateID.js";
+import CouponUsage from "../model/CouponUsage.model.js";
 
 export const createCoupon = asyncHandler(async (req, res) => {
   try {
@@ -53,17 +54,39 @@ export const createCoupon = asyncHandler(async (req, res) => {
 
 export const getCoupons = asyncHandler(async (req, res) => {
   try {
-    const coupons = await Coupon.find();
+    const accountId = req.user._id;
+    
+    // Lấy tất cả coupon còn active
+    const coupons = await Coupon.find({
+      status: "active",
+      end_date: { $gt: new Date() },
+      quantity: { $gt: 0 }
+    });
 
-    return res.json(
+    // Lấy lịch sử sử dụng coupon của user
+    const couponUsages = await CouponUsage.find({ accountId });
+
+    // Thêm thông tin về khả năng sử dụng cho mỗi coupon
+    const couponsWithUsage = await Promise.all(coupons.map(async (coupon) => {
+      const usage = couponUsages.find(u => u.couponId.equals(coupon._id));
+      const usageCount = usage ? usage.usageCount : 0;
+      
+      return {
+        ...coupon.toObject(),
+        usageCount,
+        canUse: usageCount < coupon.maximum_uses
+      };
+    }));
+
+    res.json(
       jsonGenerate(
-        StatusCode.OK,
-        "Lấy danh sách mã giảm giá thành công",
-        coupons
+        StatusCode.OK, 
+        "Lấy danh sách coupon thành công", 
+        couponsWithUsage
       )
     );
   } catch (error) {
-    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
 
@@ -158,6 +181,47 @@ export const deleteCoupon = asyncHandler(async (req, res) => {
     return res.json(jsonGenerate(StatusCode.OK, "Xóa mã giảm giá thành công"));
   } catch (error) {
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const getAvailableCoupons = asyncHandler(async (req, res) => {
+  try {
+    const accountId = req.user._id;
+
+    // Lấy tất cả coupon còn active
+    const coupons = await Coupon.find({
+      status: "active",
+      end_date: { $gt: new Date() },
+      quantity: { $gt: 0 },
+    });
+
+    // Lấy lịch sử sử dụng coupon của user
+    const couponUsages = await CouponUsage.find({ accountId });
+
+    // Lọc các coupon có thể sử dụng
+    const availableCoupons = coupons
+      .map((coupon) => {
+        const usage = couponUsages.find((u) => u.couponId.equals(coupon._id));
+        const usageCount = usage ? usage.usageCount : 0;
+        const canUse = usageCount < coupon.maximum_uses;
+
+        return {
+          ...coupon.toObject(),
+          usageCount,
+          canUse,
+        };
+      })
+      .filter((coupon) => coupon.canUse);
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách coupon thành công",
+        availableCoupons
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
 
