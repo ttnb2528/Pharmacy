@@ -64,7 +64,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         return res.json(
           jsonGenerate(
             StatusCode.BAD_REQUEST,
-            `Sản phẩm ${medicine.name} không đủ số lượng trong kho`
+            `Opp có vẻ như sản phẩm ${medicine.name} tạm hết hàng rồi! Xin lỗi vì sự bất tiện này!`
           )
         );
       }
@@ -282,7 +282,7 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
 
       await Order.findByIdAndUpdate(order._id, { status: req.body.status });
       await LoyaltyProgram.findOneAndUpdate(
-        { AccountId },  
+        { AccountId },
         {
           $inc: {
             points,
