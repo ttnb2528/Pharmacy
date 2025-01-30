@@ -16,9 +16,7 @@ const SelectCoupon = ({
   handleApplyCoupon,
 }) => {
   const { couponData } = useContext(PharmacyContext);
-
-  console.log(couponData);
-
+  
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>

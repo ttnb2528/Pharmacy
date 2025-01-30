@@ -36,20 +36,20 @@ const CartItemBoxBuy = () => {
     }
     setSelectedCoupon(coupon);
     setIsOpen(false);
-    showNotification({
-      title: "Áp dụng mã giảm giá thành công",
-      message: `Mã giảm giá ${coupon.coupon_code} đã được áp dụng`,
-      type: "success",
-    });
+    // showNotification({
+    //   title: "Áp dụng mã giảm giá thành công",
+    //   message: `Mã giảm giá ${coupon.coupon_code} đã được áp dụng`,
+    //   type: "success",
+    // });
   };
 
   const handleRemoveCoupon = () => {
     setSelectedCoupon(null);
-    showNotification({
-      title: "Đã xóa mã giảm giá",
-      message: "Mã giảm giá đã được xóa khỏi đơn hàng",
-      type: "info",
-    });
+    // showNotification({
+    //   title: "Đã xóa mã giảm giá",
+    //   message: "Mã giảm giá đã được xóa khỏi đơn hàng",
+    //   type: "info",
+    // });
   };
 
   return (
