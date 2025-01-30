@@ -17,9 +17,15 @@ import { GrMapLocation } from "react-icons/gr";
 import { PiMedal } from "react-icons/pi";
 import { PiHandCoins } from "react-icons/pi";
 import { getInitials } from "@/utils/getInitialName.jsx";
+import {
+  CalculatePercentProgress,
+  CalculateRemainingAccumulated,
+} from "@/utils/Calculate.js";
+import { convertVND } from "@/utils/ConvertVND.js";
 
 const AccountSmall = () => {
   const { userData } = useContext(PharmacyContext);
+
   return (
     <div>
       <div className="grid w-[288px] gap-4 rounded-md bg-white">
@@ -49,7 +55,7 @@ const AccountSmall = () => {
                   <div className="mt-1 flex w-fit items-center gap-1 rounded-full bg-orange-100 px-2 py-1 text-sm font-semibold">
                     <CoinSvg />
                     <span className="font-medium text-neutral-900">
-                      0 Xu Vàng
+                      {userData?.accountId?.loyaltyProgramId?.points} Xu
                     </span>
                   </div>
                 </div>
@@ -74,7 +80,10 @@ const AccountSmall = () => {
               <div className="flex items-center gap-2">
                 <div className="relative min-w-[30px] overflow-hidden rounded-xl text-center text-[10px] font-semibold h-2 w-[100%] bg-white">
                   <Progress
-                    value={50}
+                    value={CalculatePercentProgress(
+                      userData?.accountId?.loyaltyProgramId?.rank,
+                      userData?.accountId?.loyaltyProgramId?.totalSpending
+                    )}
                     className="w-full bg-white [&>div]:bg-gray-400"
                   />
                 </div>
@@ -89,7 +98,14 @@ const AccountSmall = () => {
 
               <div className="mt-2 flex items-center ">
                 <span className="text-xs font-normal ">
-                  Chi tiêu thêm 4.000.000&nbsp;₫ để thăng hạng vàng
+                  Chi tiêu thêm{" "}
+                  {convertVND(
+                    CalculateRemainingAccumulated(
+                      userData?.accountId?.loyaltyProgramId?.rank,
+                      userData?.accountId?.loyaltyProgramId?.totalSpending
+                    )
+                  )}{" "}
+                  để thăng hạng vàng
                 </span>
               </div>
             </div>
