@@ -12,6 +12,8 @@ import AddressRouter from "./Address.route.js";
 import LocationRouter from "./Location.route.js";
 import CouponRouter from "./Coupon.route.js";
 import BatchRouter from "./Batch.route.js";
+import OrderRouter from "./Order.route.js";
+import PointHistoryRouter from "./PointHistory.route.js"; 
 import OTPRouter from "./OTP.route.js";
 
 const app = express();
@@ -29,6 +31,8 @@ app.use("/address", AddressRouter);
 app.use("/location", LocationRouter);
 app.use("/coupon", CouponRouter);
 app.use("/batch", BatchRouter);
+app.use("/order", OrderRouter);
+app.use("/pointHistory", PointHistoryRouter);
 
 app.use("/otp", OTPRouter);
 
