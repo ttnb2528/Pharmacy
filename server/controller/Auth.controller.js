@@ -6,6 +6,7 @@ import { StatusCode } from "../utils/constants.js";
 import generateToken from "../utils/createToken.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Staff from "../model/Staff.model.js";
+import LoyaltyProgram from "../model/LoyaltyProgram.model.js";
 
 export const signup = asyncHandler(async (req, res) => {
   try {
@@ -31,9 +32,18 @@ export const signup = asyncHandler(async (req, res) => {
     const user = await Account.create({ email, password, cartData: cart });
     await Customer.create({ accountId: user._id });
 
+    const loyaltyProgram = await LoyaltyProgram.create({ AccountId: user._id });
+
+    await Account.findByIdAndUpdate(user._id, {
+      loyaltyProgramId: loyaltyProgram._id,
+    });
+
     const populatedUser = await Customer.findOne({
       accountId: user._id,
-    }).populate("accountId");
+    }).populate({
+      path: "accountId",
+      populate: { path: "loyaltyProgramId" },
+    });
 
     generateToken(res, user._id);
 
@@ -71,7 +81,10 @@ export const login = asyncHandler(async (req, res) => {
     if (isPasswordCorrect) {
       const populatedUser = await Customer.findOne({
         accountId: userExist._id,
-      }).populate("accountId");
+      }).populate({
+        path: "accountId",
+        populate: { path: "loyaltyProgramId" },
+      });
 
       const user = populatedUser.toObject();
       delete user.accountId.password;

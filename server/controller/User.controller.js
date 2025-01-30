@@ -24,7 +24,7 @@ export const getUserInfo = asyncHandler(async (req, res) => {
 
   const populatedUser = await Customer.findOne({
     accountId: req.user._id,
-  }).populate("accountId");
+  }).populate({ path: "accountId", populate: { path: "loyaltyProgramId" } });
 
   res.json(jsonGenerate(StatusCode.OK, "Thành công", populatedUser));
 });
@@ -239,7 +239,7 @@ export const removeProductFromCart = asyncHandler(async (req, res) => {
 export const updateCart = asyncHandler(async (req, res) => {
   try {
     const { productId, quantity } = req.body;
-    
+
     const userData = await Account.findOne({ _id: req.user._id });
 
     if (!userData) {

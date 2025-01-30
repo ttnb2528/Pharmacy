@@ -15,6 +15,10 @@ const AccountSchema = new mongoose.Schema({
   cartData: {
     type: Object,
   },
+  loyaltyProgramId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "LoyaltyProgram",
+  },
   createAt: {
     type: Date,
     default: Date.now,
