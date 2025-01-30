@@ -48,3 +48,15 @@ export const DELETE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine/:id`;
 
 export const CATEGORY_ROUTES = "/api/v1/category";
 export const GET_ALL_CATEGORIES_ROUTE = `${CATEGORY_ROUTES}/getCategories`;
+
+export const ORDER_ROUTES = "/api/v1/order";
+export const CREATE_ORDER_ROUTE = `${ORDER_ROUTES}/createOrder`;
+export const GET_ORDERS_ROUTE = `${ORDER_ROUTES}/getOrders`;
+export const GET_CURRENT_USER_ORDER_ROUTE = `${ORDER_ROUTES}/getCurrentUserOrders`;
+export const GET_ORDER_BY_ID_ROUTE = `${ORDER_ROUTES}/getOrderById`;
+export const GET_ORDER_DETAIL_ROUTE = `${ORDER_ROUTES}/getOrderDetail`;
+export const UPDATE_STATUS_ORDER_ROUTE = `${ORDER_ROUTES}/updateStatusOrder`;
+export const DELETE_ORDER_ROUTE = `${ORDER_ROUTES}/deleteOrder`;
+
+export const POINT_HISTORY_ROUTES = "/api/v1/pointHistory";
+export const GET_POINT_HISTORIES_ROUTE = `${POINT_HISTORY_ROUTES}/getPointHistories`;
