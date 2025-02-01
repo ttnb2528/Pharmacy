@@ -18,7 +18,8 @@ const SearchResult = () => {
 
       setSearchResult(filteredProducts);
     }
-  }, []);
+  }, [allProducts, keyword]);
+
   return (
     <div>
       <Breadcrumbs category={"search"} />

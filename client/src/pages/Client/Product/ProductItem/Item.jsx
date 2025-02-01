@@ -7,6 +7,7 @@ import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import slugify from "slugify";
+import { toast } from "sonner";
 
 const Item = ({ product, setIsLoading, setViewedProducts }) => {
   // const { setSelectedProduct } = useContext(ProductContext);
@@ -67,6 +68,7 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
             [productId]: prev[productId] + 1,
           };
         });
+        toast.success(res.data.message);
       }
 
       console.log(res);
@@ -78,8 +80,6 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
   };
 
   const handleProductClick = () => {
-    console.log("Product being passed:", product);
-
     navigate(path, {
       state: { product },
     });
@@ -87,25 +87,23 @@ const Item = ({ product, setIsLoading, setViewedProducts }) => {
     const storedProducts =
       JSON.parse(localStorage.getItem("viewedProducts")) || [];
 
-    // Kiểm tra nếu sản phẩm đã tồn tại
-    const isProductExists = storedProducts.some((p) => p.id === product.id);
+    // Lọc bỏ sản phẩm cũ nếu đã tồn tại
+    let updatedProducts = storedProducts.filter((p) => p.id !== product.id);
 
-    if (!isProductExists) {
-      // Tạo mảng mới với sản phẩm mới ở cuối
-      let updatedProducts = [...storedProducts, product];
+    // Thêm sản phẩm mới vào cuối danh sách
+    updatedProducts = [...updatedProducts, product];
 
-      // Nếu vượt quá 10 sản phẩm, loại bỏ sản phẩm đầu tiên
-      if (updatedProducts.length > 10) {
-        updatedProducts = updatedProducts.slice(1);
-      }
-
-      // Cập nhật localStorage và dispatch một custom event
-      localStorage.setItem("viewedProducts", JSON.stringify(updatedProducts));
-      window.dispatchEvent(new CustomEvent("viewedProductsUpdated"));
-
-      // Cập nhật state nếu có
-      setViewedProducts?.(updatedProducts);
+    // Nếu vượt quá 10 sản phẩm, loại bỏ sản phẩm đầu tiên
+    if (updatedProducts.length > 10) {
+      updatedProducts = updatedProducts.slice(1);
     }
+
+    // Cập nhật localStorage và dispatch một custom event
+    localStorage.setItem("viewedProducts", JSON.stringify(updatedProducts));
+    window.dispatchEvent(new CustomEvent("viewedProductsUpdated"));
+
+    // Cập nhật state nếu có
+    setViewedProducts?.(updatedProducts);
   };
 
   return (

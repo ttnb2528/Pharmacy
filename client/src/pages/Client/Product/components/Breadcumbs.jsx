@@ -24,13 +24,17 @@ const Breadcrumbs = (props) => {
           <Slash />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
-          <BreadcrumbLink
-            href={`/${removeAccents(category)
-              .toLocaleLowerCase()
-              .replace(/ /g, "-")}`}
-          >
-            {category}
-          </BreadcrumbLink>
+          {category === "search" ? (
+            <BreadcrumbPage>Search</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink
+              href={`/${removeAccents(category)
+                .toLocaleLowerCase()
+                .replace(/ /g, "-")}`}
+            >
+              {category}
+            </BreadcrumbLink>
+          )}
         </BreadcrumbItem>
         {product && (
           <>
