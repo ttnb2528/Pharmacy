@@ -9,6 +9,7 @@ import {
   getMedicinesByCategory,
   getMedicinesByCategoryName,
   getMedicinesByIsDiscount,
+  updateImagesMedicine,
   updateMedicine,
 } from "../controller/Medicine.controller.js";
 
@@ -27,5 +28,6 @@ router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
 router.get("/getMedicine/:id", getMedicine);
 router.delete("/deleteMedicine/:id", deleteMedicine);
 router.put("/updateMedicine/:id", updateMedicine);
+router.put("/updateImagesMedicine/:id", updateImagesMedicine);
 
 export default router;

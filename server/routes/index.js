@@ -13,8 +13,9 @@ import LocationRouter from "./Location.route.js";
 import CouponRouter from "./Coupon.route.js";
 import BatchRouter from "./Batch.route.js";
 import OrderRouter from "./Order.route.js";
-import PointHistoryRouter from "./PointHistory.route.js"; 
+import PointHistoryRouter from "./PointHistory.route.js";
 import OTPRouter from "./OTP.route.js";
+import CloudinaryRouter from "./Cloudinary.route.js";
 
 const app = express();
 
@@ -35,5 +36,6 @@ app.use("/order", OrderRouter);
 app.use("/pointHistory", PointHistoryRouter);
 
 app.use("/otp", OTPRouter);
+app.use("/cloudinary", CloudinaryRouter);
 
 export default app;

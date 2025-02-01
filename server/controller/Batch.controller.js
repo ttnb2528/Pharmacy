@@ -141,6 +141,20 @@ export const deleteBatch = asyncHandler(async (req, res) => {
   }
 });
 
+export const getBatchesForMedicine = asyncHandler(async (req, res) => {
+  try {
+    const batches = await Batch.find({ MedicineId: req.params.id }).populate(
+      "SupplierId ManufactureId MedicineId"
+    );
+
+    return res.json(
+      jsonGenerate(StatusCode.OK, "Lấy dữ liệu thành công", batches)
+    );
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 const validate = (data) => {
   const schema = Joi.object({
     batchNumber: Joi.string().required().label("Mã lô"),

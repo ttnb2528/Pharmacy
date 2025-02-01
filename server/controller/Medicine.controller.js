@@ -23,9 +23,7 @@ export const addMedicine = asyncHandler(async (req, res) => {
   });
 
   const medicine = await newMedicine.save();
-  res
-    .status(StatusCode.CREATED)
-    .json(jsonGenerate(StatusCode.CREATED, "Thêm thuốc thành công", medicine));
+  res.json(jsonGenerate(StatusCode.CREATED, "Thêm thuốc thành công", medicine));
 });
 
 export const getMedicines = asyncHandler(async (req, res) => {
@@ -40,11 +38,9 @@ export const getMedicines = asyncHandler(async (req, res) => {
     medicine._doc.batches = batches; // Gán kết quả vào medicine object
   }
 
-  res
-    .status(StatusCode.OK)
-    .json(
-      jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
-    );
+  res.json(
+    jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+  );
 });
 
 export const getMedicinesByIsDiscount = asyncHandler(async (req, res) => {
@@ -58,11 +54,9 @@ export const getMedicinesByIsDiscount = asyncHandler(async (req, res) => {
       .populate("ManufactureId");
     medicine._doc.batches = batches; // Gán kết quả vào medicine object
   }
-  res
-    .status(StatusCode.OK)
-    .json(
-      jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
-    );
+  res.json(
+    jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+  );
 });
 
 export const getMedicinesByCategory = asyncHandler(async (req, res) => {
@@ -79,11 +73,9 @@ export const getMedicinesByCategory = asyncHandler(async (req, res) => {
       medicine._doc.batches = batches; // Gán kết quả vào medicine object
     }
 
-    res
-      .status(StatusCode.OK)
-      .json(
-        jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
-      );
+    res.json(
+      jsonGenerate(StatusCode.OK, "Lấy danh sách thuốc thành công", medicines)
+    );
   } catch (error) {
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
@@ -132,15 +124,13 @@ export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     // Handle any errors that occur during the query
-    res
-      .status(StatusCode.INTERNAL_SERVER_ERROR)
-      .json(
-        jsonGenerate(
-          StatusCode.INTERNAL_SERVER_ERROR,
-          `Lấy danh sách thuốc theo nhóm '${categoryName}' thất bại`,
-          error
-        )
-      );
+    res.json(
+      jsonGenerate(
+        StatusCode.INTERNAL_SERVER_ERROR,
+        `Lấy danh sách thuốc theo nhóm '${categoryName}' thất bại`,
+        error
+      )
+    );
   }
 });
 
@@ -188,15 +178,11 @@ export const getMedicine = asyncHandler(async (req, res) => {
     medicine._doc.batches = batches; // Gán kết quả vào medicine object
   }
   if (!medicine) {
-    return res
-      .status(StatusCode.NOT_FOUND)
-      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+    return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
   }
-  res
-    .status(StatusCode.OK)
-    .json(
-      jsonGenerate(StatusCode.OK, "Lấy thông tin thuốc thành công", medicine)
-    );
+  res.json(
+    jsonGenerate(StatusCode.OK, "Lấy thông tin thuốc thành công", medicine)
+  );
 });
 
 export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
@@ -219,15 +205,13 @@ export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
     }
   }
 
-  res
-    .status(StatusCode.OK)
-    .json(
-      jsonGenerate(
-        StatusCode.OK,
-        "Lấy danh sách thuốc bán chạy nhất thành công",
-        medicines
-      )
-    );
+  res.json(
+    jsonGenerate(
+      StatusCode.OK,
+      "Lấy danh sách thuốc bán chạy nhất thành công",
+      medicines
+    )
+  );
 });
 
 export const deleteMedicine = asyncHandler(async (req, res) => {
@@ -240,9 +224,7 @@ export const deleteMedicine = asyncHandler(async (req, res) => {
   }
 
   await Medicine.findByIdAndDelete(id);
-  res
-    .status(StatusCode.OK)
-    .json(jsonGenerate(StatusCode.OK, "Xóa thuốc thành công"));
+  res.json(jsonGenerate(StatusCode.OK, "Xóa thuốc thành công"));
 });
 
 export const updateMedicine = asyncHandler(async (req, res) => {
@@ -251,17 +233,15 @@ export const updateMedicine = asyncHandler(async (req, res) => {
   const medicine = await Medicine.findById(id);
 
   if (!medicine) {
-    return res
-      .status(StatusCode.NOT_FOUND)
-      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+    return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
   }
 
   const { error } = validate(req.body);
 
   if (error) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+    );
   }
 
   const medicineExist = await Medicine.findOne({
@@ -270,16 +250,30 @@ export const updateMedicine = asyncHandler(async (req, res) => {
   });
 
   if (medicineExist) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, "Tên thuốc đã tồn tại"));
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, "Tên thuốc đã tồn tại")
+    );
   }
 
   await Medicine.findByIdAndUpdate(id, req.body);
 
-  res
-    .status(StatusCode.OK)
-    .json(jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công"));
+  res.json(jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công"));
+});
+
+export const updateImagesMedicine = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+
+  const medicine = await Medicine.findById(id);
+
+  if (!medicine) {
+    return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+  }
+
+  await Medicine.findByIdAndUpdate(id, { images: req.body.images });
+
+  res.json(
+    jsonGenerate(StatusCode.OK, "Cập nhật hình ảnh thuốc thành công", medicine)
+  );
 });
 
 const validate = (data) => {
