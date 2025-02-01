@@ -37,6 +37,7 @@ export const UPDATE_COUPON_ROUTE = `${COUPON_ROUTES}/updateCoupon/:id`;
 
 export const PRODUCT_ROUTES = "/api/v1/medicine";
 export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
+export const GET_ALL_PRODUCTS_BY_HISTORY_ROUTE = `${PRODUCT_ROUTES}/getMedicineByHistory`;
 export const GET_ALL_PRODUCTS_DISCOUNT_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByIsDiscount`;
 export const GET_ALL_PRODUCT_BY_CATEGORY_ROUTE = `${PRODUCT_ROUTES}/getMedicineByCategory`;
 export const GET_ALL_PRODUCT_BY_CATEGORY_NAME_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByCategoryName`;
