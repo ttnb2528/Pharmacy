@@ -1,7 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRoute = ({ children }) => {
-  const { userInfo } = JSON.parse(localStorage.getItem("token")) || {};
+  const userInfo = localStorage.getItem("token") || {};
+
+  console.log(userInfo);
+
   const location = useLocation();
 
   if (!userInfo) {
