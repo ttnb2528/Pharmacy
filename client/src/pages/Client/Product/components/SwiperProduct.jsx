@@ -4,7 +4,7 @@ import "swiper/css";
 import "swiper/css/thumbs";
 import { useState } from "react";
 
-import test_product_image from "@/assets/test_product_image1.jpg";
+// import test_product_image from "@/assets/test_product_image1.jpg";
 
 const SwiperProduct = (props) => {
   const { productImage } = props;
@@ -26,11 +26,7 @@ const SwiperProduct = (props) => {
         >
           {productImage?.map((item) => (
             <SwiperSlide key={item}>
-              <img
-                src={test_product_image}
-                alt="product"
-                className="h-full w-full"
-              />
+              <img src={item} alt="product" className="h-full w-full" />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -50,7 +46,8 @@ const SwiperProduct = (props) => {
             {productImage?.map((item, index) => (
               <SwiperSlide key={item}>
                 <img
-                  src={test_product_image}
+                  key={index}
+                  src={item}
                   alt="product"
                   className={`w-[20%] border rounded-lg ${
                     index === currentThumbIndex ? "border-green-400" : "" // Sử dụng currentThumbIndex để kiểm tra
