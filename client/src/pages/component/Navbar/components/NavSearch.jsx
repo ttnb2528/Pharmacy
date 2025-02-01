@@ -123,6 +123,25 @@ const NavSearch = () => {
     }
   };
 
+  const handleNavigate = (product) => {
+    navigate(
+      `${slugify(product?.categoryId?.name, { lower: true })}/${slugify(
+        product?.name,
+        { lower: true }
+      )}`,
+      { state: { product } }
+    );
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      const searchParams = new URLSearchParams();
+      searchParams.set("keyword", searchTerm);
+      navigate(`/search?${searchParams.toString()}`);
+      setShowResults(false);
+    }
+  };
+
   return (
     <div className="flex flex-wrap justify-between items-center relative gap-10">
       {loading && <Loading />}
@@ -139,6 +158,7 @@ const NavSearch = () => {
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
         />
         <FaSearch className="absolute right-3 top-3" />
         {showResults && (
@@ -156,8 +176,8 @@ const NavSearch = () => {
                     // navigate(`/product/${product.id}`);
                   }}
                 >
-                  <Link
-                    to={`/product/${product.id}`}
+                  <div
+                    onClick={() => handleNavigate(product)}
                     className="py-2 px-4 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
                   >
                     <img
@@ -166,7 +186,7 @@ const NavSearch = () => {
                       className="w-8 h-8 rounded-md"
                     />
                     <span>{product.name}</span>
-                  </Link>
+                  </div>
                 </li>
               ))}
             </ul>

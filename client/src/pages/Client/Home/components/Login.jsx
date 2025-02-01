@@ -7,9 +7,11 @@ import { useAppStore } from "@/store/index.js";
 import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 const Login = ({ close }) => {
   const { setUserInfo } = useAppStore();
+  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
@@ -43,12 +45,13 @@ const Login = ({ close }) => {
     try {
       if (validateLogin()) {
         const res = await apiClient.post(LOGIN_ROUTE, { email, password });
-        console.log(res.data);
         if (res.status === 200 && res.data.status === 200) {
           setUserInfo(res.data.data);
           localStorage.setItem("token", res.data.data.token);
 
-          window.location.replace("/");
+          // Redirect to the page user tried to access before login
+          const from = location.state?.from?.pathname || "/";
+          window.location.replace(from);
         } else {
           toast.error(res.data.message);
         }
