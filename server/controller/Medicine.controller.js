@@ -144,6 +144,37 @@ export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
   }
 });
 
+export const getMedicineByHistory = asyncHandler(async (req, res) => {
+  try {
+    const { productIds } = req.body;
+
+    const products = await Medicine.find({ _id: { $in: productIds } })
+      .populate("categoryId")
+      .populate("brandId");
+
+    for (let medicine of products) {
+      const batches = await Batch.find({ MedicineId: medicine._id })
+        .populate("SupplierId")
+        .populate("ManufactureId");
+      medicine._doc.batches = batches; // Gán kết quả vào medicine object
+    }
+
+    const sortedProducts = productIds
+      .map((id) => products.find((product) => product._id.toString() === id))
+      .filter(Boolean);
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách thuốc theo lịch sử xem thành công",
+        sortedProducts
+      )
+    );
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const getMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const medicine = await Medicine.findById(id)

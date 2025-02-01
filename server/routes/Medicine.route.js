@@ -4,6 +4,7 @@ import {
   deleteMedicine,
   getMedicine,
   getMedicineByBestSelling,
+  getMedicineByHistory,
   getMedicines,
   getMedicinesByCategory,
   getMedicinesByCategoryName,
@@ -14,10 +15,14 @@ import {
 const router = express.Router();
 
 router.post("/addMedicine", addMedicine);
+router.post("/getMedicineByHistory", getMedicineByHistory);
 router.get("/getMedicines", getMedicines);
 router.get("/getMedicinesByIsDiscount", getMedicinesByIsDiscount);
 router.get("/getMedicineByCategory/:categoryId", getMedicinesByCategory);
-router.get("/getMedicinesByCategoryName/:categoryName", getMedicinesByCategoryName);
+router.get(
+  "/getMedicinesByCategoryName/:categoryName",
+  getMedicinesByCategoryName
+);
 router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
 router.get("/getMedicine/:id", getMedicine);
 router.delete("/deleteMedicine/:id", deleteMedicine);
