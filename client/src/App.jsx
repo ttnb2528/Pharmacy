@@ -16,79 +16,133 @@ import PointsPolicy from "./pages/Client/Account/components/PointsPolicy.jsx";
 import UpdatePassword from "./pages/Client/Account/components/UpdatePassword.jsx";
 import NotFound from "./pages/component/NotFound.jsx";
 import SearchResult from "./pages/Client/Product/SearchResult.jsx";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { PharmacyContext } from "./context/Pharmacy.context.jsx";
 import slugify from "slugify";
 import Loading from "./pages/component/Loading.jsx";
 import OrderDetail from "./pages/Client/Account/components/OrderDetail.jsx";
+import PrivateRoute from "./layout/PrivateRoute.jsx";
 
 const App = () => {
   const { categories, loading } = useContext(PharmacyContext);
 
+  const routes = useMemo(() => {
+    // Public routes - không cần đăng nhập
+    const publicRoutes = [
+      {
+        path: "/",
+        element: <Layout />,
+        children: [
+          {
+            path: "/",
+            element: <Home />,
+          },
+          {
+            path: "/search",
+            element: <SearchResult />,
+          },
+          {
+            path: "/cart",
+            element: <Cart />,
+          },
+          // Thêm các category routes vào đây
+          ...(categories
+            ?.map((category) => [
+              {
+                path: `/${slugify(category?.name, { lower: true })}`,
+                element: (
+                  <Product title={category?.name} categoryId={category?._id} />
+                ),
+              },
+              {
+                path: `/${slugify(category?.name, {
+                  lower: true,
+                })}/:productName`,
+                element: <ProductDisplay />,
+              },
+            ])
+            .flat() || []),
+        ],
+      },
+    ];
+
+    // Protected routes - cần đăng nhập
+    const protectedRoutes = [
+      {
+        path: "/checkout",
+        element: (
+          <PrivateRoute>
+            <Checkout />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/account",
+        element: (
+          <PrivateRoute>
+            <Account />
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            path: "info",
+            element: <PersonalInfo />,
+          },
+          {
+            path: "history",
+            element: <OrderHistory />,
+          },
+          {
+            path: "history/:orderId",
+            element: <OrderDetail />,
+          },
+          {
+            path: "coupons",
+            element: <Coupons />,
+          },
+          {
+            path: "addresses",
+            element: <Addresses />,
+          },
+          {
+            path: "points",
+            element: <PointsHistory />,
+          },
+          {
+            path: "policy",
+            element: <PointsPolicy />,
+          },
+          {
+            path: "info/update-password",
+            element: <UpdatePassword />,
+          },
+        ],
+      },
+    ];
+
+    // Combine all routes
+    return [
+      {
+        path: "/",
+        element: <Layout />,
+        children: [...publicRoutes[0].children, ...protectedRoutes],
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+    ];
+  }, [categories]);
+
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loading />
+      </div>
+    );
   }
 
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      children: [
-        {
-          path: "/",
-          element: <Home />,
-        },
-        ...categories.map((category) => ({
-          path: `/${slugify(category?.name, { lower: false })}`,
-          element: (
-            <Product title={category?.name} categoryId={category?._id} />
-          ),
-          // children: [
-          //   {
-          //     path: ":productName",
-          //     element: <ProductDisplay />,
-          //   },
-          // ],
-        })),
-        ...categories.map((category) => ({
-          path: `/${slugify(category?.name, { lower: false })}/:productName`,
-          element: <ProductDisplay />,
-        })),
-        {
-          path: "/search",
-          element: <SearchResult />,
-        },
-        {
-          path: "/cart",
-          element: <Cart />,
-        },
-        {
-          path: "/checkout",
-          element: <Checkout />,
-        },
-        {
-          path: "/account",
-          element: <Account />,
-          children: [
-            { path: "info", element: <PersonalInfo /> },
-            { path: "history", element: <OrderHistory />, },
-            { path: "history/:orderId", element: <OrderDetail /> },
-            { path: "coupons", element: <Coupons /> },
-            { path: "addresses", element: <Addresses /> },
-            { path: "points", element: <PointsHistory /> },
-            { path: "policy", element: <PointsPolicy /> },
-            { path: "info/update-password", element: <UpdatePassword /> },
-          ],
-        },
-      ],
-    },
-    {
-      path: "*",
-      element: <NotFound />,
-    },
-  ]);
-
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={createBrowserRouter(routes)} />;
 };
 
 export default App;
