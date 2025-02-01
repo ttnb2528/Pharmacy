@@ -4,15 +4,36 @@ import "slick-carousel/slick/slick-theme.css";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import { useEffect, useState } from "react";
 import Loading from "../../Loading.jsx";
+import { apiClient } from "@/lib/api-client.js";
+import { GET_ALL_PRODUCTS_BY_HISTORY_ROUTE } from "@/API/index.api.js";
 
 const FooterHistory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [viewedProducts, setViewedProducts] = useState([]);
 
-  const updateViewedProducts = () => {
+  const updateViewedProducts = async () => {
     const storedProducts = localStorage.getItem("viewedProducts");
     if (storedProducts) {
-      setViewedProducts(JSON.parse(storedProducts));
+      try {
+        setIsLoading(true);
+        const productIds = JSON.parse(storedProducts).map(
+          (product) => product._id
+        );
+
+        const res = await apiClient.post(GET_ALL_PRODUCTS_BY_HISTORY_ROUTE, {
+          productIds,
+        });
+
+        if (res.status === 200 && res.data.status === 200) {
+          setViewedProducts(res.data.data);
+        } else {
+          console.error(res);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -36,6 +57,7 @@ const FooterHistory = () => {
     className: viewedProducts.length > 5 ? "" : "[&>div>div]:ml-0",
     infinite: viewedProducts.length > 5 ? true : false,
     lazyLoad: true,
+    swipeToSlide: true,
     slidesToShow: 5,
     responsive: [
       {
@@ -64,6 +86,7 @@ const FooterHistory = () => {
       },
     ],
   };
+
   return (
     <div>
       {isLoading && <Loading />}
