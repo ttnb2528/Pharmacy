@@ -9,30 +9,58 @@ import {
 import { Button } from "@/components/ui/button";
 
 const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
+  const getConfirmationText = () => {
+    switch (type) {
+      case "product":
+        return `Bạn có chắc chắn muốn xóa sản phẩm <span class="font-semibold text-green-500">${
+          info?.name || "này"
+        }</span> không?`;
+      case "address":
+        return "Bạn có chắc chắn muốn xóa địa chỉ này không?";
+      case "order":
+        return "Bạn có chắc chắn muốn hủy đơn hàng này không?";
+      case "customer":
+        return `Bạn có chắc chắn muốn xóa khách hàng <span class="font-semibold text-green-500">${info.name}</span> không?`;
+      case "category":
+        return `Bạn có chắc chắn muốn xóa danh mục <span class="font-semibold text-green-500">${
+          info?.name || "này"
+        }</span> không?`;
+      default:
+        return "Bạn có chắc chắn muốn thực hiện hành động này không?"; // Default text
+    }
+  };
+
+  const getTitleText = () => {
+    switch (type) {
+      case "product":
+        return "Xóa sản phẩm";
+      case "address":
+        return "Xóa địa chỉ";
+      case "order":
+        return "Hủy đơn hàng";
+      case "account":
+        return "Xóa tài khoản";
+      case "category":
+        return "Xóa danh mục";
+      default:
+        return "Xác nhận hành động"; // Default title
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] p-0">
         <DialogHeader className="px-4 py-2.5">
-          {type === "product" ? (
-            <DialogTitle className="text-2xl font-bold">
-              Xóa sản phẩm
-            </DialogTitle>
-          ) : (
-            <DialogTitle className="text-2xl font-bold">
-              Xóa địa chỉ
-            </DialogTitle>
-          )}
+          <DialogTitle className="text-2xl font-bold">
+            {getTitleText()}
+          </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        {type === "product" ? (
-          <p className="px-4">
-            Bạn có chắc chắn muốn xóa sản phẩm{" "}
-            <span className="font-semibold text-green-500">{info.name}</span>{" "}
-            không?
-          </p>
-        ) : (
-          <p className="px-4">Bạn có chắc chắn muốn xóa địa chỉ này không?</p>
-        )}
+        <p
+          className="px-4"
+          dangerouslySetInnerHTML={{ __html: getConfirmationText() }}
+        />{" "}
+        {/* Use dangerouslySetInnerHTML for HTML in text */}
         <DialogFooter className="px-4 py-2.5">
           <Button type="button" variant="outline" onClick={onClose}>
             Quay lại

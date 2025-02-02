@@ -21,5 +21,12 @@ export const GET_ALL_BRANDS_ROUTE = `${BRAND_ROUTES}/getBrands`;
 export const BATCHES_ROUTES = "/api/v1/batch";
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 
+export const CUSTOMER_ROUTES = "/api/v1/customer";
+export const ADD_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/createCustomer`;
+export const GET_ALL_CUSTOMERS_ROUTE = `${CUSTOMER_ROUTES}/getCustomers`;
+export const GET_CUSTOMER_BY_ID_ROUTE = `${CUSTOMER_ROUTES}/:id`;
+export const UPDATE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/profile`;
+export const DELETE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/deleteCustomer`;
+
 export const CLOUDINARY_ROUTES = "/api/v1/cloudinary";
 export const REMOVE_IMAGE_ROUTE = `${CLOUDINARY_ROUTES}/removeImage`;

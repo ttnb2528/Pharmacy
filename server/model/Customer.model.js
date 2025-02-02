@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const CustomerSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
   name: {
     type: String,
     default: null,
@@ -25,16 +29,15 @@ const CustomerSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  address: [
-    {
-      type: String,
-      default: null,
-    },
-  ],
+  address: {
+    type: String,
+    default: null,
+  },
+
   accountId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Account",
-    required: true,
+    default: null,
   },
 });
 

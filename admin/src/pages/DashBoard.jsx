@@ -1,13 +1,12 @@
 import {
   Activity,
-  Box,
   Calendar,
   DollarSign,
   Home,
   Layers,
   //   Package,
   Pill,
-//   ShoppingBag,   
+  //   ShoppingBag,
   ShoppingCart,
   Tag,
   Truck,
@@ -31,8 +30,6 @@ import { Link, Outlet } from "react-router-dom";
 const sidebarItems = [
   { icon: Home, label: "Tổng quan", to: "/" },
   { icon: Pill, label: "Quản lý thuốc", to: "/products" },
-  { icon: Users, label: "Tài khoản", to: "/accounts" },
-  { icon: Box, label: "Lô hàng", to: "/batches" },
   { icon: Tag, label: "Thương hiệu", to: "/brands" },
   { icon: Layers, label: "Danh mục", to: "/categories" },
   { icon: DollarSign, label: "Mã giảm giá", to: "/coupons" },

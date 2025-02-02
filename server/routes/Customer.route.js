@@ -3,6 +3,7 @@ import {
   addProfileImage,
   addToCart,
   clearCart,
+  createCustomer,
   deleteCustomer,
   getCustomerById,
   getCustomers,
@@ -22,6 +23,7 @@ import {
 
 const router = express.Router();
 
+router.post("/createCustomer", authenticate, createCustomer);
 router.post("/add-profile-image", authenticate, addProfileImage);
 router.post("/addToCart", authenticate, addToCart);
 router.post("/removeFromCart", authenticate, removeFromCart);
@@ -30,12 +32,12 @@ router.post("/updateCart", authenticate, updateCart);
 router.post("/clearCart", authenticate, clearCart);
 router.delete("/remove-profile-image", authenticate, removeProfileImage);
 router.get("/getUserInfo", authenticate, getUserInfo);
+router.get("/getCustomers", getCustomers);
 router.get("/:id", authenticate, getCustomerById);
 router.put("/profile/:id", authenticate, updateCustomer);
 router.put("/update-password/:id", authenticate, updatePassword);
 
 // ROLE: Admin and Staff
-router.get("/", authenticate, authorize, getCustomers);
-router.delete("/:id", authenticate, authorizeAdmin, deleteCustomer);
+router.delete("/deleteCustomer/:id", deleteCustomer);
 
 export default router;

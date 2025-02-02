@@ -5,10 +5,51 @@ import { StatusCode } from "../utils/constants.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import Joi from "joi";
 import cloudinary from "../config/cloudinary.js";
+import { generateID } from "../utils/generateID.js";
+
+export const createCustomer = asyncHandler(async (req, res) => {
+  try {
+    const { error } = validate(req.body);
+    if (error) {
+      return res.json(jsonGenerate(StatusCode.BAD_REQUEST, error.message));
+    }
+
+    const phoneExits = await Customer.findOne({ phone: req.body.phone });
+
+    if (phoneExits) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Số điện thoại đã sử dụng")
+      );
+    }
+
+    let id = await generateID(Customer);
+
+    const newCustomer = new Customer({
+      id,
+      ...req.body,
+    });
+
+    const customer = await newCustomer.save();
+
+    const populatedCustomer = await Customer.findOne({
+      _id: customer._id,
+    }).populate("accountId");
+
+    res.json(
+      jsonGenerate(
+        StatusCode.CREATED,
+        "Tạo khách hàng thành công",
+        populatedCustomer
+      )
+    );
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
 
 export const getCustomers = asyncHandler(async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const customers = await Customer.find().populate("accountId");
     res.json(jsonGenerate(StatusCode.OK, "Thành công", customers));
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
@@ -61,7 +102,7 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     const updatedCustomer = await Customer.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
-    });
+    }).populate("accountId");
 
     res.json(
       jsonGenerate(StatusCode.OK, "Cập nhật thành công", updatedCustomer)
@@ -167,10 +208,16 @@ export const deleteCustomer = asyncHandler(async (req, res) => {
       );
     }
 
-    await Account.deleteOne({ _id: customer.accountId });
-    await Customer.findByIdAndDelete(id);
+    const haveAccount = await Account.findOne({ _id: customer.accountId });
 
-    res.json(jsonGenerate(StatusCode.OK, "Xóa thành công"));
+    if (!haveAccount) {
+      await Customer.findByIdAndDelete(id);
+      return res.json(jsonGenerate(StatusCode.OK, "Xóa thành công"));
+    } else {
+      await Account.deleteOne({ _id: customer.accountId });
+      await Customer.findByIdAndDelete(id);
+      return res.json(jsonGenerate(StatusCode.OK, "Xóa thành công"));
+    }
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }

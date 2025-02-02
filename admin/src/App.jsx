@@ -5,6 +5,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Products from "./pages/Products.jsx";
 import Overview from "./pages/Overview.jsx";
 import MedicineContextProvider from "./context/ProductContext.context.jsx";
+import AdminCustomer from "./pages/Customer/AdminCustomer.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -25,14 +26,6 @@ const App = () => {
           ),
         },
         {
-          path: "accounts",
-          element: <div>Accounts</div>,
-        },
-        {
-          path: "batches",
-          element: <div>Batches</div>,
-        },
-        {
           path: "brands",
           element: <div>Brands</div>,
         },
@@ -46,7 +39,7 @@ const App = () => {
         },
         {
           path: "customers",
-          element: <div>Customers</div>,
+          element: <AdminCustomer />,
         },
         {
           path: "employees",
