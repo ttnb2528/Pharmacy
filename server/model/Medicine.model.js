@@ -79,6 +79,10 @@ const MedicineSchema = new mongoose.Schema({
     ref: "Brand",
     required: true,
   },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
   batches: [
     {
       type: mongoose.Schema.Types.ObjectId,

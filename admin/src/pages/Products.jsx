@@ -38,16 +38,28 @@ import {
 import { useContext, useState } from "react";
 import { MedicineContext } from "@/context/ProductContext.context";
 import MedicineDetails from "./component/MedicineDetails.jsx";
+import { apiClient } from "@/lib/api-admin.js";
+import { DELETE_MEDICINE_ROUTE } from "@/API/index.api.js";
+import { toast } from "sonner";
+import ConfirmForm from "./component/ConfirmForm.jsx";
+import Loading from "./component/Loading.jsx";
 
 export default function Products() {
-  const { medicines, categories } = useContext(MedicineContext);
+  const { medicines, categories, setMedicines } = useContext(MedicineContext);
   const filterCategories = [{ _id: "all", name: "Tất cả" }, ...categories];
 
-  const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isImport, setIsImport] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const [selectedMedicine, setSelectedMedicine] = useState(null);
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -64,15 +76,23 @@ export default function Products() {
   const handleCancel = () => {
     setSelectedMedicine(null);
     setIsEditing(false);
-    setIsDialogOpen(false);
+    setIsAdding(false);
+    setIsImport(false);
   };
 
-  const filteredMedicines = medicines.filter(
-    (medicine) =>
-      medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedCategory === "Tất cả" ||
-        medicine.categoryId.name === selectedCategory)
-  );
+  const filteredMedicines = medicines.filter((medicine) => {
+    const isMatchCategory =
+      selectedCategory === "Tất cả" ||
+      medicine.categoryId.name === selectedCategory;
+    const isMatchSearch = medicine.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    // Kết hợp điều kiện deleted
+    const isNotDeleted = !medicine.deleted;
+
+    return isMatchCategory && isMatchSearch && isNotDeleted;
+  });
 
   const totalPages = Math.ceil(filteredMedicines.length / itemsPerPage);
   const paginatedMedicines = filteredMedicines.slice(
@@ -80,10 +100,44 @@ export default function Products() {
     currentPage * itemsPerPage
   );
 
-  
+  const handleDeleteMEdicine = async (medicine) => {
+    try {
+      setIsLoading(true);
+      const res = await apiClient.delete(
+        `${DELETE_MEDICINE_ROUTE}/${medicine._id}`
+      );
+      console.log(res);
+
+      if (res.status === 200 && res.data.status === 200) {
+        toast.success("Xóa thuốc thành công");
+        setIsConfirmOpen(false);
+        setSelectedMedicine(null);
+        setMedicines((prevMedicines) => {
+          return prevMedicines.map((item) => {
+            if (item._id === medicine._id) {
+              return { ...item, deleted: true }; // Cập nhật deleted: true
+            }
+            return item;
+          });
+        });
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenConfirm = (medicine) => {
+    setSelectedMedicine(medicine);
+    setIsConfirmOpen(true);
+  };
 
   return (
     <div>
+      {isLoading && <Loading />}
       <header className="flex items-center justify-between p-4 border-b">
         <SidebarTrigger />
         <h1 className="text-2xl font-bold">Danh sách thuốc</h1>
@@ -114,7 +168,7 @@ export default function Products() {
               </SelectContent>
             </Select>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Thêm thuốc
@@ -127,7 +181,9 @@ export default function Products() {
               <DialogDescription></DialogDescription>
               <MedicineDetails
                 medicine={null}
-                isEditing={true}
+                isEditing={false}
+                isImport={false}
+                isAdding={true}
                 handleCancel={handleCancel}
               />
             </DialogContent>
@@ -173,6 +229,9 @@ export default function Products() {
                         <MedicineDetails
                           medicine={selectedMedicine}
                           isEditing={false}
+                          isAdding={false}
+                          isImport={false}
+                          handleCancel={handleCancel}
                         />
                       </DialogContent>
                     </Dialog>
@@ -190,14 +249,22 @@ export default function Products() {
                       <DialogContent className="max-w-4xl">
                         <DialogHeader>
                           <DialogTitle>Sửa thông tin thuốc</DialogTitle>
+                          <DialogDescription></DialogDescription>
                         </DialogHeader>
                         <MedicineDetails
                           medicine={selectedMedicine}
                           isEditing={true}
+                          isAdding={false}
+                          isImport={true}
+                          handleCancel={handleCancel}
                         />
                       </DialogContent>
                     </Dialog>
-                    <Button variant="outline" size="icon">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleOpenConfirm(medicine)}
+                    >
                       <Trash className="h-4 w-4" />
                     </Button>
                   </div>
@@ -235,6 +302,19 @@ export default function Products() {
           </PaginationContent>
         </Pagination>
       </main>
+
+      {isConfirmOpen && (
+        <ConfirmForm
+          info={selectedMedicine}
+          open={isConfirmOpen}
+          onClose={() => {
+            setIsConfirmOpen(false);
+            setSelectedMedicine(null);
+          }}
+          handleConfirm={() => handleDeleteMEdicine(selectedMedicine)}
+          type="product"
+        />
+      )}
     </div>
   );
 }

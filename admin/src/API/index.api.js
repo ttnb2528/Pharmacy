@@ -8,7 +8,9 @@ export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
 export const PRODUCT_ROUTES = "/api/v1/medicine";
 export const ADD_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/addMedicine`;
 export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
+export const UPDATE_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/updateMedicine`;
 export const UPDATE_IMAGES_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/updateImagesMedicine`;
+export const DELETE_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine`;
 
 export const CATEGORY_ROUTES = "/api/v1/category";
 export const GET_ALL_CATEGORIES_ROUTE = `${CATEGORY_ROUTES}/getCategories`;

@@ -10,9 +10,15 @@ import { generateID } from "../utils/generateID.js";
 export const addMedicine = asyncHandler(async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
-    return res
-      .status(StatusCode.BAD_REQUEST)
-      .json(jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message));
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+    );
+  }
+
+  const medicineExist = await Medicine.findOne({ name: req.body.name });
+
+  if (medicineExist) {
+    return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Thuốc đã tồn tại"));
   }
 
   let id = await generateID(Medicine);
@@ -23,6 +29,7 @@ export const addMedicine = asyncHandler(async (req, res) => {
   });
 
   const medicine = await newMedicine.save();
+
   res.json(jsonGenerate(StatusCode.CREATED, "Thêm thuốc thành công", medicine));
 });
 
@@ -216,15 +223,24 @@ export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
 
 export const deleteMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  const medicine = await Medicine.findById(id);
+  const medicine = await Medicine.findById(id)
+    .populate("categoryId")
+    .populate("brandId");
+
+  const batches = await Batch.find({ MedicineId: medicine._id })
+    .populate("SupplierId")
+    .populate("ManufactureId");
+
+  medicine._doc.batches = batches; // Gán kết quả vào medicine object
+
   if (!medicine) {
-    return res
-      .status(StatusCode.NOT_FOUND)
-      .json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+    return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
   }
 
-  await Medicine.findByIdAndDelete(id);
-  res.json(jsonGenerate(StatusCode.OK, "Xóa thuốc thành công"));
+  await Medicine.findByIdAndUpdate(id, {
+    deleted: true,
+  });
+  res.json(jsonGenerate(StatusCode.OK, "Xóa thuốc thành công", medicine));
 });
 
 export const updateMedicine = asyncHandler(async (req, res) => {
@@ -263,7 +279,15 @@ export const updateMedicine = asyncHandler(async (req, res) => {
 export const updateImagesMedicine = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
-  const medicine = await Medicine.findById(id);
+  const medicine = await Medicine.findById(id)
+    .populate("categoryId")
+    .populate("brandId");
+
+  const batches = await Batch.find({ MedicineId: medicine._id })
+    .populate("SupplierId")
+    .populate("ManufactureId");
+
+  medicine._doc.batches = batches; // Gán kết quả vào medicine object
 
   if (!medicine) {
     return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));

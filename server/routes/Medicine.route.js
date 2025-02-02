@@ -26,8 +26,8 @@ router.get(
 );
 router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
 router.get("/getMedicine/:id", getMedicine);
-router.delete("/deleteMedicine/:id", deleteMedicine);
 router.put("/updateMedicine/:id", updateMedicine);
 router.put("/updateImagesMedicine/:id", updateImagesMedicine);
+router.delete("/deleteMedicine/:id", deleteMedicine);
 
 export default router;

@@ -45,6 +45,7 @@ const MedicineContextProvider = (props) => {
 
   const contextValue = {
     medicines,
+    setMedicines,
     categories,
     brands,
   };

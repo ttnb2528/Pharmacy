@@ -28,7 +28,9 @@ import { apiClient } from "@/lib/api-admin.js";
 import {
   ADD_MEDICINE_ROUTE,
   GET_ALL_BATCHES_FOR_MEDICINE_ROUTE,
+  REMOVE_IMAGE_ROUTE,
   UPDATE_IMAGES_MEDICINE_ROUTE,
+  UPDATE_MEDICINE_ROUTE,
   //   REMOVE_IMAGE_ROUTE,
 } from "@/API/index.api.js";
 import { toast } from "sonner";
@@ -36,12 +38,19 @@ import { toast } from "sonner";
 import { FaTrash } from "react-icons/fa";
 import Loading from "./Loading.jsx";
 
-const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
+const MedicineDetails = ({
+  medicine,
+  isEditing,
+  isAdding,
+  isImport,
+  handleCancel,
+}) => {
   const [activeTab, setActiveTab] = useState("info");
-  const { categories, brands } = useContext(MedicineContext);
+  const { categories, brands, setMedicines } = useContext(MedicineContext);
   const [batches, setBatches] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [newImageFiles, setNewImageFiles] = useState();
 
   // Thêm state để quản lý form
   const [formData, setFormData] = useState({
@@ -97,7 +106,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
   const renderField = (label, field, id, type = "text") => (
     <div className="grid grid-cols-4 items-center gap-4">
       <Label htmlFor={id}>{label}</Label>
-      {isEditing ? (
+      {isEditing || isAdding ? (
         <Input
           id={id}
           type={type}
@@ -114,7 +123,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
   const renderTextArea = (label, field, id) => (
     <div className="grid grid-cols-4 items-center gap-4">
       <Label htmlFor={id}>{label}</Label>
-      {isEditing ? (
+      {isEditing || isAdding ? (
         <Textarea
           id={id}
           value={formData[field]}
@@ -130,7 +139,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
   const renderBoolean = (label, field, id) => (
     <div className="grid grid-cols-4 items-center gap-4">
       <Label htmlFor={id}>{label}</Label>
-      {isEditing ? (
+      {isEditing || isAdding ? (
         <div className="col-span-3">
           <Switch
             id={id}
@@ -172,7 +181,56 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
     }
   }, [isEditing, medicine]);
 
-  const handleSubmit = async () => {
+  const handleDeleteImageEdit1 = async (index) => {
+    try {
+      const parts = formData.images[index].split("/");
+      let fileName = parts[parts.length - 1].split(".")[0]; // Loại bỏ phần mở rộng .jpg
+      let folder = parts[parts.length - 2];
+      let publicId = folder + "/" + fileName;
+      // console.log(publicId);
+
+      const res = await apiClient.post(REMOVE_IMAGE_ROUTE, {
+        publicId,
+      });
+
+      if (res.status === 200 && res.data.status === 200) {
+        const newImages = formData.images.filter((_, i) => i !== index);
+        setFormData((prev) => ({ ...prev, images: newImages }));
+        toast.success("Xóa hình ảnh thành công");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteImageEdit = async (index) => {
+    setFormData((prev) => {
+      const newImages = prev.images.filter((_, i) => i !== index);
+      return { ...prev, images: newImages };
+    });
+
+    const fileInput = document.getElementById("images");
+    if (fileInput && fileInput.files) {
+      const dataTransfer = new DataTransfer();
+
+      Array.from(fileInput.files)
+        .filter((_, i) => i !== index)
+        .forEach((file) => dataTransfer.items.add(file));
+
+      fileInput.files = dataTransfer.files;
+    }
+  };
+
+  const handleImageChangeEdit = (e) => {
+    const files = Array.from(e.target.files);
+    setNewImageFiles(files);
+    const URLFiles = files.map((file) => URL.createObjectURL(file));
+    setFormData((prev) => ({ ...prev, images: [...prev.images, ...URLFiles] }));
+  };
+
+  const handleSubmitAdd = async () => {
     // Xử lý submit form với formData
     try {
       if (imageFiles.length > 0) {
@@ -190,8 +248,6 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
               body: formData,
             });
 
-            console.log(res);
-
             if (res.status === 200) {
               const data = await res.json();
               return data.secure_url;
@@ -208,6 +264,62 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
 
           if (res1.status === 200 && res1.data.status === 200) {
             toast.success("Thêm thuốc thành công");
+            setMedicines((prev) => [...prev, res1.data.data]);
+            handleCancel();
+          } else {
+            toast.error(res1.data.message);
+          }
+        } else {
+          toast.error(res.data.message);
+        }
+      } else {
+        toast.error("Vui lòng chọn hình ảnh");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitEdit = async (medicine) => {
+    try {
+      if (formData.images.length > 0) {
+        setIsLoading(true);
+        const res = await apiClient.put(
+          `${UPDATE_MEDICINE_ROUTE}/${medicine._id}`,
+          formData
+        );
+        console.log(res);
+
+        if (res.status === 200 && res.data.status === 200) {
+          const uploadPromises = newImageFiles.map(async (file) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "pharmacy_avatar");
+
+            const res = await fetch(import.meta.env.VITE_CLOUDINARY_IMAGE_URL, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (res.status === 200) {
+              const data = await res.json();
+              return data.secure_url;
+            }
+          });
+
+          const imageUrls = await Promise.all(uploadPromises);
+          formData.images = [...formData.images, ...imageUrls];
+
+          const res1 = await apiClient.put(
+            `${UPDATE_IMAGES_MEDICINE_ROUTE}/${res.data.data._id}`,
+            { images: formData.images }
+          );
+
+          if (res1.status === 200 && res1.data.status === 200) {
+            toast.success("Cập nhật thuốc thành công");
+            setMedicines((prev) => [...prev, res1.data.data]);
             handleCancel();
           } else {
             toast.error(res1.data.message);
@@ -234,8 +346,10 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
       {isLoading && <Loading />}
       <TabsList>
         <TabsTrigger value="info">Thông tin thuốc</TabsTrigger>
-        {isEditing && <TabsTrigger value="batch">Nhập thuốc</TabsTrigger>}
-        {!isEditing && <TabsTrigger value="history">Lịch sử nhập</TabsTrigger>}
+        {isImport && <TabsTrigger value="batch">Nhập thuốc</TabsTrigger>}
+        {!isEditing && !isAdding && !isImport && (
+          <TabsTrigger value="history">Lịch sử nhập</TabsTrigger>
+        )}
       </TabsList>
       <TabsContent value="info" className="overflow-auto">
         <div className="grid gap-4 py-4">
@@ -251,7 +365,9 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
           {renderBoolean("Kê đơn", "isRx", "isRx")}
           {renderBoolean("Giảm giá", "isDiscount", "isDiscount")}
 
-          {(isEditing ? formData.isDiscount : medicine?.isDiscount) &&
+          {(isEditing || isAdding
+            ? formData.isDiscount
+            : medicine?.isDiscount) &&
             renderField(
               "Phần trăm giảm giá",
               "percentDiscount",
@@ -261,7 +377,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="category">Danh mục</Label>
-            {isEditing ? (
+            {isEditing || isAdding ? (
               <Select
                 value={formData.categoryId}
                 onValueChange={(value) =>
@@ -285,7 +401,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="brand">Thương hiệu</Label>
-            {isEditing ? (
+            {isEditing || isAdding ? (
               <Select
                 value={formData.brandId}
                 onValueChange={(value) => handleInputChange("brandId", value)}
@@ -308,7 +424,7 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="images">Hình ảnh</Label>
             <div className="col-span-3">
-              {isEditing &&
+              {isAdding &&
                 imageFiles.map((image, index) => (
                   <div
                     key={index}
@@ -343,7 +459,40 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
                     )}
                   </div>
                 ))}
-              {isEditing && (
+
+              {isEditing &&
+                formData.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="relative inline-block mr-2 mb-2"
+                    onMouseEnter={() => {
+                      const newHover = [...avatarHover];
+                      newHover[index] = true;
+                      setAvatarHover(newHover);
+                    }}
+                    onMouseLeave={() => {
+                      const newHover = [...avatarHover];
+                      newHover[index] = false;
+                      setAvatarHover(newHover);
+                    }}
+                  >
+                    <img
+                      src={image}
+                      alt={`Product image ${index + 1}`}
+                      className="w-24 h-24 object-cover rounded-md"
+                    />
+                    {avatarHover[index] && (
+                      <div
+                        className="absolute inset-0 top-1 flex items-center w-24 h-24 justify-center bg-black/50 rounded-md"
+                        onClick={() => handleDeleteImageEdit(index)}
+                      >
+                        <FaTrash className="text-white text-xl cursor-pointer" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+              {isAdding && (
                 <Input
                   id="images"
                   type="file"
@@ -353,7 +502,18 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
                   onChange={handleImageChange}
                 />
               )}
-              {!isEditing && (
+
+              {isEditing && (
+                <Input
+                  id="images"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="mt-2"
+                  onChange={handleImageChangeEdit}
+                />
+              )}
+              {!isEditing && !isAdding && (
                 <div className="flex space-x-2">
                   {medicine?.images.map((image, index) => (
                     <img
@@ -368,16 +528,22 @@ const MedicineDetails = ({ medicine, isEditing, handleCancel }) => {
             </div>
           </div>
         </div>
-        {isEditing && (
+        {(isEditing || isAdding || isImport) && (
           <div className="flex justify-end space-x-2">
-            <Button onClick={handleSubmit}>Lưu</Button>
+            <Button
+              onClick={
+                isAdding ? handleSubmitAdd : () => handleSubmitEdit(medicine)
+              }
+            >
+              Lưu
+            </Button>
             <Button variant="outline" onClick={handleCancel}>
               Hủy
             </Button>
           </div>
         )}
       </TabsContent>
-      {isEditing && (
+      {isEditing && isImport && (
         <TabsContent value="batch">
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
