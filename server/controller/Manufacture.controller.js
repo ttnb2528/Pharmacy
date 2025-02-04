@@ -1,4 +1,6 @@
 import Manufacture from "../model/Manufacture.model.js";
+import Medicine from "../model/Medicine.model.js";
+import Batch from "../model/Batch.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -48,11 +50,28 @@ export const getManufactures = asyncHandler(async (req, res) => {
   try {
     const manufactures = await Manufacture.find();
 
+    const manufacturesWithCount = await Promise.all(
+      manufactures.map(async (manufacture) => {
+        // Lấy danh sách các lô hàng của nhà sản xuất
+        const batches = await Batch.find({ ManufactureId: manufacture._id });
+
+        // Lấy danh sách các MedicineId từ các lô hàng
+        const medicineIds = batches.map((batch) => batch.MedicineId);
+
+        // Đếm số lượng thuốc duy nhất từ danh sách MedicineId
+        const count = await Medicine.countDocuments({
+          _id: { $in: medicineIds },
+        });
+
+        return { ...manufacture.toObject(), productCount: count };
+      })
+    );
+
     res.json(
       jsonGenerate(
         StatusCode.OK,
         "Lấy danh sách nơi sản xuất thành công",
-        manufactures
+        manufacturesWithCount
       )
     );
   } catch (error) {
@@ -126,7 +145,8 @@ export const deleteManufacture = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy nơi sản xuất")
       );
     }
-    await Manufacture.findByIdAndDelete(id);
+
+    await Manufacture.findByIdAndUpdate(id, { isDeleted: true });
 
     res.json(jsonGenerate(StatusCode.OK, "Xóa nơi sản xuất thành công"));
   } catch (error) {
@@ -137,6 +157,7 @@ export const deleteManufacture = asyncHandler(async (req, res) => {
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên nơi sản xuất"),
+    country: Joi.string().required().label("Nước sản xuất"),
   })
     .messages({
       "string.empty": "{#label} không được để trống",

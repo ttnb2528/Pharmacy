@@ -9,6 +9,8 @@ import AdminCustomer from "./pages/Customer/AdminCustomer.jsx";
 import AdminBrand from "./pages/Brand/AdminBrand.jsx";
 import AdminCategory from "./pages/Category/AdminCategory.jsx";
 import CategoryContextProvider from "./context/CategoryContext.context.jsx";
+import ManufactureContextProvider from "./context/ManufactureContext.context.jsx";
+import AdminManufacture from "./pages/Manufacture/AdminManufacture.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -54,7 +56,11 @@ const App = () => {
         },
         {
           path: "manufacturers",
-          element: <div>Manufacturers</div>,
+          element: (
+            <ManufactureContextProvider>
+              <AdminManufacture />
+            </ManufactureContextProvider>
+          ),
         },
         {
           path: "orders",

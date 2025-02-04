@@ -13,6 +13,10 @@ const ManufactureSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Manufacture = mongoose.model("Manufacture", ManufactureSchema);

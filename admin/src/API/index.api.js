@@ -24,6 +24,12 @@ export const GET_ALL_BRANDS_ROUTE = `${BRAND_ROUTES}/getBrands`;
 export const UPDATE_BRAND_ROUTE = `${BRAND_ROUTES}/updateBrand`;
 export const DELETE_BRAND_ROUTE = `${BRAND_ROUTES}/deleteBrand`;
 
+export const MANUFACTURE_ROUTES = "/api/v1/manufacture";
+export const ADD_MANUFACTURE_ROUTE = `${MANUFACTURE_ROUTES}/addManufacture`;
+export const GET_ALL_MANUFACTURES_ROUTE = `${MANUFACTURE_ROUTES}/getManufactures`;
+export const UPDATE_MANUFACTURE_ROUTE = `${MANUFACTURE_ROUTES}/updateManufacture`;
+export const DELETE_MANUFACTURE_ROUTE = `${MANUFACTURE_ROUTES}/deleteManufacture`;
+
 export const BATCHES_ROUTES = "/api/v1/batch";
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 
