@@ -16,6 +16,12 @@ export const createCoupon = asyncHandler(async (req, res) => {
       );
     }
 
+    if (req.body.discount_value <= 0) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Giá trị giảm giá phải lớn hơn 0")
+      );
+    }
+
     if (req.body.start_date > req.body.end_date) {
       return res.json(
         jsonGenerate(
@@ -55,33 +61,35 @@ export const createCoupon = asyncHandler(async (req, res) => {
 export const getCoupons = asyncHandler(async (req, res) => {
   try {
     const accountId = req.user._id;
-    
+
     // Lấy tất cả coupon còn active
     const coupons = await Coupon.find({
       status: "active",
       end_date: { $gt: new Date() },
-      quantity: { $gt: 0 }
+      quantity: { $gt: 0 },
     });
 
     // Lấy lịch sử sử dụng coupon của user
     const couponUsages = await CouponUsage.find({ accountId });
 
     // Thêm thông tin về khả năng sử dụng cho mỗi coupon
-    const couponsWithUsage = await Promise.all(coupons.map(async (coupon) => {
-      const usage = couponUsages.find(u => u.couponId.equals(coupon._id));
-      const usageCount = usage ? usage.usageCount : 0;
-      
-      return {
-        ...coupon.toObject(),
-        usageCount,
-        canUse: usageCount < coupon.maximum_uses
-      };
-    }));
+    const couponsWithUsage = await Promise.all(
+      coupons.map(async (coupon) => {
+        const usage = couponUsages.find((u) => u.couponId.equals(coupon._id));
+        const usageCount = usage ? usage.usageCount : 0;
+
+        return {
+          ...coupon.toObject(),
+          usageCount,
+          canUse: usageCount < coupon.maximum_uses,
+        };
+      })
+    );
 
     res.json(
       jsonGenerate(
-        StatusCode.OK, 
-        "Lấy danh sách coupon thành công", 
+        StatusCode.OK,
+        "Lấy danh sách coupon thành công",
         couponsWithUsage
       )
     );
@@ -136,6 +144,12 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       );
     }
 
+    if (req.body.discount_value <= 0) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Giá trị giảm giá phải lớn hơn 0")
+      );
+    }
+
     if (req.body.coupon_code !== coupon.coupon_code) {
       const couponExits = await Coupon.findOne({
         coupon_code: req.body.coupon_code,
@@ -161,6 +175,8 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       )
     );
   } catch (error) {
+    console.log(error);
+
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
@@ -239,13 +255,15 @@ const validate = (data) => {
     maximum_uses: Joi.number().label("Số lần sử dụng tối đa"),
     start_date: Joi.date().label("Ngày bắt đầu"),
     end_date: Joi.date().label("Ngày kết thúc"),
-  }).messages({
-    "string.empty": "{#label} không được để trống",
-    "any.required": "{#label} là bắt buộc",
-    "string.base": "{#label} phải là chuỗi ký tự",
-    "number.base": "{#label} phải là số",
-    "date.base": "{#label} phải là ngày tháng",
-  });
+  })
+    .messages({
+      "string.empty": "{#label} không được để trống",
+      "any.required": "{#label} là bắt buộc",
+      "string.base": "{#label} phải là chuỗi ký tự",
+      "number.base": "{#label} phải là số",
+      "date.base": "{#label} phải là ngày tháng",
+    })
+    .unknown(true);
 
   return schema.validate(data);
 };

@@ -13,6 +13,8 @@ import ManufactureContextProvider from "./context/ManufactureContext.context.jsx
 import AdminManufacture from "./pages/Manufacture/AdminManufacture.jsx";
 import SupplierContextProvider from "./context/SupllierContext.controller.jsx";
 import AdminSupplier from "./pages/Supllier/AdminSupplier.jsx";
+import AdminCoupon from "./pages/Coupon/AdminCoupon.jsx";
+import CouponContextProvider from "./context/CouponContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -46,7 +48,11 @@ const App = () => {
         },
         {
           path: "coupons",
-          element: <div>Coupons</div>,
+          element: (
+            <CouponContextProvider>
+              <AdminCoupon />
+            </CouponContextProvider>
+          ),
         },
         {
           path: "customers",
