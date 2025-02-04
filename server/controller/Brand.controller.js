@@ -1,4 +1,5 @@
 import Brand from "../model/Brand.model.js";
+import Medicine from "../model/Medicine.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -101,9 +102,11 @@ export const updateBrand = asyncHandler(async (req, res) => {
       );
     }
 
-    await Brand.findByIdAndUpdate(id, req.body);
+    const newBrand = await Brand.findByIdAndUpdate(id, req.body);
 
-    res.json(jsonGenerate(StatusCode.OK, "Cập nhật thương hiệu thành công"));
+    res.json(
+      jsonGenerate(StatusCode.OK, "Cập nhật thương hiệu thành công", newBrand)
+    );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
   }
@@ -119,11 +122,24 @@ export const deleteBrand = asyncHandler(async (req, res) => {
       );
     }
 
+    const medicineExits = await Medicine.findOne({ brandId: req.params.id });
+
+    console.log(medicineExits);
+
+    if (medicineExits) {
+      return res.json(
+        jsonGenerate(
+          StatusCode.BAD_REQUEST,
+          "Không thể xóa thương hiệu này vì có thuốc đang sử dụng"
+        )
+      );
+    }
+
     await Brand.findByIdAndDelete(req.params.id);
 
     res.json(jsonGenerate(StatusCode.OK, "Xóa thương hiệu thành công"));
   } catch (error) {
-    res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
 

@@ -6,6 +6,7 @@ import Products from "./pages/Products.jsx";
 import Overview from "./pages/Overview.jsx";
 import MedicineContextProvider from "./context/ProductContext.context.jsx";
 import AdminCustomer from "./pages/Customer/AdminCustomer.jsx";
+import AdminBrand from "./pages/Brand/AdminBrand.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -27,7 +28,7 @@ const App = () => {
         },
         {
           path: "brands",
-          element: <div>Brands</div>,
+          element: <AdminBrand />,
         },
         {
           path: "categories",

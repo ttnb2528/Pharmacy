@@ -2,6 +2,7 @@ import { Check, X, Mail, Phone, MapPin, Calendar, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+
 const CustomerDetails = ({ customer }) => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("vi", {

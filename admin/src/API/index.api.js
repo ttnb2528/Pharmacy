@@ -16,7 +16,10 @@ export const CATEGORY_ROUTES = "/api/v1/category";
 export const GET_ALL_CATEGORIES_ROUTE = `${CATEGORY_ROUTES}/getCategories`;
 
 export const BRAND_ROUTES = "/api/v1/brand";
+export const ADD_BRAND_ROUTE = `${BRAND_ROUTES}/addBrand`;
 export const GET_ALL_BRANDS_ROUTE = `${BRAND_ROUTES}/getBrands`;
+export const UPDATE_BRAND_ROUTE = `${BRAND_ROUTES}/updateBrand`;
+export const DELETE_BRAND_ROUTE = `${BRAND_ROUTES}/deleteBrand`;
 
 export const BATCHES_ROUTES = "/api/v1/batch";
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
