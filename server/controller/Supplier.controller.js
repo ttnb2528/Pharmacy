@@ -127,7 +127,7 @@ export const deleteSupplier = asyncHandler(async (req, res) => {
       );
     }
 
-    await Supplier.findByIdAndDelete(req.params.id);
+    await Supplier.findByIdAndUpdate(req.params.id, { isDeleted: true });
 
     res.json(jsonGenerate(StatusCode.OK, "Xóa nhà cung cấp thành công"));
   } catch (error) {
@@ -139,7 +139,7 @@ const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên nhà cung cấp"),
     address: Joi.string().required().label("Địa chỉ"),
-    phone: Joi.date().required().label("Số điện thoại"),
+    phone: Joi.string().required().label("Số điện thoại"),
   })
     .messages({
       "string.empty": "{#label} không được để trống",

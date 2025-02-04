@@ -11,6 +11,8 @@ import AdminCategory from "./pages/Category/AdminCategory.jsx";
 import CategoryContextProvider from "./context/CategoryContext.context.jsx";
 import ManufactureContextProvider from "./context/ManufactureContext.context.jsx";
 import AdminManufacture from "./pages/Manufacture/AdminManufacture.jsx";
+import SupplierContextProvider from "./context/SupllierContext.controller.jsx";
+import AdminSupplier from "./pages/Supllier/AdminSupplier.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -72,7 +74,11 @@ const App = () => {
         },
         {
           path: "suppliers",
-          element: <div>Suppliers</div>,
+          element: (
+            <SupplierContextProvider>
+              <AdminSupplier />
+            </SupplierContextProvider>
+          ),
         },
         {
           path: "reports",

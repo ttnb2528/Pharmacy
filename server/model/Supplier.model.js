@@ -17,6 +17,10 @@ const SupplierSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Supplier = mongoose.model("Supplier", SupplierSchema);

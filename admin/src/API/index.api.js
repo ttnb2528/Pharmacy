@@ -30,6 +30,12 @@ export const GET_ALL_MANUFACTURES_ROUTE = `${MANUFACTURE_ROUTES}/getManufactures
 export const UPDATE_MANUFACTURE_ROUTE = `${MANUFACTURE_ROUTES}/updateManufacture`;
 export const DELETE_MANUFACTURE_ROUTE = `${MANUFACTURE_ROUTES}/deleteManufacture`;
 
+export const SUPPLIER_ROUTE = "/api/v1/supplier";
+export const ADD_SUPPLIER_ROUTE = `${SUPPLIER_ROUTE}/addSupplier`;
+export const GET_ALL_SUPPLIERS_ROUTE = `${SUPPLIER_ROUTE}/getSuppliers`;
+export const UPDATE_SUPPLIER_ROUTE = `${SUPPLIER_ROUTE}/updateSupplier`;
+export const DELETE_SUPPLIER_ROUTE = `${SUPPLIER_ROUTE}/deleteSupplier`;
+
 export const BATCHES_ROUTES = "/api/v1/batch";
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 
