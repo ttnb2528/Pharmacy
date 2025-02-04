@@ -1,4 +1,5 @@
 import Category from "../model/Category.model.js";
+import Medicine from "../model/Medicine.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -44,11 +45,19 @@ export const getCategories = asyncHandler(async (req, res) => {
   try {
     const categories = await Category.find();
 
+    // Tính toán số lượng sản phẩm cho mỗi danh mục
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (category) => {
+        const count = await Medicine.countDocuments({ categoryId: category._id });
+        return {...category.toObject(), productCount: count }; // Thêm productCount vào mỗi category
+      })
+    );
+
     res.json(
       jsonGenerate(
         StatusCode.OK,
         "Lấy danh sách danh mục thành công",
-        categories
+        categoriesWithCount // Trả về danh sách danh mục đã có số lượng sản phẩm
       )
     );
   } catch (error) {
@@ -101,9 +110,11 @@ export const updateCategory = asyncHandler(async (req, res) => {
       );
     }
 
-    await Category.findByIdAndUpdate(id, req.body);
+    const newCategory = await Category.findByIdAndUpdate(id, req.body);
 
-    res.json(jsonGenerate(StatusCode.OK, "Cập nhật danh mục thành công"));
+    res.json(
+      jsonGenerate(StatusCode.OK, "Cập nhật danh mục thành công", newCategory)
+    );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
   }
@@ -116,6 +127,17 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     if (!category) {
       return res.json(
         jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục")
+      );
+    }
+
+    const hasMedicine = await Medicine.findOne({ categoryId: req.params.id });
+
+    if (hasMedicine) {
+      return res.json(
+        jsonGenerate(
+          StatusCode.BAD_REQUEST,
+          "Không thể xóa danh mục đã có sản phẩm"
+        )
       );
     }
 

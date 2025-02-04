@@ -13,7 +13,10 @@ export const UPDATE_IMAGES_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/updateImagesMedic
 export const DELETE_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine`;
 
 export const CATEGORY_ROUTES = "/api/v1/category";
+export const ADD_CATEGORY_ROUTE = `${CATEGORY_ROUTES}/addCategory`;
 export const GET_ALL_CATEGORIES_ROUTE = `${CATEGORY_ROUTES}/getCategories`;
+export const UPDATE_CATEGORY_ROUTE = `${CATEGORY_ROUTES}/updateCategory`;
+export const DELETE_CATEGORY_ROUTE = `${CATEGORY_ROUTES}/deleteCategory`;
 
 export const BRAND_ROUTES = "/api/v1/brand";
 export const ADD_BRAND_ROUTE = `${BRAND_ROUTES}/addBrand`;

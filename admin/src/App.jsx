@@ -7,6 +7,8 @@ import Overview from "./pages/Overview.jsx";
 import MedicineContextProvider from "./context/ProductContext.context.jsx";
 import AdminCustomer from "./pages/Customer/AdminCustomer.jsx";
 import AdminBrand from "./pages/Brand/AdminBrand.jsx";
+import AdminCategory from "./pages/Category/AdminCategory.jsx";
+import CategoryContextProvider from "./context/CategoryContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -32,7 +34,11 @@ const App = () => {
         },
         {
           path: "categories",
-          element: <div>Categories</div>,
+          element: (
+            <CategoryContextProvider>
+              <AdminCategory />,
+            </CategoryContextProvider>
+          ),
         },
         {
           path: "coupons",
