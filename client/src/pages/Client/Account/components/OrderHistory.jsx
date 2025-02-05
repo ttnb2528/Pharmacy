@@ -9,7 +9,7 @@ import { GET_CURRENT_USER_ORDER_ROUTE } from "@/API/index.api.js";
 const orderStatuses = [
   { value: "completed", label: "Hoàn thành" },
   { value: "processing", label: "Đang xử lý" },
-  { value: "packed", label: "Đã đóng gói" },
+  { value: "packaged", label: "Đã đóng gói" },
   { value: "shipping", label: "Đang giao" },
   { value: "cancelled", label: "Đã hủy" },
   { value: "pending", label: "Chờ xử lý" },

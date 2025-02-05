@@ -46,6 +46,11 @@ export const GET_CUSTOMER_BY_ID_ROUTE = `${CUSTOMER_ROUTES}/:id`;
 export const UPDATE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/profile`;
 export const DELETE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/deleteCustomer`;
 
+export const ORDER_ROUTES = "/api/v1/order";
+export const GET_ALL_ORDERS_ROUTE = `${ORDER_ROUTES}/getOrders`;
+export const GET_ORDER_DETAIL_ROUTE = `${ORDER_ROUTES}/getOrderDetail`;
+export const UPDATE_ORDER_STATUS_ROUTE = `${ORDER_ROUTES}/updateStatusOrder`;
+
 export const STAFF_ROUTES = "/api/v1/staff";
 export const ADD_STAFF_ROUTE = `${STAFF_ROUTES}/createStaff`;
 export const GET_ALL_STAFF_ROUTE = `${STAFF_ROUTES}/getStaffs`;
