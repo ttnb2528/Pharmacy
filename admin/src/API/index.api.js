@@ -46,6 +46,12 @@ export const GET_CUSTOMER_BY_ID_ROUTE = `${CUSTOMER_ROUTES}/:id`;
 export const UPDATE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/profile`;
 export const DELETE_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/deleteCustomer`;
 
+export const STAFF_ROUTES = "/api/v1/staff";
+export const ADD_STAFF_ROUTE = `${STAFF_ROUTES}/createStaff`;
+export const GET_ALL_STAFF_ROUTE = `${STAFF_ROUTES}/getStaffs`;
+export const UPDATE_STAFF_ROUTE = `${STAFF_ROUTES}/updateStaff`;
+export const DELETE_STAFF_ROUTE = `${STAFF_ROUTES}/deleteStaff`;
+
 export const COUPON_ROUTES = "/api/v1/coupon";
 export const ADD_COUPON_ROUTE = `${COUPON_ROUTES}/createCoupon`;
 export const GET_ALL_COUPONS_ROUTE = `${COUPON_ROUTES}/getCoupons`;

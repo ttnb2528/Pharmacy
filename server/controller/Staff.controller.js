@@ -6,15 +6,24 @@ import { jsonGenerate } from "../utils/helpers.js";
 
 export const createStaff = asyncHandler(async (req, res) => {
   try {
-    const { username, password, name, phone, address, isAdmin } = req.body;
+    // const { username, password, name, phone, address, isAdmin } = req.body;
+    const { isAdmin, username } = req.body;
 
     if (isAdmin === true) {
-      if (!username || !password) {
+      // if (!username || !password) {
+      //   return res.json(
+      //     jsonGenerate(
+      //       StatusCode.BAD_REQUEST,
+      //       "Vui lòng nhập username và password"
+      //     )
+      //   );
+      // }
+
+      const { error } = validate1(req.body);
+
+      if (error) {
         return res.json(
-          jsonGenerate(
-            StatusCode.BAD_REQUEST,
-            "Vui lòng nhập username và password"
-          )
+          jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
         );
       }
 
@@ -28,8 +37,7 @@ export const createStaff = asyncHandler(async (req, res) => {
 
       const admin = await Staff.create({
         name: "Admin",
-        username,
-        password,
+        ...req.body,
         isAdmin: true, // Đặt isAdmin = true
       });
 
@@ -37,10 +45,11 @@ export const createStaff = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.CREATED, "Tạo admin thành công", admin)
       );
     } else if (isAdmin === false) {
-      // Tạo nhân viên - yêu cầu các trường bắt buộc
-      if (!username || !password || !name || !phone || !address) {
+      const { error } = validate(req.body);
+
+      if (error) {
         return res.json(
-          jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập đầy đủ thông tin")
+          jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
         );
       }
 
@@ -52,7 +61,9 @@ export const createStaff = asyncHandler(async (req, res) => {
         );
       }
 
-      const staff = await Staff.create(req.body);
+      const staff = await Staff.create({
+        ...req.body,
+      });
 
       return res.json(
         jsonGenerate(StatusCode.CREATED, "Tạo nhân viên thành công", staff)
@@ -152,11 +163,13 @@ export const deleteStaff = asyncHandler(async (req, res) => {
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên nhân viên"),
-    gender: Joi.string().required().label("Giới tính"),
-    date: Joi.date().required().label("Ngày sinh"),
+    // gender: Joi.string().required().label("Giới tính"),
+    // date: Joi.date().required().label("Ngày sinh"),
     phone: Joi.string().required().label("Số điện thoại"),
     address: Joi.string().required().label("Địa chỉ"),
     workDate: Joi.string().required().label("Ngày vào làm"),
+    username: Joi.string().required().label("Tên đăng nhập"),
+    password: Joi.string().required().label("Mật khẩu"),
   })
     .messages({
       "string.empty": "{#label} không được để trống",
@@ -166,4 +179,19 @@ const validate = (data) => {
     .unknown(true);
 
   return schema.validate(data);
+};
+
+const validate1 = (data) => {
+  const AdminSchema = Joi.object({
+    username: Joi.string().required().label("Tên đăng nhập"),
+    password: Joi.string().required().label("Mật khẩu"),
+  })
+    .messages({
+      "string.empty": "{#label} không được để trống",
+      "any.required": "{#label} là bắt buộc",
+      "string.base": "{#label} phải là chuỗi ký tự",
+    })
+    .unknown(true);
+
+  return AdminSchema.validate(data);
 };

@@ -15,6 +15,8 @@ import SupplierContextProvider from "./context/SupllierContext.controller.jsx";
 import AdminSupplier from "./pages/Supllier/AdminSupplier.jsx";
 import AdminCoupon from "./pages/Coupon/AdminCoupon.jsx";
 import CouponContextProvider from "./context/CouponContext.context.jsx";
+import AdminStaff from "./pages/Staff/AdminStaff.jsx";
+import StaffContextProvider from "./context/StaffContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -60,7 +62,11 @@ const App = () => {
         },
         {
           path: "employees",
-          element: <div>Employees</div>,
+          element: (
+            <StaffContextProvider>
+              <AdminStaff />
+            </StaffContextProvider>
+          ),
         },
         {
           path: "manufacturers",
