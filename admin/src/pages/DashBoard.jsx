@@ -37,7 +37,7 @@ const sidebarItems = [
   { icon: Users, label: "Nhân viên", to: "/employees" },
   { icon: Truck, label: "Nhà sản xuất", to: "/manufacturers" },
   { icon: ShoppingCart, label: "Đơn hàng", to: "/orders" },
-  { icon: Calendar, label: "Giờ làm", to: "/schedules" },
+  { icon: Calendar, label: "Giờ làm", to: "/shift-works" },
   { icon: Truck, label: "Nhà cung cấp", to: "/suppliers" },
   { icon: Activity, label: "Thống kê doanh số", to: "/reports" },
 ];

@@ -17,6 +17,8 @@ import AdminCoupon from "./pages/Coupon/AdminCoupon.jsx";
 import CouponContextProvider from "./context/CouponContext.context.jsx";
 import AdminStaff from "./pages/Staff/AdminStaff.jsx";
 import StaffContextProvider from "./context/StaffContext.context.jsx";
+import AdminShiftWork from "./pages/ShiftWork/AdminShiftWork.jsx";
+import ShiftWorkContextProvider from "./context/ShiftWorkContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -81,8 +83,12 @@ const App = () => {
           element: <div>Orders</div>,
         },
         {
-          path: "schedules",
-          element: <div>Schedules</div>,
+          path: "shift-works",
+          element: (
+            <ShiftWorkContextProvider>
+              <AdminShiftWork />
+            </ShiftWorkContextProvider>
+          ),
         },
         {
           path: "suppliers",

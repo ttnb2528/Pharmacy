@@ -52,6 +52,12 @@ export const GET_ALL_STAFF_ROUTE = `${STAFF_ROUTES}/getStaffs`;
 export const UPDATE_STAFF_ROUTE = `${STAFF_ROUTES}/updateStaff`;
 export const DELETE_STAFF_ROUTE = `${STAFF_ROUTES}/deleteStaff`;
 
+export const SHIFT_WORK_ROUTES = "/api/v1/shiftWork";
+export const ADD_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/addShiftWork`;
+export const GET_ALL_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/getShiftWorks`;
+export const UPDATE_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/updateShiftWork`;
+export const DELETE_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/deleteShiftWork`;
+
 export const COUPON_ROUTES = "/api/v1/coupon";
 export const ADD_COUPON_ROUTE = `${COUPON_ROUTES}/createCoupon`;
 export const GET_ALL_COUPONS_ROUTE = `${COUPON_ROUTES}/getCoupons`;

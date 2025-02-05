@@ -92,6 +92,8 @@ export const updateShiftWork = asyncHandler(async (req, res) => {
     const { error } = validate(req.body);
 
     if (error) {
+      console.log(error);
+      
       return res.json(
         jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
       );
@@ -141,10 +143,22 @@ export const deleteShiftWork = asyncHandler(async (req, res) => {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, "Lỗi server", error));
   }
 });
+
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Tên ca làm việc"),
-    hours: Joi.number().required().label("Số giờ"),
+    timeSlots: Joi.array()
+      .items(
+        Joi.object({
+          startTime: Joi.string().required().label("Giờ bắt đầu"),
+          endTime: Joi.string().required().label("Giờ kết thúc"),
+        })
+      )
+      .required()
+      .label("Thời gian"),
+    overtimeThreshold: Joi.number().label("Ngưỡng tăng ca"),
+    overtimeRate: Joi.number().label("Tỷ lệ tăng ca"),
+    capacity: Joi.number().required().label("Sức chứa"),
   })
     .messages({
       "string.empty": "{#label} không được để trống",
