@@ -32,13 +32,13 @@ const sidebarItems = [
   { icon: Pill, label: "Quản lý thuốc", to: "/products" },
   { icon: Tag, label: "Thương hiệu", to: "/brands" },
   { icon: Layers, label: "Danh mục", to: "/categories" },
+  { icon: Truck, label: "Nhà sản xuất", to: "/manufacturers" },
+  { icon: Truck, label: "Nhà cung cấp", to: "/suppliers" },
   { icon: DollarSign, label: "Mã giảm giá", to: "/coupons" },
   { icon: Users, label: "Khách hàng", to: "/customers" },
   { icon: Users, label: "Nhân viên", to: "/employees" },
-  { icon: Truck, label: "Nhà sản xuất", to: "/manufacturers" },
-  { icon: ShoppingCart, label: "Đơn hàng", to: "/orders" },
   { icon: Calendar, label: "Giờ làm", to: "/shift-works" },
-  { icon: Truck, label: "Nhà cung cấp", to: "/suppliers" },
+  { icon: ShoppingCart, label: "Đơn hàng", to: "/orders" },
   { icon: Activity, label: "Thống kê doanh số", to: "/reports" },
 ];
 
