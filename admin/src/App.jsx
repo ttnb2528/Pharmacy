@@ -23,6 +23,9 @@ import AdminOrders from "./pages/Order/AdminOrders.jsx";
 import Login from "./pages/Login.jsx";
 import OrderContextProvider from "./context/OrderContext.context.jsx";
 import PrivateRoute from "./layout/PrivateRoute.jsx";
+import ProfilePage from "./pages/Profile/Profile.jsx";
+import ProfileContextProvider from "./context/ProfileContext.context.jsx";
+import UpdatePassword from "./pages/Profile/UpdatePassword.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -137,6 +140,22 @@ const App = () => {
         {
           path: "reports",
           element: <div>Reports</div>,
+        },
+        {
+          path: "profile",
+          element: (
+            <ProfileContextProvider>
+              <ProfilePage />,
+            </ProfileContextProvider>
+          ),
+        },
+        {
+          path: "change-password",
+          element: (
+            <ProfileContextProvider>
+              <UpdatePassword />,
+            </ProfileContextProvider>
+          ),
         },
       ],
     },

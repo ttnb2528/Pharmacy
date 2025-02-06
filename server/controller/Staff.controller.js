@@ -104,6 +104,22 @@ export const getStaff = asyncHandler(async (req, res) => {
   }
 });
 
+export const getCurrentStaff = asyncHandler(async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.user._id);
+
+    if (!staff) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thông tin")
+      );
+    }
+
+    res.json(jsonGenerate(StatusCode.OK, "Lấy thành công", staff));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const updateStaff = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
@@ -115,13 +131,13 @@ export const updateStaff = asyncHandler(async (req, res) => {
       );
     }
 
-    const { error } = validate(req.body);
+    // const { error } = validate(req.body);
 
-    if (error) {
-      return res.json(
-        jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
-      );
-    }
+    // if (error) {
+    //   return res.json(
+    //     jsonGenerate(StatusCode.BAD_REQUEST, error.details[0].message)
+    //   );
+    // }
 
     const staffExits = await Staff.findOne({
       username: req.body.username,
@@ -134,9 +150,34 @@ export const updateStaff = asyncHandler(async (req, res) => {
       );
     }
 
-    await Staff.findByIdAndUpdate(id, req.body);
+    const newStaff = await Staff.findByIdAndUpdate(id, req.body);
 
-    res.json(jsonGenerate(StatusCode.OK, "Cập nhật nhân viên thành công"));
+    res.json(
+      jsonGenerate(StatusCode.OK, "Cập nhật nhân viên thành công", newStaff)
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const updatePassword = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const { password } = req.body;
+
+    const staff = await Staff.findById(id);
+
+    if (!staff) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm nhân viên")
+      );
+    }
+
+    staff.password = password;
+    await staff.save();
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật mật khẩu thành công"));
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }

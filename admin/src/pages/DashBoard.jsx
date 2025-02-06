@@ -4,13 +4,14 @@ import {
   DollarSign,
   Home,
   Layers,
-  //   Package,
   Pill,
-  //   ShoppingBag,
   ShoppingCart,
   Tag,
   Truck,
   Users,
+  Settings,
+  LogOut,
+  User,
 } from "lucide-react";
 
 import {
@@ -23,9 +24,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  //   SidebarTrigger,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link, Outlet } from "react-router-dom";
+import { apiClient } from "@/lib/api-admin.js";
+import { LOGOUT_ROUTE } from "@/API/index.api.js";
+import { toast } from "sonner";
+import { getInitials } from "@/utils/getInitialName.js";
 
 const sidebarItems = [
   { icon: Home, label: "Tổng quan", to: "/", roles: ["admin", "employee"] },
@@ -98,7 +112,21 @@ const DashBoard = () => {
   const filteredSidebarItems = sidebarItems.filter((item) =>
     item.roles.includes(userRole)
   );
-  
+  const handleLogout = async () => {
+    try {
+      const res = await apiClient.post(LOGOUT_ROUTE);
+      if (res.status === 200 && res.data.status === 200) {
+        toast.success(res.data.message);
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
@@ -124,6 +152,45 @@ const DashBoard = () => {
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
+          <SidebarFooter className="border-t">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start px-2">
+                  <Avatar className="h-8 w-8 mr-2">
+                    <AvatarImage src={userData.avatar} alt={userData.name} />
+                    <AvatarFallback>
+                      {userData?.name ? getInitials(userData?.name) : "AD"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium">{userData.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {userRole === "admin" ? "Quản trị viên" : "Nhân viên"}
+                    </span>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Hồ sơ</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/change-password">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Thay đổi mật khẩu</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarFooter>
         </Sidebar>
         <div className="flex-1 overflow-auto">
           <Outlet />

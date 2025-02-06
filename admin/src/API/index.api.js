@@ -54,8 +54,10 @@ export const UPDATE_ORDER_STATUS_ROUTE = `${ORDER_ROUTES}/updateStatusOrder`;
 export const STAFF_ROUTES = "/api/v1/staff";
 export const ADD_STAFF_ROUTE = `${STAFF_ROUTES}/createStaff`;
 export const GET_ALL_STAFF_ROUTE = `${STAFF_ROUTES}/getStaffs`;
+export const GET_CURRENT_STAFF = `${STAFF_ROUTES}/getCurrentStaff`;
 export const UPDATE_STAFF_ROUTE = `${STAFF_ROUTES}/updateStaff`;
 export const DELETE_STAFF_ROUTE = `${STAFF_ROUTES}/deleteStaff`;
+export const UPDATE_PASSWORD_ROUTE = `${STAFF_ROUTES}/update-password-admin`;
 
 export const SHIFT_WORK_ROUTES = "/api/v1/shiftWork";
 export const ADD_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/addShiftWork`;
