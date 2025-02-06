@@ -20,7 +20,9 @@ import StaffContextProvider from "./context/StaffContext.context.jsx";
 import AdminShiftWork from "./pages/ShiftWork/AdminShiftWork.jsx";
 import ShiftWorkContextProvider from "./context/ShiftWorkContext.context.jsx";
 import AdminOrders from "./pages/Order/AdminOrders.jsx";
+import Login from "./pages/Login.jsx";
 import OrderContextProvider from "./context/OrderContext.context.jsx";
+import PrivateRoute from "./layout/PrivateRoute.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -30,78 +32,106 @@ const App = () => {
       children: [
         {
           index: true,
-          element: <Overview />,
+          element: (
+            <PrivateRoute>
+              <Overview />
+            </PrivateRoute>
+          ),
         },
         {
           path: "products",
           element: (
-            <MedicineContextProvider>
-              <Products />
-            </MedicineContextProvider>
+            <PrivateRoute>
+              <MedicineContextProvider>
+                <Products />
+              </MedicineContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "brands",
-          element: <AdminBrand />,
+          element: (
+            <PrivateRoute>
+              <AdminBrand />,
+            </PrivateRoute>
+          ),
         },
         {
           path: "categories",
           element: (
-            <CategoryContextProvider>
-              <AdminCategory />,
-            </CategoryContextProvider>
+            <PrivateRoute>
+              <CategoryContextProvider>
+                <AdminCategory />,
+              </CategoryContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "coupons",
           element: (
-            <CouponContextProvider>
-              <AdminCoupon />
-            </CouponContextProvider>
+            <PrivateRoute>
+              <CouponContextProvider>
+                <AdminCoupon />
+              </CouponContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "customers",
-          element: <AdminCustomer />,
+          element: (
+            <PrivateRoute>
+              <AdminCustomer />,
+            </PrivateRoute>
+          ),
         },
         {
           path: "employees",
           element: (
-            <StaffContextProvider>
-              <AdminStaff />
-            </StaffContextProvider>
+            <PrivateRoute isAdmin>
+              <StaffContextProvider>
+                <AdminStaff />
+              </StaffContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "manufacturers",
           element: (
-            <ManufactureContextProvider>
-              <AdminManufacture />
-            </ManufactureContextProvider>
+            <PrivateRoute>
+              <ManufactureContextProvider>
+                <AdminManufacture />
+              </ManufactureContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "orders",
           element: (
-            <OrderContextProvider>
-              <AdminOrders />,
-            </OrderContextProvider>
+            <PrivateRoute>
+              <OrderContextProvider>
+                <AdminOrders />,
+              </OrderContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "shift-works",
           element: (
-            <ShiftWorkContextProvider>
-              <AdminShiftWork />
-            </ShiftWorkContextProvider>
+            <PrivateRoute>
+              <ShiftWorkContextProvider>
+                <AdminShiftWork />
+              </ShiftWorkContextProvider>
+            </PrivateRoute>
           ),
         },
         {
           path: "suppliers",
           element: (
-            <SupplierContextProvider>
-              <AdminSupplier />
-            </SupplierContextProvider>
+            <PrivateRoute>
+              <SupplierContextProvider>
+                <AdminSupplier />
+              </SupplierContextProvider>
+            </PrivateRoute>
           ),
         },
         {
@@ -109,6 +139,10 @@ const App = () => {
           element: <div>Reports</div>,
         },
       ],
+    },
+    {
+      path: "/login",
+      element: <Login />,
     },
     {
       path: "*",

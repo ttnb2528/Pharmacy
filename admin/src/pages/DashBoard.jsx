@@ -28,21 +28,77 @@ import {
 import { Link, Outlet } from "react-router-dom";
 
 const sidebarItems = [
-  { icon: Home, label: "Tổng quan", to: "/" },
-  { icon: Pill, label: "Quản lý thuốc", to: "/products" },
-  { icon: Tag, label: "Thương hiệu", to: "/brands" },
-  { icon: Layers, label: "Danh mục", to: "/categories" },
-  { icon: Truck, label: "Nhà sản xuất", to: "/manufacturers" },
-  { icon: Truck, label: "Nhà cung cấp", to: "/suppliers" },
-  { icon: DollarSign, label: "Mã giảm giá", to: "/coupons" },
-  { icon: Users, label: "Khách hàng", to: "/customers" },
-  { icon: Users, label: "Nhân viên", to: "/employees" },
-  { icon: Calendar, label: "Giờ làm", to: "/shift-works" },
-  { icon: ShoppingCart, label: "Đơn hàng", to: "/orders" },
-  { icon: Activity, label: "Thống kê doanh số", to: "/reports" },
+  { icon: Home, label: "Tổng quan", to: "/", roles: ["admin", "employee"] },
+  {
+    icon: Pill,
+    label: "Quản lý thuốc",
+    to: "/products",
+    roles: ["admin", "employee"],
+  },
+  {
+    icon: Tag,
+    label: "Thương hiệu",
+    to: "/brands",
+    roles: ["admin"],
+  },
+  {
+    icon: Layers,
+    label: "Danh mục",
+    to: "/categories",
+    roles: ["admin"],
+  },
+  {
+    icon: Truck,
+    label: "Nhà sản xuất",
+    to: "/manufacturers",
+    roles: ["admin"],
+  },
+  {
+    icon: Truck,
+    label: "Nhà cung cấp",
+    to: "/suppliers",
+    roles: ["admin"],
+  },
+  {
+    icon: DollarSign,
+    label: "Mã giảm giá",
+    to: "/coupons",
+    roles: ["admin"],
+  },
+  {
+    icon: Users,
+    label: "Khách hàng",
+    to: "/customers",
+    roles: ["admin", "employee"],
+  },
+  { icon: Users, label: "Nhân viên", to: "/employees", roles: ["admin"] },
+  { icon: Calendar, label: "Giờ làm", to: "/shift-works", roles: ["admin"] },
+  {
+    icon: ShoppingCart,
+    label: "Đơn hàng",
+    to: "/orders",
+    roles: ["admin", "employee"],
+  },
+  {
+    icon: Activity,
+    label: "Thống kê doanh số",
+    to: "/reports",
+    roles: ["admin"],
+  },
 ];
 
 const DashBoard = () => {
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const userRole = userData
+    ? userData.isAdmin
+      ? "admin"
+      : "employee"
+    : "employee"; // Determine role based on isAdmin flag
+
+  const filteredSidebarItems = sidebarItems.filter((item) =>
+    item.roles.includes(userRole)
+  );
+  
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
@@ -54,7 +110,7 @@ const DashBoard = () => {
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {sidebarItems.map((item, index) => (
+                  {filteredSidebarItems.map((item, index) => (
                     <SidebarMenuItem key={index}>
                       <Link to={item?.to}>
                         <SidebarMenuButton>
