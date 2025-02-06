@@ -11,6 +11,7 @@ import {
   Users,
   Settings,
   LogOut,
+  CreditCard,
   User,
 } from "lucide-react";
 
@@ -47,6 +48,12 @@ const sidebarItems = [
     icon: Pill,
     label: "Quản lý thuốc",
     to: "/products",
+    roles: ["admin", "employee"],
+  },
+  {
+    icon: CreditCard,
+    label: "Bán thuốc",
+    to: "/sell-medicine",
     roles: ["admin", "employee"],
   },
   {
