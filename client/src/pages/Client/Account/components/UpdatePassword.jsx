@@ -52,6 +52,7 @@ const UpdatePassword = () => {
       // Call API to change password
       if (!validatePassword()) {
         setIsLoading(false);
+        return;
       }
 
       const res = await apiClient.put(
@@ -97,7 +98,7 @@ const UpdatePassword = () => {
         <div className="rounded-lg bg-white p-4 md:p-6">
           <div className="mb-4 text-sm font-medium">
             Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác
-            Bạo có thể tạo mật khẩu từ 8 - 16 kí tự
+            Bạn có thể tạo mật khẩu từ 8 - 16 kí tự
           </div>
           <form className="max-w-[416px] block">
             <div className="space-y-4">
