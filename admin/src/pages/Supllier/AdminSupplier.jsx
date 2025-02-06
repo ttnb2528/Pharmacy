@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { Plus, Search, Eye, Edit, Trash2, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Table,
   TableBody,
@@ -33,6 +32,7 @@ import {
 import { toast } from "sonner";
 import Loading from "../component/Loading.jsx";
 import { SupplierContext } from "@/context/SupllierContext.controller.jsx";
+import Header from "../component/Header.jsx";
 
 const AdminSupplier = () => {
   const { suppliers, setSuppliers } = useContext(SupplierContext);
@@ -159,11 +159,7 @@ const AdminSupplier = () => {
   return (
     <div className="container mx-auto p-4">
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between mb-6 border-b pb-4">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách nhà cung cấp</h1>
-        <Button variant="outline">Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách nhà cung cấp"} />
 
       <div className="flex justify-between items-center mb-4">
         <div className="relative">

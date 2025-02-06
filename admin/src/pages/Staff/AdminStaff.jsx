@@ -35,7 +35,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import {
   Select,
@@ -53,6 +52,7 @@ import {
   UPDATE_STAFF_ROUTE,
 } from "@/API/index.api.js";
 import { toast } from "sonner";
+import Header from "../component/Header.jsx";
 
 const AdminStaff = () => {
   const { staffs, setStaffs } = useContext(StaffContext);
@@ -185,11 +185,7 @@ const AdminStaff = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách nhân viên</h1>
-        <Button variant="outline">Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách nhân viên"} />
       <main className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div className="relative w-64">
@@ -372,7 +368,7 @@ const AdminStaff = () => {
           </TableHeader>
           <TableBody>
             {currentStaff.map((s) => (
-              <TableRow key={s.id}>
+              <TableRow key={s._id}>
                 <TableCell className="font-medium">
                   {s?.name ?? "..."}
                 </TableCell>

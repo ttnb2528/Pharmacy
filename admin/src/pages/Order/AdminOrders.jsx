@@ -38,7 +38,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import { OrderContext } from "@/context/OrderContext.context.jsx";
 import { convertVND } from "@/utils/convertVND.js";
@@ -49,6 +48,7 @@ import {
   UPDATE_ORDER_STATUS_ROUTE,
 } from "@/API/index.api.js";
 import { toast } from "sonner";
+import Header from "../component/Header.jsx";
 
 // Mock data for orders
 // const mockOrders = [
@@ -254,11 +254,7 @@ export default function AdminOrders() {
   return (
     <div>
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách Mã giảm giá</h1>
-        <Button>Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách mã giảm giá"} />
 
       <main className="p-6">
         <div className="flex justify-between items-center mb-4">

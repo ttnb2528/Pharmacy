@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,23 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { SidebarTrigger } from "@/components/ui/sidebar";
-
-import {
-    DollarSign,
-    Package,
-    ShoppingCart,
-    Users,
-  } from "lucide-react";
+import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import Header from "./component/Header.jsx";
 
 const Overview = () => {
   return (
     <div>
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Tổng quan</h1>
-        <Button>Đăng xuất</Button>
-      </header>
+      <Header title={"Tổng quan"} />
       <main className="p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>

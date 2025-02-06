@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiClient } from "@/lib/api-admin.js";
 import {
   ADD_SHIFT_WORK_ROUTE,
@@ -31,6 +30,7 @@ import {
 import { toast } from "sonner";
 import { ShiftWorkContext } from "@/context/ShiftWorkContext.context.jsx";
 import Loading from "../component/Loading.jsx";
+import Header from "../component/Header.jsx";
 
 const AdminShiftWork = () => {
   const { shiftWorks, setShiftWorks } = useContext(ShiftWorkContext);
@@ -156,11 +156,7 @@ const AdminShiftWork = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách ca làm việc</h1>
-        <Button>Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách ca làm việc"} />
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div className="relative w-64">

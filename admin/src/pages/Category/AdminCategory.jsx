@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Table,
   TableBody,
@@ -33,6 +32,7 @@ import {
 } from "@/API/index.api.js";
 import { toast } from "sonner";
 import Loading from "../component/Loading.jsx";
+import Header from "../component/Header.jsx";
 
 const AdminCategory = () => {
   const { categories, setCategories } = useContext(CategoryContext);
@@ -151,11 +151,7 @@ const AdminCategory = () => {
   return (
     <div className="container mx-auto p-4">
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between mb-6 border-b pb-4">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách danh mục</h1>
-        <Button variant="outline">Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách danh mục"} />
 
       <div className="flex justify-between items-center mb-4">
         <div className="relative">

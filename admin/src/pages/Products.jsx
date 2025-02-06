@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { SidebarTrigger } from "@/components/ui/sidebar";
+
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -43,6 +43,7 @@ import { DELETE_MEDICINE_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
 import ConfirmForm from "./component/ConfirmForm.jsx";
 import Loading from "./component/Loading.jsx";
+import Header from "./component/Header.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -138,11 +139,7 @@ export default function Products() {
   return (
     <div>
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách thuốc</h1>
-        <Button>Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách thuốc"} />
       <main className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">

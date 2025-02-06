@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Pagination,
   PaginationContent,
@@ -40,6 +39,7 @@ import CustomerForm1 from "./Components/CustomerForm1.jsx";
 import { toast } from "sonner";
 import Loading from "../component/Loading.jsx";
 import ConfirmForm from "../component/ConfirmForm.jsx";
+import Header from "../component/Header.jsx";
 
 const AdminCustomer = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -168,11 +168,7 @@ const AdminCustomer = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <header className="flex items-center justify-between p-4 border-b">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">Danh sách khách hàng</h1>
-        <Button>Đăng xuất</Button>
-      </header>
+      <Header title={"Danh sách khách hàng"} />
       <main className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
