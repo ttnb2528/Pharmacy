@@ -3,12 +3,14 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCT_BY_CATEGORY_NAME_ROUTE } from "@/API/index.api.js";
 import Loading from "@/pages/component/Loading.jsx";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 
 const HomeProductForGroup = () => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [activeTab, setActiveTab] = useState("Sản phẩm tiện lợi");
   const [productForGroups, setProductForGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -129,7 +131,13 @@ const HomeProductForGroup = () => {
             <Slider {...settings}>
               {productForGroups.map((product, i) => {
                 return (
-                  <Item key={i} product={product} setIsLoading={setIsLoading} />
+                  <Item
+                    key={i}
+                    product={product}
+                    setIsLoading={setIsLoading}
+                    hasLogin={hasLogin}
+                    setShowLogin={setShowLogin}
+                  />
                 );
               })}
             </Slider>

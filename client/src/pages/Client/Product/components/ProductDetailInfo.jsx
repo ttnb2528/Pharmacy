@@ -2,6 +2,7 @@ import { ADD_TO_CART_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import Loading from "@/pages/component/Loading.jsx";
@@ -15,6 +16,7 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 import { toast } from "sonner";
 
 const ProductDetailInfo = ({ product }) => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const { setCart } = useContext(PharmacyContext);
   const [qty, setQty] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -208,7 +210,7 @@ const ProductDetailInfo = ({ product }) => {
               className="w-full bg-green-500 hover:bg-green-600 disabled:text-neutral-200 disabled:bg-neutral-500"
               onClick={() => {
                 if (qty > 0) {
-                  AddToCart(product?.id, qty);
+                  hasLogin ? AddToCart(product?.id, qty) : setShowLogin(true);
                 } else {
                   toast.error("Số lượng phải lớn hơn 0");
                 }

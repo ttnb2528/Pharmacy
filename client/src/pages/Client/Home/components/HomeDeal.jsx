@@ -1,14 +1,16 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import moment from "moment";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { GET_ALL_PRODUCTS_DISCOUNT_ROUTE } from "@/API/index.api.js";
 import { apiClient } from "@/lib/api-client.js";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 
 const HomeDeal = () => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [remainingTime, setRemainingTime] = useState(moment.duration(0));
   const [all_products, setAllProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -173,6 +175,8 @@ const HomeDeal = () => {
                   key={product._id}
                   product={product}
                   setIsLoading={setIsLoading}
+                  hasLogin={hasLogin}
+                  setShowLogin={setShowLogin}
                 />
               );
               // } else {

@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRoute = ({ children }) => {
-  const userInfo = localStorage.getItem("token") || {};
+  const userInfo = localStorage.getItem("token") || "";
 
   console.log(userInfo);
 

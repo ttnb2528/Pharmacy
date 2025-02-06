@@ -5,7 +5,9 @@ import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { useContext, useState } from "react";
 import Loading from "@/pages/component/Loading.jsx";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 const HomeSuggest = () => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const { allProducts } = useContext(PharmacyContext);
   // get random 5 products
   const suggestProducts = allProducts
@@ -60,7 +62,13 @@ const HomeSuggest = () => {
             <Slider {...settings}>
               {suggestProducts.map((product, i) => {
                 return (
-                  <Item key={i} product={product} setIsLoading={setIsLoading} />
+                  <Item
+                    key={i}
+                    product={product}
+                    setIsLoading={setIsLoading}
+                    hasLogin={hasLogin}
+                    setShowLogin={setShowLogin}
+                  />
                 );
               })}
             </Slider>

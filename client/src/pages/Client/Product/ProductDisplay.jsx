@@ -7,36 +7,37 @@ import ProductDetailRight from "./components/ProductDetailRight.jsx";
 import { useLocation } from "react-router-dom";
 
 const ProductDisplay = () => {
+  
   const { state } = useLocation();
   const product = state.product;
-
   return (
-    <div>
-      <Breadcrumbs
-        category={product?.categoryId?.name}
-        product={product?.name}
-      />
+    <>
+      <div>
+        <Breadcrumbs
+          category={product?.categoryId?.name}
+          product={product?.name}
+        />
 
-      <div className="relative grid grid-cols-1 gap-6 md:container md:grid-cols-[min(60%,calc(555rem/16)),1fr] md:pt-6 lg:grid-cols-[min(72%,calc(970rem/16)),1fr] mb-10 bg-white p-5">
-        <div className="grid md:gap-3">
-          <div className="grid grid-cols-1 items-start md:gap-6 lg:grid-cols-2 xl:grid-cols-2">
-            {/* image */}
-            <div className="md:sticky md:top-0">
-              <SwiperProduct productImage={product?.images} />
+        <div className="relative grid grid-cols-1 gap-6 md:container md:grid-cols-[min(60%,calc(555rem/16)),1fr] md:pt-6 lg:grid-cols-[min(72%,calc(970rem/16)),1fr] mb-10 bg-white p-5">
+          <div className="grid md:gap-3">
+            <div className="grid grid-cols-1 items-start md:gap-6 lg:grid-cols-2 xl:grid-cols-2">
+              {/* image */}
+              <div className="md:sticky md:top-0">
+                <SwiperProduct productImage={product?.images} />
+              </div>
+              {/* info */}
+              <ProductDetailInfo product={product} />
             </div>
-            {/* info */}
-            <ProductDetailInfo product={product} />
+
+            <Separator />
+
+            <ProductDescription product={product} />
           </div>
 
-          <Separator />
-
-          <ProductDescription product={product} />
+          <ProductDetailRight product={product} />
         </div>
 
-        <ProductDetailRight product={product} />
-      </div>
-
-      {/* <div className="flex flex-col md:flex-row gap-8">
+        {/* <div className="flex flex-col md:flex-row gap-8">
         <div className="w-2/5">
           <div className="mb-4 relative overflow-hidden">
             <div className="flex transition-transform duration-300 ease-out cursor-grab active:cursor-grabbing w-[424px]">
@@ -57,7 +58,8 @@ const ProductDisplay = () => {
         <div className="w-2/5">abc</div>
         <div className="w-1/5">abc</div>
       </div> */}
-    </div>
+      </div>
+    </>
   );
 };
 

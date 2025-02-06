@@ -2,12 +2,14 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loading from "../../Loading.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCTS_BY_HISTORY_ROUTE } from "@/API/index.api.js";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 
 const FooterHistory = () => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [isLoading, setIsLoading] = useState(false);
   const [viewedProducts, setViewedProducts] = useState([]);
 
@@ -107,6 +109,8 @@ const FooterHistory = () => {
                     product={viewedProducts[i]}
                     setIsLoading={setIsLoading}
                     setViewedProducts={setViewedProducts}
+                    hasLogin={hasLogin}
+                    setShowLogin={setShowLogin}
                   />
                 );
               })}

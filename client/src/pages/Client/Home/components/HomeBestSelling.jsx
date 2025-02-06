@@ -5,8 +5,10 @@ import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import { useContext, useState } from "react";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import Loading from "@/pages/component/Loading.jsx";
+import { HomeContext } from "@/context/HomeContext.context.jsx";
 
 const HomeBestSelling = () => {
+  const { hasLogin, setShowLogin } = useContext(HomeContext);
   const { productsBestSelling } = useContext(PharmacyContext);
   const [isLoading, setIsLoading] = useState(false);
   function SampleNextArrow(props) {
@@ -122,7 +124,13 @@ const HomeBestSelling = () => {
             <Slider {...settings}>
               {productsBestSelling?.map((product, i) => {
                 return (
-                  <Item key={i} product={product} setIsLoading={setIsLoading} />
+                  <Item
+                    key={i}
+                    product={product}
+                    setIsLoading={setIsLoading}
+                    hasLogin={hasLogin}
+                    setShowLogin={setShowLogin}
+                  />
                 );
               })}
             </Slider>

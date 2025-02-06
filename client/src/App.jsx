@@ -22,6 +22,7 @@ import slugify from "slugify";
 import Loading from "./pages/component/Loading.jsx";
 import OrderDetail from "./pages/Client/Account/components/OrderDetail.jsx";
 import PrivateRoute from "./layout/PrivateRoute.jsx";
+import HomeContextProvider from "./context/HomeContext.context.jsx";
 
 const App = () => {
   const { categories, loading } = useContext(PharmacyContext);
@@ -31,11 +32,19 @@ const App = () => {
     const publicRoutes = [
       {
         path: "/",
-        element: <Layout />,
+        element: (
+          // <HomeContextProvider>
+          <Layout />
+          // </HomeContextProvider>
+        ),
         children: [
           {
             path: "/",
-            element: <Home />,
+            element: (
+              // <HomeContextProvider>
+              <Home />
+              // </HomeContextProvider>
+            ),
           },
           {
             path: "/search",
@@ -142,7 +151,11 @@ const App = () => {
     );
   }
 
-  return <RouterProvider router={createBrowserRouter(routes)} />;
+  return (
+    <HomeContextProvider>
+      <RouterProvider router={createBrowserRouter(routes)} />;
+    </HomeContextProvider>
+  );
 };
 
 export default App;
