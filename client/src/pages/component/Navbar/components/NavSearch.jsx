@@ -86,7 +86,8 @@ const NavSearch = () => {
       // Check if the click occurred outside the search container
       if (
         searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target)
+        !searchContainerRef.current.contains(event.target) &&
+        event.target !== inputRef.current
       ) {
         setShowResults(false);
       }
@@ -151,8 +152,9 @@ const NavSearch = () => {
         </Link>
       </div>
 
-      <div className="relative flex-1" ref={inputRef}>
+      <div className="relative flex-1">
         <Input
+          ref={inputRef}
           className="w-full h-10 rounded border-none bg-white focus-visible:ring-0 p-2 outline-none"
           placeholder="Tìm kiếm sản phẩm..."
           value={searchTerm}
