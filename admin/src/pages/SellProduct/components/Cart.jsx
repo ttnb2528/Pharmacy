@@ -11,6 +11,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Plus, Minus, Trash2, Printer } from "lucide-react";
 import { convertVND } from "@/utils/convertVND.js";
+import { apiClient } from "@/lib/api-admin.js";
+import { CREATE_BILL_ROUTE } from "@/API/index.api.js";
 
 const Cart = ({
   cart,
@@ -44,16 +46,45 @@ const Cart = ({
     );
   }, 0);
 
-  const handleCreateInvoice = () => {
-    console.log("Creating invoice:", {
-      customerType,
-      customer: selectedCustomer,
-      prescriptionSource: prescriptionInfo.source,
-      prescriptionNumber: prescriptionInfo.number,
-      cart,
-      total,
-    });
-    setInvoiceCreated(true);
+  const handleCreateInvoice = async () => {
+    try {
+      const billData = {
+        billIsRx: activeTab === "prescription" ? true : false,
+        customer: {
+          customerId: selectedCustomer
+            ? selectedCustomer?.accountId?._id
+            : null,
+          name: selectedCustomer ? selectedCustomer.name : null,
+          phone: selectedCustomer ? selectedCustomer.phone : null,
+          type: customerType,
+        },
+        prescription: {
+          source: prescriptionInfo.source,
+          number: prescriptionInfo.number,
+        },
+        medicines: cart.map((medicine) => ({
+          medicineId: medicine._id,
+          isRx: medicine.isRx,
+          name: medicine.name,
+          unit: medicine.unit,
+          quantity: medicine.quantity,
+          price:
+            customerType === "business"
+              ? medicine?.batches[0]?.price
+              : medicine?.batches[0]?.retailPrice,
+        })),
+        total,
+        type: "sell",
+      };
+
+      const res = await apiClient.post(CREATE_BILL_ROUTE, billData);
+      console.log(billData);
+
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    }
+    // setInvoiceCreated(true);
   };
 
   const handlePrintInvoice = () => {
