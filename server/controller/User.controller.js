@@ -329,11 +329,11 @@ export const clearCart = asyncHandler(async (req, res) => {
 const validate = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("Họ và tên"),
-    gender: Joi.string().required().label("Giới tính"),
-    date: Joi.date().required().label("Ngày sinh"),
-    email: Joi.string().required().label("Email"),
+    // gender: Joi.string().required().label("Giới tính"),
+    // date: Joi.date().required().label("Ngày sinh"),
+    // email: Joi.string().required().label("Email"),
     phone: Joi.string().required().label("Số điện thoại"),
-    address: Joi.string().required().label("Địa chỉ"),
+    // address: Joi.string().required().label("Địa chỉ"),
   })
     .messages({
       "string.empty": "{#label} không được để trống",

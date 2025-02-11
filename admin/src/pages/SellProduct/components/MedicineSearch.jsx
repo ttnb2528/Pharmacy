@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,52 +9,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SellProductContext } from "@/context/SellProductContext.context.jsx";
+import { toast } from "sonner";
 
 // Mock data for available medicines
-const availableMedicines = [
-  {
-    id: 1,
-    name: "Paracetamol",
-    price: 5000,
-    stock: 100,
-    isPrescription: false,
-    unit: "Viên",
-  },
-  {
-    id: 2,
-    name: "Amoxicillin",
-    price: 10000,
-    stock: 50,
-    isPrescription: true,
-    unit: "Viên",
-  },
-  {
-    id: 3,
-    name: "Omeprazole",
-    price: 15000,
-    stock: 75,
-    isPrescription: true,
-    unit: "Viên",
-  },
-  {
-    id: 4,
-    name: "Ibuprofen",
-    price: 8000,
-    stock: 80,
-    isPrescription: false,
-    unit: "Viên",
-  },
-  {
-    id: 5,
-    name: "Cetirizine",
-    price: 12000,
-    stock: 60,
-    isPrescription: false,
-    unit: "Viên",
-  },
-];
+// const availableMedicines = [
+//   {
+//     id: 1,
+//     name: "Paracetamol",
+//     price: 5000,
+//     stock: 100,
+//     isPrescription: false,
+//     unit: "Viên",
+//   },
+//   {
+//     id: 2,
+//     name: "Amoxicillin",
+//     price: 10000,
+//     stock: 50,
+//     isPrescription: true,
+//     unit: "Viên",
+//   },
+//   {
+//     id: 3,
+//     name: "Omeprazole",
+//     price: 15000,
+//     stock: 75,
+//     isPrescription: true,
+//     unit: "Viên",
+//   },
+//   {
+//     id: 4,
+//     name: "Ibuprofen",
+//     price: 8000,
+//     stock: 80,
+//     isPrescription: false,
+//     unit: "Viên",
+//   },
+//   {
+//     id: 5,
+//     name: "Cetirizine",
+//     price: 12000,
+//     stock: 60,
+//     isPrescription: false,
+//     unit: "Viên",
+//   },
+// ];
 
 const MedicineSearch = ({ activeTab, cart, setCart, isPrescription }) => {
+  const { allProducts } = useContext(SellProductContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -71,18 +74,16 @@ const MedicineSearch = ({ activeTab, cart, setCart, isPrescription }) => {
       return;
     }
 
-    const filteredMedicines = availableMedicines.filter((medicine) => {
+    const filteredMedicines = allProducts.filter((medicine) => {
       const matchesSearch = medicine.name
         .toLowerCase()
         .includes(newSearchTerm.toLowerCase());
       const matchesFilter =
         filterType === "all" ||
-        (filterType === "prescription" && medicine.isPrescription) ||
-        (filterType === "otc" && !medicine.isPrescription);
+        (filterType === "prescription" && medicine.isRx) ||
+        (filterType === "otc" && !medicine.isRx);
       return (
-        matchesSearch &&
-        matchesFilter &&
-        (isPrescription || !medicine.isPrescription)
+        matchesSearch && matchesFilter && (isPrescription || !medicine.isRx)
       );
     });
     setSearchResults(filteredMedicines);
@@ -93,24 +94,31 @@ const MedicineSearch = ({ activeTab, cart, setCart, isPrescription }) => {
   };
 
   const handleMedicineSelect = (medicineId) => {
-    const selectedMedicine = availableMedicines.find(
-      (m) => m.id === medicineId
-    );
+    const selectedMedicine = allProducts.find((m) => m.id === medicineId);
     if (selectedMedicine) {
-      const existingItem = cart.find((item) => item.id === selectedMedicine.id);
-      if (existingItem) {
-        setCart(
-          cart.map((item) =>
-            item.id === selectedMedicine.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
+      if (selectedMedicine.quantityStock > 0) {
+        // Kiểm tra số lượng tồn kho
+        // Thêm thuốc vào giỏ hàng
+        const existingItem = cart.find(
+          (item) => item.id === selectedMedicine.id
         );
+        if (existingItem) {
+          setCart(
+            cart.map((item) =>
+              item.id === selectedMedicine.id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+            )
+          );
+        } else {
+          setCart([...cart, { ...selectedMedicine, quantity: 1 }]);
+        }
+        setSearchTerm("");
+        setSearchResults();
       } else {
-        setCart([...cart, { ...selectedMedicine, quantity: 1 }]);
+        // Hiển thị thông báo "Hết hàng"
+        toast.warning(`Thuốc ${selectedMedicine.name} đã hết hàng!`);
       }
-      setSearchTerm("");
-      setSearchResults([]);
     }
   };
 
@@ -142,9 +150,9 @@ const MedicineSearch = ({ activeTab, cart, setCart, isPrescription }) => {
           onChange={handleSearchChange}
           onFocus={handleFocus}
         />
-        {showResults && (
+        {showResults && searchResults && Array.isArray(searchResults) && (
           <div
-            className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions z-10"
+            className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions z-10 max-h-60 overflow-y-auto"
             ref={searchContainerRef}
           >
             <ul>
@@ -158,6 +166,11 @@ const MedicineSearch = ({ activeTab, cart, setCart, isPrescription }) => {
                   }}
                 >
                   <span>{medicine.name}</span>
+                  {medicine.quantityStock === 0 && (
+                    <span className="text-red-500 ml-2 text-sm">
+                      (Hết hàng)
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

@@ -27,6 +27,7 @@ import ProfilePage from "./pages/Profile/Profile.jsx";
 import ProfileContextProvider from "./context/ProfileContext.context.jsx";
 import UpdatePassword from "./pages/Profile/UpdatePassword.jsx";
 import SellMedicinePage from "./pages/SellProduct/AdminSellProduct.jsx";
+import SellProductContextProvider from "./context/SellProductContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -56,9 +57,9 @@ const App = () => {
           path: "sell-medicine",
           element: (
             <PrivateRoute>
-              {/* <MedicineContextProvider> */}
+              <SellProductContextProvider>
                 <SellMedicinePage />
-              {/* </MedicineContextProvider> */}
+              </SellProductContextProvider>
             </PrivateRoute>
           ),
         },

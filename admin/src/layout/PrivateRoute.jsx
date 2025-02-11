@@ -4,8 +4,6 @@ const PrivateRoute = ({ children, isAdmin }) => {
   const location = useLocation();
   const isLoggedIn = !!localStorage.getItem("user"); // Kiểm tra đăng nhập
 
-  console.log(isLoggedIn);
-
   if (!isLoggedIn) {
     // Chuyển đến trang đăng nhập nếu chưa đăng nhập
     return <Navigate to="/login" state={{ from: location }} replace />;

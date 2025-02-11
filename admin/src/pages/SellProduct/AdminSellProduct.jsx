@@ -13,6 +13,7 @@ const SellMedicinePage = () => {
   const [customerType, setCustomerType] = useState("walkin");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [cart, setCart] = useState([]);
+  const [invoiceCreated, setInvoiceCreated] = useState(false);
   const [prescriptionInfo, setPrescriptionInfo] = useState({
     source: "",
     number: "",
@@ -30,12 +31,16 @@ const SellMedicinePage = () => {
           <TabsContent value="prescription">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <CustomerSearch
+                activeTab={activeTab}
                 customerType={customerType}
                 setCustomerType={setCustomerType}
                 selectedCustomer={selectedCustomer}
                 setSelectedCustomer={setSelectedCustomer}
+                setCart={setCart}
+                setInvoiceCreated={setInvoiceCreated}
+                setPrescriptionInfo={setPrescriptionInfo}
               />
-              {customerType !== "walkin" && (
+              {customerType === "loyalty" && (
                 <PrescriptionInfo
                   prescriptionInfo={prescriptionInfo}
                   setPrescriptionInfo={setPrescriptionInfo}
@@ -59,6 +64,8 @@ const SellMedicinePage = () => {
                   customerType={customerType}
                   selectedCustomer={selectedCustomer}
                   prescriptionInfo={prescriptionInfo}
+                  setInvoiceCreated={setInvoiceCreated}
+                  invoiceCreated={invoiceCreated}
                 />
               </CardContent>
             </Card>
@@ -66,10 +73,14 @@ const SellMedicinePage = () => {
           <TabsContent value="otc">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <CustomerSearch
+                activeTab={activeTab}
                 customerType={customerType}
                 setCustomerType={setCustomerType}
                 selectedCustomer={selectedCustomer}
                 setSelectedCustomer={setSelectedCustomer}
+                setCart={setCart}
+                setInvoiceCreated={setInvoiceCreated}
+                setPrescriptionInfo={setPrescriptionInfo}
               />
             </div>
             <Card className="mt-4">
@@ -85,10 +96,13 @@ const SellMedicinePage = () => {
                 />
                 <Cart
                   cart={cart}
+                  activeTab={activeTab}
                   setCart={setCart}
                   customerType={customerType}
                   selectedCustomer={selectedCustomer}
                   prescriptionInfo={prescriptionInfo}
+                  invoiceCreated={invoiceCreated}
+                  setInvoiceCreated={setInvoiceCreated}
                 />
               </CardContent>
             </Card>

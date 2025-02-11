@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,16 +10,18 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Minus, Trash2, Printer } from "lucide-react";
+import { convertVND } from "@/utils/convertVND.js";
 
 const Cart = ({
   cart,
   setCart,
+  activeTab,
   customerType,
   selectedCustomer,
   prescriptionInfo,
+  invoiceCreated,
+  setInvoiceCreated,
 }) => {
-  const [invoiceCreated, setInvoiceCreated] = useState(false);
-
   const updateQuantity = (id, quantity) => {
     setCart(
       cart.map((item) =>
@@ -35,7 +34,15 @@ const Cart = ({
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => {
+    return (
+      sum +
+      item.quantity *
+        (customerType === "business"
+          ? item?.batches[0]?.price
+          : item?.batches[0]?.retailPrice)
+    );
+  }, 0);
 
   const handleCreateInvoice = () => {
     console.log("Creating invoice:", {
@@ -51,13 +58,6 @@ const Cart = ({
 
   const handlePrintInvoice = () => {
     console.log("Printing invoice");
-  };
-
-  const getPrice = (basePrice) => {
-    if (customerType === "business") {
-      return basePrice * 0.9; // 10% discount for business customers
-    }
-    return basePrice;
   };
 
   return (
@@ -80,7 +80,7 @@ const Cart = ({
             <TableRow key={medicine.id}>
               <TableCell>{medicine.id}</TableCell>
               <TableCell>{medicine.name}</TableCell>
-              <TableCell>{medicine.isPrescription ? "Có" : "Không"}</TableCell>
+              <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
               <TableCell>{medicine.unit}</TableCell>
               <TableCell>
                 <div className="flex items-center">
@@ -102,7 +102,7 @@ const Cart = ({
                     }
                     className="w-16 mx-2 text-center"
                     min="1"
-                    max={medicine.stock}
+                    max={medicine.quantityStock}
                   />
                   <Button
                     size="sm"
@@ -110,20 +110,29 @@ const Cart = ({
                     onClick={() =>
                       updateQuantity(medicine.id, medicine.quantity + 1)
                     }
-                    disabled={medicine.quantity >= medicine.stock}
+                    disabled={medicine.quantity >= medicine.quantityStock}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
               </TableCell>
               <TableCell>
-                {getPrice(medicine.price).toLocaleString()} VND
+                {/* {getPrice(medicine.price).toLocaleString()} VND */}
+                {customerType === "business"
+                  ? convertVND(medicine?.batches[0]?.price)
+                  : convertVND(medicine?.batches[0]?.retailPrice)}
               </TableCell>
               <TableCell>
-                {(
+                {/* {(
                   getPrice(medicine.price) * medicine.quantity
                 ).toLocaleString()}{" "}
-                VND
+                VND */}
+
+                {customerType === "business"
+                  ? convertVND(medicine?.batches[0]?.price * medicine.quantity)
+                  : convertVND(
+                      medicine?.batches[0]?.retailPrice * medicine.quantity
+                    )}
               </TableCell>
               <TableCell>
                 <Button
@@ -151,9 +160,10 @@ const Cart = ({
         {cart &&
           cart.length > 0 &&
           (customerType === "walkin" ||
+            customerType === "business" ||
             (selectedCustomer &&
-              prescriptionInfo.source &&
-              prescriptionInfo.number)) && (
+              (activeTab === "otc" ||
+                (prescriptionInfo.source && prescriptionInfo.number)))) && (
             <Button onClick={handleCreateInvoice} disabled={invoiceCreated}>
               Tạo hóa đơn
             </Button>

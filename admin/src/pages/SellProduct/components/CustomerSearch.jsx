@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,19 +10,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserPlus, X } from "lucide-react";
+import { SellProductContext } from "@/context/SellProductContext.context.jsx";
 
 // Mock data for customers
-const customers = [
-  { id: 1, name: "Nguyễn Văn A", phone: "0123456789" },
-  { id: 2, name: "Trần Thị B", phone: "0987654321" },
-  { id: 3, name: "Lê Văn C", phone: "0369852147" },
-];
+// const customers = [
+//   { id: 1, name: "Nguyễn Văn A", phone: "0123456789" },
+//   { id: 2, name: "Trần Thị B", phone: "0987654321" },
+//   { id: 3, name: "Lê Văn C", phone: "0369852147" },
+// ];
 
 const CustomerSearch = ({
   customerType,
   setCustomerType,
   selectedCustomer,
   setSelectedCustomer,
+  setCart,
+  setInvoiceCreated,
+  setPrescriptionInfo,
+  activeTab,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -31,6 +36,19 @@ const CustomerSearch = ({
   const [customerPhone, setCustomerPhone] = useState("");
   const inputRef = useRef(null);
   const searchContainerRef = useRef(null);
+
+  const { customers } = useContext(SellProductContext);
+
+  useEffect(() => {
+    if (activeTab) {
+      setCustomerName("");
+      setCustomerPhone("");
+      setSelectedCustomer(null);
+      setCart([]);
+      setInvoiceCreated(false);
+      setPrescriptionInfo({ source: "", number: "" });
+    }
+  }, [activeTab]);
 
   const handleSearchChange = (event) => {
     const newSearchTerm = event.target.value;
@@ -84,6 +102,9 @@ const CustomerSearch = ({
     setCustomerPhone("");
     setSelectedCustomer(null);
     // setCustomerType("walkin");
+    setCart([]);
+    setInvoiceCreated(false);
+    setPrescriptionInfo({ source: "", number: "" });
   };
 
   useEffect(() => {
