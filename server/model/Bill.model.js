@@ -7,6 +7,16 @@ const BillSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    staff: {
+      staffId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      name: {
+        type: String,
+        default: null,
+      },
+    },
     type: {
       type: String,
       enum: ["sell", "return"],
@@ -20,7 +30,9 @@ const BillSchema = new mongoose.Schema(
       customerId: {
         type: mongoose.Schema.Types.ObjectId,
         required: function () {
-          return this.customer.type !== "walkin" && this.customer.type !== "business";
+          return (
+            this.customer.type !== "walkin" && this.customer.type !== "business"
+          );
         },
       },
       name: {
@@ -58,6 +70,10 @@ const BillSchema = new mongoose.Schema(
 
     medicines: [
       {
+        id: {
+          type: Number,
+          required: true,
+        },
         medicineId: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,

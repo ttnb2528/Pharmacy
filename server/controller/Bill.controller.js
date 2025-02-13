@@ -30,6 +30,12 @@ export const createBill = asyncHandler(async (req, res) => {
 
     // Tạo bill
     let id = await generateID(Bill);
+    let staffId = req.user._id;
+    let name = req.user.isAdmin ? "Admin" : req.user.name;
+    const staff = {
+      staffId,
+      name,
+    };
     const newBill = new Bill({
       id: id,
       billIsRx,
@@ -38,6 +44,7 @@ export const createBill = asyncHandler(async (req, res) => {
       medicines,
       total,
       type,
+      staff,
     });
 
     const bill = await newBill.save();
@@ -112,6 +119,18 @@ export const createBill = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.CREATED, "Tạo hóa đơn thành công", bill)
       );
     }
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const getBills = asyncHandler(async (req, res) => {
+  try {
+    const bills = await Bill.find().sort();
+
+    res.json(
+      jsonGenerate(StatusCode.OK, "Lấy danh sách hóa đơn thành công", bills)
+    );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }

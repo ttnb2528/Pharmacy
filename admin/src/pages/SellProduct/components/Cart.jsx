@@ -13,6 +13,7 @@ import { Plus, Minus, Trash2, Printer } from "lucide-react";
 import { convertVND } from "@/utils/convertVND.js";
 import { apiClient } from "@/lib/api-admin.js";
 import { CREATE_BILL_ROUTE } from "@/API/index.api.js";
+import { toast } from "sonner";
 
 const Cart = ({
   cart,
@@ -23,6 +24,7 @@ const Cart = ({
   prescriptionInfo,
   invoiceCreated,
   setInvoiceCreated,
+  setIsLoading,
 }) => {
   const updateQuantity = (id, quantity) => {
     setCart(
@@ -48,6 +50,7 @@ const Cart = ({
 
   const handleCreateInvoice = async () => {
     try {
+      setIsLoading(true);
       const billData = {
         billIsRx: activeTab === "prescription" ? true : false,
         customer: {
@@ -63,6 +66,7 @@ const Cart = ({
           number: prescriptionInfo.number,
         },
         medicines: cart.map((medicine) => ({
+          id: medicine.id,
           medicineId: medicine._id,
           isRx: medicine.isRx,
           name: medicine.name,
@@ -78,13 +82,18 @@ const Cart = ({
       };
 
       const res = await apiClient.post(CREATE_BILL_ROUTE, billData);
-      console.log(billData);
 
-      console.log(res);
+      if (res.status === 200 && res.data.status === 201) {
+        setInvoiceCreated(true);
+        toast.success(res.data.message);
+      } else {
+        toast.error(res.data.message);
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    // setInvoiceCreated(true);
   };
 
   const handlePrintInvoice = () => {

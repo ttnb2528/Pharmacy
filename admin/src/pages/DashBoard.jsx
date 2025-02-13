@@ -101,6 +101,12 @@ const sidebarItems = [
     roles: ["admin", "employee"],
   },
   {
+    icon: DollarSign,
+    label: "Hóa đơn",
+    to: "/bills",
+    roles: ["admin", "employee"],
+  },
+  {
     icon: Activity,
     label: "Thống kê doanh số",
     to: "/reports",

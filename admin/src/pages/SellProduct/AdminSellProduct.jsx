@@ -7,8 +7,10 @@ import PrescriptionInfo from "./components/PrescriptionInfo";
 import MedicineSearch from "./components/MedicineSearch";
 import Cart from "./components/Cart";
 import Header from "../component/Header.jsx";
+import Loading from "../component/Loading.jsx";
 
 const SellMedicinePage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("prescription");
   const [customerType, setCustomerType] = useState("walkin");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -21,6 +23,7 @@ const SellMedicinePage = () => {
 
   return (
     <div>
+      {isLoading && <Loading />}
       <Header title="Bán thuốc" />
       <main className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -59,6 +62,7 @@ const SellMedicinePage = () => {
                   isPrescription={true}
                 />
                 <Cart
+                  activeTab={activeTab}
                   cart={cart}
                   setCart={setCart}
                   customerType={customerType}
@@ -66,6 +70,7 @@ const SellMedicinePage = () => {
                   prescriptionInfo={prescriptionInfo}
                   setInvoiceCreated={setInvoiceCreated}
                   invoiceCreated={invoiceCreated}
+                  setIsLoading={setIsLoading}
                 />
               </CardContent>
             </Card>
@@ -103,6 +108,7 @@ const SellMedicinePage = () => {
                   prescriptionInfo={prescriptionInfo}
                   invoiceCreated={invoiceCreated}
                   setInvoiceCreated={setInvoiceCreated}
+                  setIsLoading={setIsLoading}
                 />
               </CardContent>
             </Card>

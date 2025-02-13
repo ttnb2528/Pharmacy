@@ -73,6 +73,7 @@ export const DELETE_COUPON_ROUTE = `${COUPON_ROUTES}/deleteCoupon`;
 
 export const BILL_ROUTES = "/api/v1/bill";
 export const CREATE_BILL_ROUTE = `${BILL_ROUTES}/createBill`;
+export const GET_ALL_BILLS_ROUTE = `${BILL_ROUTES}/getBills`;
 
 export const CLOUDINARY_ROUTES = "/api/v1/cloudinary";
 export const REMOVE_IMAGE_ROUTE = `${CLOUDINARY_ROUTES}/removeImage`;

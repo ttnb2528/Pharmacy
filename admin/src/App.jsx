@@ -28,6 +28,8 @@ import ProfileContextProvider from "./context/ProfileContext.context.jsx";
 import UpdatePassword from "./pages/Profile/UpdatePassword.jsx";
 import SellMedicinePage from "./pages/SellProduct/AdminSellProduct.jsx";
 import SellProductContextProvider from "./context/SellProductContext.context.jsx";
+import BillContextProvider from "./context/BillContext.context.jsx";
+import AdminBill from "./pages/Bill/AdminBill.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -67,7 +69,7 @@ const App = () => {
           path: "brands",
           element: (
             <PrivateRoute>
-              <AdminBrand />,
+              <AdminBrand />
             </PrivateRoute>
           ),
         },
@@ -76,7 +78,7 @@ const App = () => {
           element: (
             <PrivateRoute>
               <CategoryContextProvider>
-                <AdminCategory />,
+                <AdminCategory />
               </CategoryContextProvider>
             </PrivateRoute>
           ),
@@ -95,7 +97,7 @@ const App = () => {
           path: "customers",
           element: (
             <PrivateRoute>
-              <AdminCustomer />,
+              <AdminCustomer />
             </PrivateRoute>
           ),
         },
@@ -124,8 +126,18 @@ const App = () => {
           element: (
             <PrivateRoute>
               <OrderContextProvider>
-                <AdminOrders />,
+                <AdminOrders />
               </OrderContextProvider>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: "bills",
+          element: (
+            <PrivateRoute>
+              <BillContextProvider>
+                <AdminBill />
+              </BillContextProvider>
             </PrivateRoute>
           ),
         },
@@ -157,7 +169,7 @@ const App = () => {
           path: "profile",
           element: (
             <ProfileContextProvider>
-              <ProfilePage />,
+              <ProfilePage />
             </ProfileContextProvider>
           ),
         },
@@ -165,7 +177,7 @@ const App = () => {
           path: "change-password",
           element: (
             <ProfileContextProvider>
-              <UpdatePassword />,
+              <UpdatePassword />
             </ProfileContextProvider>
           ),
         },
