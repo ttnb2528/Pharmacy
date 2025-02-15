@@ -57,13 +57,13 @@ const BillSchema = new mongoose.Schema(
       source: {
         type: String,
         required: function () {
-          return this.billIsRx;
+          return this.billIsRx && this.customer.type !== "walkin";
         },
       },
       number: {
         type: String,
         required: function () {
-          return this.billIsRx;
+          return this.billIsRx && this.customer.type !== "walkin";
         },
       },
     },

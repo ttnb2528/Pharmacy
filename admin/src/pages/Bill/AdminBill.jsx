@@ -52,7 +52,7 @@ const AdminBill = () => {
             {bills.map((bill) => (
               <TableRow key={bill.id}>
                 <TableCell>{bill.id}</TableCell>
-                <TableCell>{bill.customer.name}</TableCell>
+                <TableCell>{bill.customer.name?? "Khách vãng lai"}</TableCell>
                 <TableCell>
                   {new Date(bill.createdAt).toLocaleDateString("vi")}
                 </TableCell>
