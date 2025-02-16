@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,111 +7,141 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { BatchesContext } from "@/context/BatchesContext.context.jsx";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import { format } from "date-fns";
+import { Input } from "@/components/ui/input.jsx";
+import { formatDate } from "@/utils/formatDate.js";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_ALL_BATCHES_FOR_STATISTICS_ROUTE } from "@/API/index.api.js";
+import Loading from "@/pages/component/Loading.jsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select.jsx";
 
 const InventoryMovement = () => {
-  const { batches } = useContext(BatchesContext);
   const [date, setDate] = useState({
     from: new Date(),
     to: new Date(),
   });
+
   const [groupedData, setGroupedData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  //  Fetch dữ liệu khi `date` thay đổi
   useEffect(() => {
-    if (batches) {
-      const filtered = batches.filter((item) => {
-        const entryDate = new Date(item.createdAt).getDay();
-        const fromDate = date.from.getDay();
-        const toDate = date.to.getDay();
-        return entryDate >= fromDate && entryDate <= toDate;
-      });
+    const fetchBatches = async () => {
+      try {
+        setIsLoading(true);
+        const response = await apiClient.get(
+          `${GET_ALL_BATCHES_FOR_STATISTICS_ROUTE}?from=${date.from.toISOString()}&to=${date.to.toISOString()}`
+        );
+        if (response.status === 200 && response.data.status === 200) {
+          const data = response.data.data;
 
-      // Group data by medicine name and calculate total quantity
-      const grouped = filtered.reduce((acc, item) => {
-        const medicineName = item?.MedicineId.name;
-        if (!acc[medicineName]) {
-          acc[medicineName] = {
-            name: medicineName,
-            quantity: 0,
-            stock: 0, // Initialize stock
-            dateOfEntry: item.createdAt, // Get the first date of entry for the medicine
-          };
+          // Xử lý group data theo tên thuốc và ngày nhập
+          const grouped = data.reduce((acc, item) => {
+            const medicineName = item?.MedicineId.name;
+            const entryDate = formatDate(item.createdAt);
+            const key = `${medicineName}_${entryDate}`;
+
+            if (!acc[key]) {
+              acc[key] = {
+                name: medicineName,
+                quantity: 0,
+                stock: item.MedicineId.quantityStock,
+                dateOfEntry: item.createdAt,
+              };
+            }
+            acc[key].quantity += item.quantity;
+            return acc;
+          }, {});
+
+          setGroupedData(Object.values(grouped));
         }
-        acc[medicineName].quantity += item.quantity;
-        acc[medicineName].stock = item.MedicineId.quantityStock; //Sum of stock of each medicine
-        return acc;
-      }, {});
-      setGroupedData(Object.values(grouped));
-    }
-  }, [batches, date]);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBatches();
+  }, [date]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  // const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(groupedData.length / itemsPerPage);
+  const paginatedResult = useMemo(() => {
+    return groupedData.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  }, [groupedData, currentPage, itemsPerPage]);
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex flex-col justify-between gap-5 mb-4">
-        <h2 className="text-2xl font-bold">Thống kê xuất nhập tồn</h2>
+        <span className="text-2xl font-bold">Thống kê xuất nhập tồn</span>
 
-        <div className="flex items-center space-x-4">
-          {/* Date Picker From */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[150px] justify-start text-left font-normal",
-                  !date.from && "text-muted-foreground"
-                )}
-              >
-                {date.from ? format(date.from, "PPP") : "Chọn ngày bắt đầu"}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 flex w-auto">
-              <Calendar
-                mode="single"
-                selected={date.from}
-                onSelect={(selectedDate) =>
-                  setDate({ ...date, from: selectedDate || new Date() })
-                }
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="flex justify-between">
+          <div className="flex items-center space-x-4">
+            <span className="font-semibold">Chọn ngày bắt đầu</span>
+            <Input
+              type="date"
+              className="w-auto"
+              value={format(date.from, "yyyy-MM-dd")}
+              onChange={(e) =>
+                setDate({ ...date, from: new Date(e.target.value) })
+              }
+            />
 
-          {/* Date Picker To */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[150px] justify-start text-left font-normal",
-                  !date.to && "text-muted-foreground"
-                )}
-              >
-                {date.to ? format(date.to, "PPP") : "Chọn ngày kết thúc"}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 flex w-auto">
-              <Calendar
-                mode="single"
-                selected={date.to}
-                onSelect={(selectedDate) =>
-                  setDate({ ...date, to: selectedDate || new Date() })
-                }
-              />
-            </PopoverContent>
-          </Popover>
+            <span className="font-semibold">Chọn ngày kết thúc</span>
+            <Input
+              type="date"
+              className="w-auto"
+              value={format(date.to, "yyyy-MM-dd")}
+              onChange={(e) =>
+                setDate({ ...date, to: new Date(e.target.value) })
+              }
+            />
+          </div>
+
+          {paginatedResult.length > 0 && (
+            // Hiển thị dropdown chọn số lượng item mỗi trang
+            <Select value={itemsPerPage} onValueChange={setItemsPerPage}>
+              <SelectTrigger className="w-[150px]">
+                {itemsPerPage} mục/trang
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 15, 20].map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item} mục/trang
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
+        {paginatedResult.length > 0 && (
+          <div>
+            Kết quả: <span className="font-semibold">{groupedData.length}</span>{" "}
+            mục
+          </div>
+        )}
       </div>
 
       <Table>
@@ -124,16 +154,54 @@ const InventoryMovement = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {groupedData.map((item, index) => (
+          {paginatedResult.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.name}</TableCell>
-              <TableCell>{format(item.dateOfEntry, "PPP")}</TableCell>
+              <TableCell>{formatDate(item.dateOfEntry)}</TableCell>
               <TableCell>{item.quantity}</TableCell>
               <TableCell>{item.stock}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {
+        // Hiển thị pagination nếu có nhiều hơn 1 trang
+        totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )
+      }
+
+      {isLoading && <Loading />}
     </div>
   );
 };
