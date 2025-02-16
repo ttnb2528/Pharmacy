@@ -155,6 +155,31 @@ export const getBatchesForMedicine = asyncHandler(async (req, res) => {
   }
 });
 
+export const getBatchesForStatistics = asyncHandler(async (req, res) => {
+  try {
+    const { from, to } = req.query;
+
+    const fromDate = new Date(from);
+    fromDate.setHours(0, 0, 0, 0);
+
+    const toDate = new Date(to);
+    toDate.setHours(23, 59, 59, 999);
+
+    const batches = await Batch.find({
+      createdAt: {
+        $gte: fromDate,
+        $lte: toDate,
+      },
+    }).populate("MedicineId");
+
+    return res.json(
+      jsonGenerate(StatusCode.OK, "Lấy dữ liệu thành công", batches)
+    );
+  } catch (error) {
+    return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 const validate = (data) => {
   const schema = Joi.object({
     batchNumber: Joi.string().required().label("Mã lô"),
