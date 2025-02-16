@@ -20,27 +20,27 @@ const Statistics = () => {
   const tabs = [
     {
       value: "inventory",
-      label: "Inventory Movement",
+      label: "Thống kê nhập tồn theo ngày",
       component: <InventoryMovement />,
     },
     {
       value: "expiring",
-      label: "Expiring Medicines",
+      label: "Thuốc sắp hết hạn",
       component: <ExpiringMedicines />,
     },
     {
       value: "expired",
-      label: "Expired Medicines",
+      label: "Thuốc đã hết hạn",
       component: <ExpiredMedicines />,
     },
     {
       value: "daily-revenue",
-      label: "Daily Revenue",
+      label: "Doanh thu theo ngày",
       component: <DailyRevenue />,
     },
     {
       value: "monthly-revenue",
-      label: "Monthly Revenue",
+      label: "Doanh thu theo tháng",
       component: <MonthlyRevenue />,
     },
   ];
@@ -52,7 +52,7 @@ const Statistics = () => {
         <Card>
           <CardHeader>
             <Select onValueChange={setSelectedTab} value={selectedTab}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[250px]">
                 {tabs.find((tab) => tab.value === selectedTab)?.label}{" "}
               </SelectTrigger>
               <SelectContent>
