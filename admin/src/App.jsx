@@ -30,6 +30,8 @@ import SellMedicinePage from "./pages/SellProduct/AdminSellProduct.jsx";
 import SellProductContextProvider from "./context/SellProductContext.context.jsx";
 import BillContextProvider from "./context/BillContext.context.jsx";
 import AdminBill from "./pages/Bill/AdminBill.jsx";
+import Statistics from "./pages/Statistics/Statistics.jsx";
+import BatchesContextProvider from "./context/BatchesContext.context.jsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -163,7 +165,11 @@ const App = () => {
         },
         {
           path: "reports",
-          element: <div>Reports</div>,
+          element: (
+            <BatchesContextProvider>
+              <Statistics />
+            </BatchesContextProvider>
+          ),
         },
         {
           path: "profile",

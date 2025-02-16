@@ -37,6 +37,7 @@ export const UPDATE_SUPPLIER_ROUTE = `${SUPPLIER_ROUTE}/updateSupplier`;
 export const DELETE_SUPPLIER_ROUTE = `${SUPPLIER_ROUTE}/deleteSupplier`;
 
 export const BATCHES_ROUTES = "/api/v1/batch";
+export const GET_ALL_BATCHES_ROUTE = `${BATCHES_ROUTES}/getBatches`;
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 
 export const CUSTOMER_ROUTES = "/api/v1/customer";
