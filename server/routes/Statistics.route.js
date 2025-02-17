@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getDailyRevenue,
+  getDashboardOverview,
   getExpiredMedicines,
   getExpiringMedicines,
   getMonthlyRevenue,
@@ -12,5 +13,6 @@ router.get("/getExpiringMedicines", getExpiringMedicines);
 router.get("/getExpiredMedicines", getExpiredMedicines);
 router.get("/getDailyRevenue", getDailyRevenue);
 router.get("/getMonthlyRevenue", getMonthlyRevenue);
+router.get("/getDashboardOverview", getDashboardOverview);
 
 export default router;
