@@ -26,6 +26,7 @@ import Loading from "@/pages/component/Loading.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { cn } from "@/lib/utils.js";
 import { formatDate } from "@/utils/formatDate.js";
+import { convertVND } from "@/utils/convertVND.js";
 
 const DailyRevenue = () => {
   const [revenueData, setRevenueData] = useState([]);
@@ -143,7 +144,10 @@ const DailyRevenue = () => {
             <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
               <LineChart data={displayedData}>
                 <XAxis dataKey="date" />
-                <YAxis />
+                <YAxis
+                  tickFormatter={(value) => convertVND(value)}
+                  tick={{ fontSize: 12 }}
+                />
                 <CartesianGrid strokeDasharray="3 3" />
                 <Tooltip content={CustomTooltip} />
                 <Legend />
@@ -164,10 +168,13 @@ const DailyRevenue = () => {
             </ResponsiveContainer>
           ) : (
             <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
-              <BarChart data={displayedData}>
+              <BarChart data={displayedData} margin={{ left: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis />
+                <YAxis
+                  tickFormatter={(value) => convertVND(value)}
+                  tick={{ fontSize: 12 }}
+                />
                 <Tooltip content={CustomTooltip} />
                 <Legend />
                 {filterType === "all" && (

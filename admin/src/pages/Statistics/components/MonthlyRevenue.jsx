@@ -117,7 +117,7 @@ const MonthlyRevenue = () => {
           </div>
         </div>
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={monthlyRevenue}>
+          <BarChart data={monthlyRevenue} margin={{ left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
