@@ -8,33 +8,44 @@ import {
   Tooltip,
   // Legend,
 } from "recharts";
-import { useContext, useEffect, useState } from "react";
-import { BatchesContext } from "@/context/BatchesContext.context.jsx";
+import { useEffect, useState } from "react";
 import { format, differenceInDays } from "date-fns";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_EXPIRED_MEDICINES_ROUTE } from "@/API/index.api.js";
+import Loading from "@/pages/component/Loading.jsx";
 
 const ExpiredMedicines = () => {
-  const { batches } = useContext(BatchesContext);
   const [expiredData, setExpiredData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (batches) {
-      const today = new Date();
-      const expired = batches
-        .filter((batch) => {
-          const expiryDate = new Date(batch.expiryDate);
-          const daysLeft = differenceInDays(expiryDate, today);
-          return daysLeft < 0;
-        })
-        .map((batch) => ({
-          name: batch.MedicineId.name,
-          batchNumber: batch.batchNumber,
-          daysLeft: differenceInDays(new Date(batch.expiryDate), today),
-          quantity: batch.quantity,
-          expiryDate: format(new Date(batch.expiryDate), "PPP"),
-        }));
-      setExpiredData(expired);
-    }
-  }, [batches]);
+    const fetchExpiredMedicines = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get(GET_EXPIRED_MEDICINES_ROUTE);
+        if (res.status === 200 && res.data.status === 200) {
+          const expired = res.data.data.map((batch) => ({
+            name: batch.MedicineId.name,
+            batchNumber: batch.batchNumber,
+            daysLeft: differenceInDays(new Date(batch.expiryDate), new Date()),
+            quantity: batch.quantity,
+            expiryDate: format(new Date(batch.expiryDate), "PPP"),
+          }));
+          setExpiredData(expired);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExpiredMedicines();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
