@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  BarChart,
+  Bar,
   LineChart,
   Line,
   XAxis,
@@ -9,149 +11,194 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useContext, useEffect, useState } from "react";
-import { format, differenceInDays } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { format } from "date-fns";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { BatchesContext } from "@/context/BatchesContext.context.jsx";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_DAILY_REVENUE_ROUTE } from "@/API/index.api.js";
+import Loading from "@/pages/component/Loading.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { cn } from "@/lib/utils.js";
+import { formatDate } from "@/utils/formatDate.js";
 
 const DailyRevenue = () => {
-  const { bills, orders } = useContext(BatchesContext); // Assuming you have both bills and orders in your context
   const [revenueData, setRevenueData] = useState([]);
-  const [date, setDate] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
-  const [isFiltering, setIsFiltering] = useState(false);
-
-  const handleFilter = () => {
-    setIsFiltering(true);
-  };
+  const [date, setDate] = useState({ from: new Date(), to: new Date() });
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterType, setFilterType] = useState("all"); // "all", "bills", "orders"
 
   useEffect(() => {
-    if (isFiltering) {
-      const startDate = date.from.getDay();
-      const endDate = date.to.getDay();
+    const fetchDailyRevenue = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get(
+          `${GET_DAILY_REVENUE_ROUTE}?startDate=${date.from.toISOString()}&endDate=${date.to.toISOString()}`
+        );
 
-      const filteredBills = bills
-        ? bills.filter((bill) => {
-          console.log(bill);
-          
-            const billDate = new Date(bill.createdAt);
-            console.log(billDate);
-            
-            return billDate >= startDate || billDate <= endDate;
-          })
-        : [];
-
-      const filteredOrders = orders
-        ? orders.filter((order) => {
-            const orderDate = new Date(order.date).getDay();
-            return orderDate >= startDate || orderDate <= endDate;
-          })
-        : [];
-
-      console.log(filteredBills, filteredOrders);
-
-      const dailyRevenue = {};
-
-      [...filteredBills, ...filteredOrders].forEach((item) => {
-        const itemDate = new Date(item.createdAt || item.date); // Use createdAt for bills, date for orders
-        const formattedDate = format(itemDate, "yyyy-MM-dd");
-
-        if (!dailyRevenue[formattedDate]) {
-          dailyRevenue[formattedDate] = 0;
+        if (res.status === 200 && res.data.status === 200) {
+          setRevenueData(res.data.data);
         }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        dailyRevenue[formattedDate] += item.total;
-      });
+    fetchDailyRevenue();
+  }, [date.from, date.to]);
 
-      const revenueData = Object.entries(dailyRevenue).map(([date, total]) => ({
-        date,
-        total,
-      }));
-      setRevenueData(revenueData);
-      setIsFiltering(false);
+  const displayedData = revenueData.map((item) => ({
+    date: item.date,
+    totalRevenue: filterType === "all" ? item.totalRevenue : 0,
+    orders: filterType === "orders" ? item.orders : 0,
+    bills: filterType === "bills" ? item.bills : 0,
+  }));
+
+  const hasData = displayedData.some(
+    (item) =>
+      (filterType === "all" && item.totalRevenue > 0) ||
+      (filterType === "orders" && item.orders > 0) ||
+      (filterType === "bills" && item.bills > 0)
+  );
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white border p-2 rounded">
+          <p className="font-semibold text-gray-500">{formatDate(data.date)}</p>
+          <p
+            className={cn(
+              filterType === "all" && "text-[#8884d8]",
+              filterType === "orders" && "text-[#4CAF50]",
+              filterType === "bills" && "text-[#FF9800]"
+            )}
+          >
+            tổng doanh thu: {data.totalRevenue}
+          </p>
+        </div>
+      );
     }
-  }, [bills, orders, isFiltering, date]);
+    return null;
+  };
 
-  console.log(revenueData);
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Doanh thu hàng ngày</CardTitle>
+        <CardTitle>Doanh thu theo ngày</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center space-x-4">
-          {/* Date Picker From */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[150px] justify-start text-left font-normal",
-                  !date.from && "text-muted-foreground"
-                )}
-              >
-                {date.from ? format(date.from, "PPP") : "Chọn ngày bắt đầu"}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 flex w-auto">
-              <Calendar
-                mode="single"
-                selected={date.from}
-                onSelect={(selectedDate) =>
-                  setDate({ ...date, from: selectedDate || new Date() })
-                }
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="flex justify-between">
+          <div className="flex items-center space-x-4">
+            {/* Bộ lọc ngày */}
+            <span className="font-semibold">Chọn ngày bắt đầu</span>
+            <Input
+              type="date"
+              className="w-auto"
+              value={format(date.from, "yyyy-MM-dd")}
+              onChange={(e) =>
+                setDate({ ...date, from: new Date(e.target.value) })
+              }
+            />
 
-          {/* Date Picker To */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[150px] justify-start text-left font-normal",
-                  !date.to && "text-muted-foreground"
-                )}
-              >
-                {date.to ? format(date.to, "PPP") : "Chọn ngày kết thúc"}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 flex w-auto">
-              <Calendar
-                mode="single"
-                selected={date.to}
-                onSelect={(selectedDate) =>
-                  setDate({ ...date, to: selectedDate || new Date() })
-                }
-              />
-            </PopoverContent>
-          </Popover>
-          <Button onClick={handleFilter}>Lọc</Button>
+            <span className="font-semibold">Chọn ngày kết thúc</span>
+            <Input
+              type="date"
+              className="w-auto"
+              value={format(date.to, "yyyy-MM-dd")}
+              onChange={(e) =>
+                setDate({ ...date, to: new Date(e.target.value) })
+              }
+            />
+          </div>
+          {/* Bộ lọc loại doanh thu */}
+          {displayedData.length > 0 && (
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Chọn loại doanh thu" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="bills">Chỉ hóa đơn</SelectItem>
+                <SelectItem value="orders">Chỉ đơn hàng</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={revenueData}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="total" stroke="#8884d8" />
-          </LineChart>
-        </ResponsiveContainer>
+
+        {/* Biểu đồ */}
+        {hasData ? (
+          displayedData.length > 5 ? (
+            <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
+              <LineChart data={displayedData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip content={CustomTooltip} />
+                <Legend />
+                {filterType === "all" && (
+                  <Line
+                    type="monotone"
+                    dataKey="totalRevenue"
+                    stroke="#8884d8"
+                  />
+                )}
+                {filterType === "orders" && (
+                  <Line type="monotone" dataKey="orders" stroke="#4CAF50" />
+                )}
+                {filterType === "bills" && (
+                  <Line type="monotone" dataKey="bills" stroke="#FF9800" />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
+              <BarChart data={displayedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip content={CustomTooltip} />
+                <Legend />
+                {filterType === "all" && (
+                  <Bar
+                    name="Tổng doanh thu"
+                    dataKey="totalRevenue"
+                    fill="#8884d8"
+                  />
+                )}
+                {filterType === "orders" && (
+                  <Bar
+                    name="Doanh thu theo đơn hàng"
+                    dataKey="orders"
+                    fill="#4CAF50"
+                  />
+                )}
+                {filterType === "bills" && (
+                  <Bar
+                    name="Doanh thu theo hóa đơn"
+                    dataKey="bills"
+                    fill="#FF9800"
+                  />
+                )}
+              </BarChart>
+            </ResponsiveContainer>
+          )
+        ) : (
+          <div className="mt-5 text-center text-lg text-muted-foreground">
+            Không có dữ liệu
+          </div>
+        )}
       </CardContent>
     </Card>
   );
