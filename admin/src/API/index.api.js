@@ -43,6 +43,7 @@ export const GET_ALL_BATCHES_FOR_STATISTICS_ROUTE = `${BATCHES_ROUTES}/getBatche
 
 export const STATISTICS_ROUTES = "/api/v1/statistic";
 export const GET_EXPIRING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiringMedicines`;
+export const GET_EXPIRED_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiredMedicines`;
 
 export const CUSTOMER_ROUTES = "/api/v1/customer";
 export const ADD_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/createCustomer`;

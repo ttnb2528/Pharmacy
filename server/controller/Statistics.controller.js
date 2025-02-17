@@ -20,3 +20,19 @@ export const getExpiringMedicines = asyncHandler(async (req, res) => {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
+
+export const getExpiredMedicines = asyncHandler(async (req, res) => {
+  try {
+    const today = new Date();
+
+    const medicines = await Batch.find({
+      expiryDate: { $lt: today },
+    }).populate("MedicineId");
+
+    res.json(
+      jsonGenerate(StatusCode.OK, "Lấy thuốc đã hết hạn thành công", medicines)
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});

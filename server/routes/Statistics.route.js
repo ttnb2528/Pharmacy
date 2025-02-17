@@ -1,8 +1,12 @@
 import express from "express";
-import { getExpiringMedicines } from "../controller/Statistics.controller.js";
+import {
+  getExpiredMedicines,
+  getExpiringMedicines,
+} from "../controller/Statistics.controller.js";
 
 const router = express.Router();
 
 router.get("/getExpiringMedicines", getExpiringMedicines);
+router.get("/getExpiredMedicines", getExpiredMedicines);
 
 export default router;
