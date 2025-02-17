@@ -8,8 +8,65 @@ import {
 
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import Header from "./component/Header.jsx";
+import { useEffect, useState } from "react";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_DASHBOARD_OVERVIEW_ROUTE } from "@/API/index.api.js";
+import Loading from "./component/Loading.jsx";
+import { convertVND } from "@/utils/convertVND.js";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { formatDate } from "@/utils/formatDate.js";
 
 const Overview = () => {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get(GET_DASHBOARD_OVERVIEW_ROUTE);
+        console.log(res);
+
+        if (res.status === 200 && res.data.status === 200) {
+          setData(res.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active) {
+      return (
+        <div className="bg-white p-2 shadow-md rounded-md">
+          <p className="text-sm text-gray-500">{formatDate(label)}</p>
+          <p className="text-sm font-semibold">
+            Doanh số: {convertVND(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <div>
       <Header title={"Tổng quan"} />
@@ -23,9 +80,14 @@ const Overview = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45,231,890 VND</div>
+              <div className="text-2xl font-bold">
+                {convertVND(data.totalRevenue)}
+              </div>
               <p className="text-xs text-muted-foreground">
-                +20.1% so với tháng trước
+                {data.revenueChange > 0
+                  ? `+${data.revenueChange}%`
+                  : `${data.revenueChange}%`}{" "}
+                so với tháng trước
               </p>
             </CardContent>
           </Card>
@@ -35,9 +97,9 @@ const Overview = () => {
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+573</div>
+              <div className="text-2xl font-bold">+{data.totalOrders}</div>
               <p className="text-xs text-muted-foreground">
-                +201 so với tháng trước
+                +{data.ordersChange}% so với tháng trước
               </p>
             </CardContent>
           </Card>
@@ -49,9 +111,12 @@ const Overview = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
+              <div className="text-2xl font-bold">+{data.newCustomers}</div>
               <p className="text-xs text-muted-foreground">
-                +180 so với tháng trước
+                {data.customersChange > 0
+                  ? `+${data.customersChange}%`
+                  : `${data.customersChange}%`}{" "}
+                so với tháng trước
               </p>
             </CardContent>
           </Card>
@@ -63,9 +128,11 @@ const Overview = () => {
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Paracetamol</div>
+              <div className="text-2xl font-bold">
+                {data.bestSellingProduct.name}
+              </div>
               <p className="text-xs text-muted-foreground">
-                1,234 đơn vị đã bán
+                {data.bestSellingProduct.sold} đơn vị đã bán
               </p>
             </CardContent>
           </Card>
@@ -80,10 +147,36 @@ const Overview = () => {
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
-                {/* Add your chart component here */}
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Biểu đồ thống kê sẽ được hiển thị ở đây
-                </div>
+                {/* Biểu đồ */}
+                {data.dailyRevenue.length > 0 ? (
+                  <ResponsiveContainer
+                    width="100%"
+                    height={400}
+                    className={"mt-5"}
+                  >
+                    <LineChart data={data.dailyRevenue}>
+                      <XAxis dataKey="date" tick={{ fontSize: 14 }} />
+                      <YAxis
+                        tickFormatter={(value) => convertVND(value)}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <Tooltip content={CustomTooltip} />
+                      {/* <Tooltip /> */}
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        name="Doanh số"
+                        dataKey="totalRevenue"
+                        stroke="#8884d8"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="mt-5 text-center text-lg text-muted-foreground">
+                    Không có dữ liệu
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
