@@ -45,6 +45,7 @@ export const STATISTICS_ROUTES = "/api/v1/statistic";
 export const GET_EXPIRING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiringMedicines`;
 export const GET_EXPIRED_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiredMedicines`;
 export const GET_DAILY_REVENUE_ROUTE = `${STATISTICS_ROUTES}/getDailyRevenue`;
+export const GET_MONTHLY_REVENUE_ROUTE = `${STATISTICS_ROUTES}/getMonthlyRevenue`;
 
 export const CUSTOMER_ROUTES = "/api/v1/customer";
 export const ADD_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/createCustomer`;

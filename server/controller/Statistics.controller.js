@@ -109,3 +109,55 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
     )
   );
 });
+
+export const getMonthlyRevenue = asyncHandler(async (req, res) => {
+  try {
+    const { year, type = "all" } = req.query;
+    const selectedYear = parseInt(year) || new Date().getFullYear();
+
+    // Khởi tạo dữ liệu đủ 12 tháng
+    const revenueByMonth = Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      total: 0,
+    }));
+
+    // Truy vấn hóa đơn và đơn hàng theo năm
+    const bills =
+      type === "all" || type === "bills"
+        ? await Bill.find({
+            createdAt: {
+              $gte: new Date(`${selectedYear}-01-01`),
+              $lt: new Date(`${selectedYear + 1}-01-01`),
+            },
+          })
+        : [];
+
+    const orders =
+      type === "all" || type === "orders"
+        ? await Order.find({
+            date: {
+              $gte: new Date(`${selectedYear}-01-01`),
+              $lt: new Date(`${selectedYear + 1}-01-01`),
+            },
+            status: "completed",
+          })
+        : [];
+
+    // Cộng tổng doanh thu theo tháng
+    [...bills, ...orders].forEach((item) => {
+      const itemDate = new Date(item.createdAt || item.date);
+      const monthIndex = itemDate.getMonth(); // Lấy chỉ số tháng (0-11)
+      revenueByMonth[monthIndex].total += item.total;
+    });
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy doanh thu theo tháng thành công",
+        revenueByMonth
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
