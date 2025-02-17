@@ -9,47 +9,66 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useContext, useEffect, useState } from "react";
-import { BatchesContext } from "@/context/BatchesContext.context.jsx";
-import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import Loading from "@/pages/component/Loading.jsx";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_MONTHLY_REVENUE_ROUTE } from "@/API/index.api.js";
+import { convertVND } from "@/utils/convertVND.js";
+import { Label } from "@/components/ui/label.jsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.jsx";
 
 const MonthlyRevenue = () => {
-  const { bills, orders } = useContext(BatchesContext);
+  // const { bills, orders } = useContext(BatchesContext);
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [filterType, setFilterType] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (bills && orders) {
-      const filteredBills = bills.filter(
-        (bill) => new Date(bill.createdAt).getFullYear() === selectedYear
-      );
-      const filteredOrders = orders.filter(
-        (order) => new Date(order.date).getFullYear() === selectedYear
-      );
+    const fetchMonthlyRevenue = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get(
+          `${GET_MONTHLY_REVENUE_ROUTE}?year=${selectedYear}&type=${filterType}`
+        );
 
-      const revenueByMonth = {};
-
-      [...filteredBills, ...filteredOrders].forEach((item) => {
-        const itemDate = new Date(item.createdAt || item.date);
-        const month = format(itemDate, "MMMM"); // Get month name
-
-        if (!revenueByMonth[month]) {
-          revenueByMonth[month] = 0;
+        if (res.status === 200 && res.data.status === 200) {
+          setMonthlyRevenue(res.data.data);
         }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        revenueByMonth[month] += item.total;
-      });
+    fetchMonthlyRevenue();
+  }, [filterType, selectedYear]);
 
-      const monthlyRevenueData = Object.entries(revenueByMonth).map(
-        ([month, total]) => ({
-          month,
-          total,
-        })
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white border p-2 rounded">
+          <p className="font-semibold text-gray-500">Tháng: {data.month}</p>
+          <p className="text-gray-500">
+            tổng doanh thu: {convertVND(data.total)}
+          </p>
+        </div>
       );
-
-      setMonthlyRevenue(monthlyRevenueData);
     }
-  }, [bills, orders, selectedYear]);
+    return null;
+  };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Card>
@@ -59,34 +78,62 @@ const MonthlyRevenue = () => {
       <CardContent>
         {/* Chọn năm */}
         <div className="mb-4">
-          <label htmlFor="year">Chọn năm:</label>
-          <select
-            id="year"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-          >
-            {/* Generate options for the last 5 years */}
-            {Array.from({ length: 5 }, (_, i) => {
-              const year = new Date().getFullYear() - i;
-              return (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              );
-            })}
-          </select>
+          <div className="flex justify-between">
+            <div className="flex items-center space-x-4">
+              <Label htmlFor="year">Chọn năm:</Label>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-[100px]">
+                  {selectedYear}
+                </SelectTrigger>
+                <SelectContent>
+                  {[
+                    new Date().getFullYear() - 2,
+                    new Date().getFullYear() - 1,
+                    new Date().getFullYear(),
+                  ].map((year) => (
+                    <div
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className="hover:bg-gray-100 cursor-pointer p-2"
+                    >
+                      {year}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {monthlyRevenue.length > 0 && (
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Chọn loại doanh thu" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  <SelectItem value="bills">Chỉ hóa đơn</SelectItem>
+                  <SelectItem value="orders">Chỉ đơn hàng</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={monthlyRevenue}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
+            <XAxis
+              dataKey="month"
+              tickFormatter={(month) => `Tháng ${month}`}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis
+              tickFormatter={(value) => convertVND(value)}
+              tick={{ fontSize: 12 }}
+            />
+            <Tooltip content={CustomTooltip} />
             <Legend />
-            <Bar dataKey="total" fill="#8884d8" />
+            <Bar dataKey="total" name="Tổng doanh thu" fill="#8884d8" />
           </BarChart>
         </ResponsiveContainer>
-      </CardContent>{" "}
+      </CardContent>
     </Card>
   );
 };
