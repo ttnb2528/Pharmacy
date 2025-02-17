@@ -41,6 +41,9 @@ export const GET_ALL_BATCHES_ROUTE = `${BATCHES_ROUTES}/getBatches`;
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 export const GET_ALL_BATCHES_FOR_STATISTICS_ROUTE = `${BATCHES_ROUTES}/getBatchesForStatistics`;
 
+export const STATISTICS_ROUTES = "/api/v1/statistic";
+export const GET_EXPIRING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiringMedicines`;
+
 export const CUSTOMER_ROUTES = "/api/v1/customer";
 export const ADD_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/createCustomer`;
 export const GET_ALL_CUSTOMERS_ROUTE = `${CUSTOMER_ROUTES}/getCustomers`;
