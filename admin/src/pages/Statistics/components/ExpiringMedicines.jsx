@@ -8,34 +8,49 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { useContext, useEffect, useState } from "react";
-import { BatchesContext } from "@/context/BatchesContext.context.jsx";
+import { useEffect, useState } from "react";
 import { format, differenceInDays } from "date-fns";
+import { apiClient } from "@/lib/api-admin.js";
+import { GET_EXPIRING_MEDICINES_ROUTE } from "@/API/index.api.js";
+import Loading from "@/pages/component/Loading.jsx";
 
 const ExpiringMedicines = () => {
-  const { batches } = useContext(BatchesContext);
   const [expiringData, setExpiringData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (batches) {
-      const today = new Date();
-      const expiring = batches
-        .filter((batch) => {
-          const expiryDate = new Date(batch.expiryDate);
-          let daysLeft = differenceInDays(expiryDate, today);
-          daysLeft = daysLeft >= 0 ? daysLeft + 1 : daysLeft;
-          return daysLeft <= 30 && daysLeft >= 0; // Lọc trong vòng 30 ngày và không âm
-        })
-        .map((batch) => ({
-          name: batch.MedicineId.name, // Format name
-          batchNumber: batch.batchNumber,
-          daysLeft: differenceInDays(new Date(batch.expiryDate), today) + 1,
-          quantity: batch.quantity,
-          expiryDate: format(new Date(batch.expiryDate), "PPP"), // Format expiry date
-        }));
-      setExpiringData(expiring);
-    }
-  }, [batches]);
+    const fetchExpiringMedicines = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get(GET_EXPIRING_MEDICINES_ROUTE);
+        if (res.status === 200 && res.data.status === 200) {
+          console.log(res);
+
+          const data = res.data.data.map((batch) => {
+            const today = new Date();
+            const expiryDate = new Date(batch.expiryDate);
+            let daysLeft = differenceInDays(expiryDate, today);
+            daysLeft = daysLeft >= 0 ? daysLeft + 1 : daysLeft;
+            return {
+              name: batch.MedicineId.name,
+              batchNumber: batch.batchNumber,
+              daysLeft,
+              quantity: batch.quantity,
+              expiryDate: format(expiryDate, "PPP"),
+            };
+          });
+
+          setExpiringData(data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExpiringMedicines();
+  }, []);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -52,8 +67,12 @@ const ExpiringMedicines = () => {
     return null;
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <Card>
+    <Card className="mt-4">
       <CardHeader>
         <CardTitle>Thuốc sắp hết hạn (Trong vòng 30 ngày)</CardTitle>
       </CardHeader>
@@ -65,33 +84,37 @@ const ExpiringMedicines = () => {
               interval={0}
               angle={-45}
               textAnchor="end"
-              height={80}
+              height={100}
             />{" "}
             {/* X-axis with rotation */}
             <YAxis
               yAxisId="left"
               orientation="left"
-              stroke="#8884d8"
-              label={{ value: "Days Left", angle: -90, position: "insideLeft" }}
+              stroke="black"
+              label={{
+                value: "Ngày còn lại",
+                angle: -90,
+                position: "insideLeft",
+              }}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke="#82ca9d"
-              label={{ value: "Quantity", angle: -90, position: "insideRight" }}
+              stroke="black"
+              label={{ value: "Số lượng", angle: -90, position: "insideRight" }}
             />
             <Tooltip content={<CustomTooltip />} /> {/* Add tooltip */}
             <Legend /> {/* Add legend */}
             <Bar
               yAxisId="left"
               dataKey="daysLeft"
-              fill="#8884d8"
+              fill="#ff7474"
               name="Ngày còn lại"
             />
             <Bar
               yAxisId="right"
               dataKey="quantity"
-              fill="#82ca9d"
+              fill="#e9d700"
               name="Số lượng"
             />
           </BarChart>
