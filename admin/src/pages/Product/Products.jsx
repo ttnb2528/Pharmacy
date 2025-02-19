@@ -18,7 +18,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -37,13 +36,14 @@ import {
 } from "@/components/ui/pagination";
 import { useContext, useState } from "react";
 import { MedicineContext } from "@/context/ProductContext.context";
-import MedicineDetails from "./component/MedicineDetails.jsx";
+import MedicineDetails from "./components/MedicineDetails.jsx";
 import { apiClient } from "@/lib/api-admin.js";
 import { DELETE_MEDICINE_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
-import ConfirmForm from "./component/ConfirmForm.jsx";
-import Loading from "./component/Loading.jsx";
-import Header from "./component/Header.jsx";
+import ConfirmForm from "../component/ConfirmForm.jsx";
+import Loading from "../component/Loading.jsx";
+import Header from "../component/Header.jsx";
+import AddMedicineForm from "./components/AddMedicineForm.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -71,7 +71,6 @@ export default function Products() {
 
   const handleView = (medicine) => {
     setSelectedMedicine(medicine);
-    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -137,7 +136,7 @@ export default function Products() {
   };
 
   return (
-    <div>
+    <div className="relative">
       {isLoading && <Loading />}
       <Header title={"Danh sách thuốc"} />
       <main className="p-6">
@@ -165,6 +164,7 @@ export default function Products() {
               </SelectContent>
             </Select>
           </div>
+
           <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
               <Button>
@@ -176,13 +176,14 @@ export default function Products() {
                 <DialogTitle>Thêm thuốc mới</DialogTitle>
               </DialogHeader>
               <DialogDescription></DialogDescription>
-              <MedicineDetails
+              {/* <MedicineDetails
                 medicine={null}
                 isEditing={false}
                 isImport={false}
                 isAdding={true}
                 handleCancel={handleCancel}
-              />
+              /> */}
+              <AddMedicineForm handleCancel={handleCancel} />
             </DialogContent>
           </Dialog>
         </div>
@@ -225,10 +226,11 @@ export default function Products() {
                         <DialogDescription></DialogDescription>
                         <MedicineDetails
                           medicine={selectedMedicine}
-                          isEditing={false}
-                          isAdding={false}
-                          isImport={false}
-                          handleCancel={handleCancel}
+
+                          // isEditing={false}
+                          // isAdding={false}
+                          // isImport={false}
+                          // handleCancel={handleCancel}
                         />
                       </DialogContent>
                     </Dialog>

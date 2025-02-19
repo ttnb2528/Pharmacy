@@ -28,7 +28,7 @@ import { apiClient } from "@/lib/api-admin.js";
 import {
   ADD_MEDICINE_ROUTE,
   GET_ALL_BATCHES_FOR_MEDICINE_ROUTE,
-  REMOVE_IMAGE_ROUTE,
+  // REMOVE_IMAGE_ROUTE,
   UPDATE_IMAGES_MEDICINE_ROUTE,
   UPDATE_MEDICINE_ROUTE,
   //   REMOVE_IMAGE_ROUTE,
@@ -36,7 +36,7 @@ import {
 import { toast } from "sonner";
 
 import { FaTrash } from "react-icons/fa";
-import Loading from "./Loading.jsx";
+import Loading from "@/pages/component/Loading.jsx";
 
 const MedicineDetails = ({
   medicine,
@@ -181,29 +181,29 @@ const MedicineDetails = ({
     }
   }, [isEditing, medicine]);
 
-  const handleDeleteImageEdit1 = async (index) => {
-    try {
-      const parts = formData.images[index].split("/");
-      let fileName = parts[parts.length - 1].split(".")[0]; // Loại bỏ phần mở rộng .jpg
-      let folder = parts[parts.length - 2];
-      let publicId = folder + "/" + fileName;
-      // console.log(publicId);
+  // const handleDeleteImageEdit1 = async (index) => {
+  //   try {
+  //     const parts = formData.images[index].split("/");
+  //     let fileName = parts[parts.length - 1].split(".")[0]; // Loại bỏ phần mở rộng .jpg
+  //     let folder = parts[parts.length - 2];
+  //     let publicId = folder + "/" + fileName;
+  //     // console.log(publicId);
 
-      const res = await apiClient.post(REMOVE_IMAGE_ROUTE, {
-        publicId,
-      });
+  //     const res = await apiClient.post(REMOVE_IMAGE_ROUTE, {
+  //       publicId,
+  //     });
 
-      if (res.status === 200 && res.data.status === 200) {
-        const newImages = formData.images.filter((_, i) => i !== index);
-        setFormData((prev) => ({ ...prev, images: newImages }));
-        toast.success("Xóa hình ảnh thành công");
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     if (res.status === 200 && res.data.status === 200) {
+  //       const newImages = formData.images.filter((_, i) => i !== index);
+  //       setFormData((prev) => ({ ...prev, images: newImages }));
+  //       toast.success("Xóa hình ảnh thành công");
+  //     } else {
+  //       toast.error(res.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleDeleteImageEdit = async (index) => {
     setFormData((prev) => {

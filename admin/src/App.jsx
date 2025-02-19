@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import DashBoard from "./pages/DashBoard.jsx";
 import { RouterProvider } from "react-router";
 import NotFound from "./pages/NotFound.jsx";
-import Products from "./pages/Products.jsx";
+import Products from "./pages/Product/Products.jsx";
 import Overview from "./pages/Overview.jsx";
 import MedicineContextProvider from "./context/ProductContext.context.jsx";
 import AdminCustomer from "./pages/Customer/AdminCustomer.jsx";

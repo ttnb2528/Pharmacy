@@ -293,10 +293,18 @@ export const updateImagesMedicine = asyncHandler(async (req, res) => {
     return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
   }
 
-  await Medicine.findByIdAndUpdate(id, { images: req.body.images });
+  const newMedicine = await Medicine.findByIdAndUpdate(
+    id,
+    { images: req.body.images },
+    { new: true }
+  );
 
   res.json(
-    jsonGenerate(StatusCode.OK, "Cập nhật hình ảnh thuốc thành công", medicine)
+    jsonGenerate(
+      StatusCode.OK,
+      "Cập nhật hình ảnh thuốc thành công",
+      newMedicine
+    )
   );
 });
 
