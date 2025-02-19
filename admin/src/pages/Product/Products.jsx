@@ -45,6 +45,7 @@ import Loading from "../component/Loading.jsx";
 import Header from "../component/Header.jsx";
 import AddMedicineForm from "./components/AddMedicineForm.jsx";
 import EditMedicineDialog from "./components/EditMedicineDialog.jsx";
+import ImportMedicineDialog from "./components/ImportMedicineDialog.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -77,6 +78,16 @@ export default function Products() {
 
   const handleView = (medicine) => {
     setSelectedMedicine(medicine);
+  };
+
+  const handleImport = (medicine) => {
+    setSelectedMedicine(medicine);
+    setIsImport(true);
+  };
+
+  const handleCancelImport = () => {
+    setIsImport(false);
+    setSelectedMedicine(null);
   };
 
   const handleCancel = () => {
@@ -233,6 +244,15 @@ export default function Products() {
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
+
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleImport(medicine)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+
                     <Button
                       variant="outline"
                       size="icon"
@@ -281,6 +301,14 @@ export default function Products() {
           medicine={selectedMedicine}
           isOpen={isEditing}
           onClose={handleCancelEdit}
+        />
+      )}
+
+      {isImport && (
+        <ImportMedicineDialog
+          medicine={selectedMedicine}
+          isOpen={isImport}
+          onClose={handleCancelImport}
         />
       )}
 

@@ -16,6 +16,26 @@ export const createBatch = asyncHandler(async (req, res) => {
       );
     }
 
+    const { quantity, price, retailPrice } = req.body;
+
+    if (quantity <= 0) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Số lượng phải lớn hơn 0")
+      );
+    }
+
+    if (price <= 0) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Giá bán phải lớn hơn 0")
+      );
+    }
+
+    if (retailPrice <= 0) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Giá bán lẻ phải lớn hơn 0")
+      );
+    }
+
     if (req.body.dateOfManufacture > req.body.expiryDate) {
       return res.json(
         jsonGenerate(
@@ -192,7 +212,15 @@ const validate = (data) => {
     SupplierId: Joi.string().required().label("Nhà cung cấp"),
     ManufactureId: Joi.string().required().label("Nhà sản xuất"),
     MedicineId: Joi.string().required().label("Thuốc"),
-  });
+  })
+    .messages({
+      "string.empty": "{#label} không được để trống",
+      "any.required": "{#label} là bắt buộc",
+      "string.base": "{#label} phải là chuỗi ký tự",
+      "date.base": "{#label} không hợp lệ",
+      "number.base": "{#label} phải là số",
+    })
+    .unknown(true);
 
   return schema.validate(data);
 };
