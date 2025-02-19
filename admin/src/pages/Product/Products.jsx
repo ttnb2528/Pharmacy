@@ -44,6 +44,7 @@ import ConfirmForm from "../component/ConfirmForm.jsx";
 import Loading from "../component/Loading.jsx";
 import Header from "../component/Header.jsx";
 import AddMedicineForm from "./components/AddMedicineForm.jsx";
+import EditMedicineDialog from "./components/EditMedicineDialog.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -69,15 +70,20 @@ export default function Products() {
     setIsEditing(true);
   };
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setSelectedMedicine(null);
+  };
+
   const handleView = (medicine) => {
     setSelectedMedicine(medicine);
   };
 
   const handleCancel = () => {
-    setSelectedMedicine(null);
-    setIsEditing(false);
+    setIsEditing(false); // Set isEditing về false trước
     setIsAdding(false);
     setIsImport(false);
+    setSelectedMedicine(null);
   };
 
   const filteredMedicines = medicines.filter((medicine) => {
@@ -176,13 +182,6 @@ export default function Products() {
                 <DialogTitle>Thêm thuốc mới</DialogTitle>
               </DialogHeader>
               <DialogDescription></DialogDescription>
-              {/* <MedicineDetails
-                medicine={null}
-                isEditing={false}
-                isImport={false}
-                isAdding={true}
-                handleCancel={handleCancel}
-              /> */}
               <AddMedicineForm handleCancel={handleCancel} />
             </DialogContent>
           </Dialog>
@@ -200,7 +199,7 @@ export default function Products() {
           </TableHeader>
           <TableBody>
             {paginatedMedicines.map((medicine) => (
-              <TableRow key={medicine.id}>
+              <TableRow key={medicine._id}>
                 <TableCell>{medicine.id}</TableCell>
                 <TableCell>{medicine.name}</TableCell>
                 <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
@@ -224,41 +223,16 @@ export default function Products() {
                           <DialogTitle>Chi tiết thuốc</DialogTitle>
                         </DialogHeader>
                         <DialogDescription></DialogDescription>
-                        <MedicineDetails
-                          medicine={selectedMedicine}
-
-                          // isEditing={false}
-                          // isAdding={false}
-                          // isImport={false}
-                          // handleCancel={handleCancel}
-                        />
+                        <MedicineDetails medicine={selectedMedicine} />
                       </DialogContent>
                     </Dialog>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        {/* edit product */}
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleEdit(medicine)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
-                        <DialogHeader>
-                          <DialogTitle>Sửa thông tin thuốc</DialogTitle>
-                          <DialogDescription></DialogDescription>
-                        </DialogHeader>
-                        <MedicineDetails
-                          medicine={selectedMedicine}
-                          isEditing={true}
-                          isAdding={false}
-                          isImport={true}
-                          handleCancel={handleCancel}
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEdit(medicine)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
@@ -301,6 +275,14 @@ export default function Products() {
           </PaginationContent>
         </Pagination>
       </main>
+
+      {isEditing && (
+        <EditMedicineDialog
+          medicine={selectedMedicine}
+          isOpen={isEditing}
+          onClose={handleCancelEdit}
+        />
+      )}
 
       {isConfirmOpen && (
         <ConfirmForm

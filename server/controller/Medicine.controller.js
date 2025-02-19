@@ -178,12 +178,11 @@ export const getMedicine = asyncHandler(async (req, res) => {
     .populate("categoryId")
     .populate("brandId");
 
-  for (let medicine of medicines) {
-    const batches = await Batch.find({ MedicineId: medicine._id })
-      .populate("SupplierId")
-      .populate("ManufactureId");
-    medicine._doc.batches = batches; // Gán kết quả vào medicine object
-  }
+  const batches = await Batch.find({ MedicineId: medicine._id })
+    .populate("SupplierId")
+    .populate("ManufactureId");
+  medicine._doc.batches = batches; // Gán kết quả vào medicine object
+
   if (!medicine) {
     return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
   }
@@ -271,9 +270,15 @@ export const updateMedicine = asyncHandler(async (req, res) => {
     );
   }
 
-  await Medicine.findByIdAndUpdate(id, req.body);
+  const updateMedicine = await Medicine.findByIdAndUpdate(id, req.body, {
+    new: true,
+  })
+    .populate("categoryId")
+    .populate("brandId");
 
-  res.json(jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công"));
+  res.json(
+    jsonGenerate(StatusCode.OK, "Cập nhật thuốc thành công", updateMedicine)
+  );
 });
 
 export const updateImagesMedicine = asyncHandler(async (req, res) => {
