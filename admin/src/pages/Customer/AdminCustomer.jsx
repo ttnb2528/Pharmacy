@@ -31,7 +31,6 @@ import {
   ADD_CUSTOMER_ROUTE,
   DELETE_CUSTOMER_ROUTE,
   GET_ALL_CUSTOMERS_ROUTE,
-  UPDATE_CUSTOMER_ROUTE,
 } from "@/API/index.api.js";
 import CustomerDetails from "./Components/CustomerDetail.jsx";
 // import CustomerForm from "./Components/CustomerForm.jsx";
@@ -40,20 +39,24 @@ import { toast } from "sonner";
 import Loading from "../component/Loading.jsx";
 import ConfirmForm from "../component/ConfirmForm.jsx";
 import Header from "../component/Header.jsx";
+import EditCustomerDialog from "./Components/EditCustomerDialog.jsx";
+import { formatDate } from "@/utils/formatDate.js";
 
 const AdminCustomer = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [customers, setCustomers] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [customers, setCustomers] = useState([]);
   const totalPages = Math.ceil(customers.length / itemsPerPage);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [isAdding, setIsAdding] = useState(false); // State cho nút "Thêm"
   const [isEditing, setIsEditing] = useState(false); // State cho nút "Sửa"
-  const [editingCustomer, setEditingCustomer] = useState(null);
+  // const [editingCustomer, setEditingCustomer] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -110,31 +113,15 @@ const AdminCustomer = () => {
     }
   };
 
-  const handleUpdateCustomer = async (data, customer) => {
-    try {
-      setIsLoading(true);
-      const res = await apiClient.put(
-        `${UPDATE_CUSTOMER_ROUTE}/${customer._id}`,
-        data
-      );
+  // Edit
+  const handleEditCustomer = (customer) => {
+    setIsEditing(true);
+    setSelectedCustomer(customer);
+  };
 
-      if (res.status === 200 && res.data.status === 200) {
-        const updatedCustomer = res.data.data;
-        setCustomers((prev) =>
-          prev.map((customer) =>
-            customer._id === updatedCustomer._id ? updatedCustomer : customer
-          )
-        );
-        setIsEditing(false);
-        toast.success(res.data.message);
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCancleEdit = () => {
+    setIsEditing(false);
+    setSelectedCustomer(null);
   };
 
   const handleDeleteCustomer = async (customer) => {
@@ -192,7 +179,7 @@ const AdminCustomer = () => {
               <DialogDescription></DialogDescription>
               <CustomerForm1
                 onSubmit={(data) => handleCreateCustomer(data)}
-                mode="add" // Thêm props mode="add"
+                mode="add"
               />
             </DialogContent>
           </Dialog>
@@ -216,7 +203,7 @@ const AdminCustomer = () => {
                 <TableCell>{customer.phone || "..."}</TableCell>
                 <TableCell>{customer.gender || "..."}</TableCell>
                 <TableCell>
-                  {new Date(customer.date).toLocaleDateString("vi") || "..."}
+                  {customer.date ? formatDate(customer.date) : "..."}
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
@@ -241,33 +228,13 @@ const AdminCustomer = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setIsEditing(true);
-                            setEditingCustomer(customer);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Sửa thông tin khách hàng</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <CustomerForm1
-                          customer={editingCustomer}
-                          onSubmit={(data) =>
-                            handleUpdateCustomer(data, editingCustomer)
-                          }
-                          mode="edit" // Thêm props mode="edit"
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditCustomer(customer)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
 
                     <Button
                       variant="outline"
@@ -311,6 +278,7 @@ const AdminCustomer = () => {
           </PaginationContent>
         </Pagination>
       </main>
+
       {confirmDelete && (
         <ConfirmForm
           info={selectedCustomer}
@@ -321,6 +289,15 @@ const AdminCustomer = () => {
           }}
           handleConfirm={() => handleDeleteCustomer(selectedCustomer)}
           type="customer"
+        />
+      )}
+
+      {isEditing && (
+        <EditCustomerDialog
+          customer={selectedCustomer}
+          isOpen={isEditing}
+          onClose={handleCancleEdit}
+          setCustomers={setCustomers}
         />
       )}
     </div>
