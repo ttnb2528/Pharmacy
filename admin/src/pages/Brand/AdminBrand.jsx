@@ -31,7 +31,7 @@ import {
   ADD_BRAND_ROUTE,
   DELETE_BRAND_ROUTE,
   GET_ALL_BRANDS_ROUTE,
-  UPDATE_BRAND_ROUTE,
+  // UPDATE_BRAND_ROUTE,
 } from "@/API/index.api.js";
 import { toast } from "sonner";
 import Loading from "../component/Loading.jsx";
@@ -39,6 +39,7 @@ import ConfirmForm from "../component/ConfirmForm.jsx";
 import AdminBrandDetail from "./Component/AdminBrandDetail.jsx";
 import AdminBrandForm from "./Component/AdminBrandForm.jsx";
 import Header from "../component/Header.jsx";
+import EditBranDialog from "./Component/EditBranDialog.jsx";
 
 const AdminBrand = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -104,31 +105,14 @@ const AdminBrand = () => {
     }
   };
 
-  const handleUpdateBrand = async (data, brand) => {
-    try {
-      setIsLoading(true);
-      const res = await apiClient.put(
-        `${UPDATE_BRAND_ROUTE}/${brand._id}`,
-        data
-      );
+  const handleEdit = (brand) => {
+    setSelectedBrand(brand);
+    setIsEditing(true);
+  };
 
-      if (res.status === 200 && res.data.status === 200) {
-        toast.success(res.data.message);
-        setBrands((prevBrands) =>
-          prevBrands.map((item) =>
-            item._id === brand._id ? { ...item, ...data } : item
-          )
-        );
-        setIsEditing(false);
-      } else {
-        toast.error(res.data.message);
-        setIsEditing(false);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCancel = () => {
+    setIsEditing(false);
+    setSelectedBrand(null);
   };
 
   const handleDeleteBrand = async (brand) => {
@@ -225,33 +209,9 @@ const AdminBrand = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setIsEditing(true);
-                            setSelectedBrand(brand);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Sửa thông tin thương hiệu</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <AdminBrandForm
-                          brand={selectedBrand}
-                          onSubmit={(data) =>
-                            handleUpdateBrand(data, selectedBrand)
-                          }
-                          mode="edit"
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <Button variant="outline" size="sm" onClick={() => handleEdit(brand)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
 
                     <Button
                       variant="outline"
@@ -305,6 +265,15 @@ const AdminBrand = () => {
           }}
           handleConfirm={() => handleDeleteBrand(selectedBrand)}
           type="brand"
+        />
+      )}
+
+      {isEditing && (
+        <EditBranDialog
+          brand={selectedBrand}
+          isOpen={isEditing}
+          onClose={handleCancel}
+          setBrands={setBrands}
         />
       )}
     </div>
