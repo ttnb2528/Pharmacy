@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,9 +6,18 @@ import { Textarea } from "@/components/ui/textarea";
 
 const AdminBrandForm = ({ brand, onSubmit, mode }) => {
   const [formData, setFormData] = useState({
-    name: brand.name,
-    description: brand.description,
+    name: "",
+    description: "",
   });
+
+  useEffect(() => {
+    if (brand) {
+      setFormData({
+        name: brand.name || "",
+        description: brand.description || "",
+      });
+    }
+  }, [brand]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
