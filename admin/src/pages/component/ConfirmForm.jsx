@@ -29,6 +29,10 @@ const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
         return `Bạn có chắc chắn muốn xóa thương hiệu <span class="font-semibold text-green-500">${
           info?.name || "này"
         }</span> không?`;
+      case "manufacture":
+        return `Bạn có chắc chắn muốn xóa nhà sản xuất <span class="font-semibold text-green-500">${
+          info?.name || "này"
+        }</span> không?`;
       default:
         return "Bạn có chắc chắn muốn thực hiện hành động này không?"; // Default text
     }
@@ -48,6 +52,8 @@ const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
         return "Xóa danh mục";
       case "brand":
         return "Xóa thương hiệu";
+      case "manufacture":
+        return "Xóa nhà sản xuất";
       default:
         return "Xác nhận hành động"; // Default title
     }
