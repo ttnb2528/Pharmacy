@@ -50,83 +50,6 @@ import {
 import { toast } from "sonner";
 import Header from "../component/Header.jsx";
 
-// Mock data for orders
-// const mockOrders = [
-//   {
-//     id: "ORD001",
-//     AccountId: "ACC001",
-//     nameCustomer: "John Doe",
-//     phone: "0123456789",
-//     date: new Date("2023-05-01"),
-//     total: 150000,
-//     status: "pending",
-//     type: "online",
-//     address: "123 Main St, City",
-//     coupon: "SUMMER10",
-//     paymentMethod: "COD",
-//     totalTemp: 160000,
-//     shippingFee: 20000,
-//     discountValue: 30000,
-//     discountProduct: 0,
-//     note: "Please deliver in the evening",
-//     items: [
-//       {
-//         productId: "MED001",
-//         quantity: 2,
-//         price: 50000,
-//         name: "Paracetamol",
-//         unit: "box",
-//         discount: 0,
-//       },
-//       {
-//         productId: "MED002",
-//         quantity: 1,
-//         price: 70000,
-//         name: "Amoxicillin",
-//         unit: "bottle",
-//         discount: 20000,
-//       },
-//     ],
-//   },
-//   {
-//     id: "ORD002",
-//     AccountId: "ACC002",
-//     nameCustomer: "Jane Smith",
-//     phone: "0987654321",
-//     date: new Date("2023-05-02"),
-//     total: 250000,
-//     status: "processing",
-//     type: "store",
-//     address: "456 Elm St, Town",
-//     coupon: null,
-//     paymentMethod: "online",
-//     totalTemp: 250000,
-//     shippingFee: 0,
-//     discountValue: 0,
-//     discountProduct: 0,
-//     note: "",
-//     items: [
-//       {
-//         productId: "MED003",
-//         quantity: 3,
-//         price: 60000,
-//         name: "Ibuprofen",
-//         unit: "box",
-//         discount: 0,
-//       },
-//       {
-//         productId: "MED004",
-//         quantity: 1,
-//         price: 70000,
-//         name: "Omeprazole",
-//         unit: "bottle",
-//         discount: 0,
-//       },
-//     ],
-//   },
-//   // Add more mock orders as needed
-// ];
-
 export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
   const { orders, setOrders } = useContext(OrderContext);
@@ -346,6 +269,7 @@ export default function AdminOrders() {
           <DialogContent className="sm:max-w-3xl">
             <DialogHeader>
               <DialogTitle>Chi tiết đơn hàng</DialogTitle>
+              <DialogDescription></DialogDescription>
             </DialogHeader>
             {selectedOrder && (
               <div className="grid gap-6">
