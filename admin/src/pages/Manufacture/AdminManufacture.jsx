@@ -161,7 +161,11 @@ const AdminManufacture = () => {
                 <Plus className="mr-2 h-4 w-4" /> Thêm nhà sản xuất
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm nhà sản xuất mới</DialogTitle>
                 <DialogDescription>

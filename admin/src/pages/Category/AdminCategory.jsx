@@ -155,7 +155,11 @@ const AdminCategory = () => {
               <Plus className="mr-2 h-4 w-4" /> Thêm danh mục
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent
+            onPointerDownOutside={(e) => {
+              e.preventDefault();
+            }}
+          >
             <DialogHeader>
               <DialogTitle>Thêm danh mục mới</DialogTitle>
               <DialogDescription>

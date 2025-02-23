@@ -402,7 +402,12 @@ export default function AdminOrders() {
           open={isStatusUpdateDialogOpen}
           onOpenChange={setIsStatusUpdateDialogOpen}
         >
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onPointerDownOutside={(e) => {
+              e.preventDefault();
+            }}
+          >
             <DialogHeader>
               <DialogTitle>Cập nhật trạng thái đơn hàng</DialogTitle>
               <DialogDescription>

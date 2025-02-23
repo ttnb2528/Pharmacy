@@ -152,7 +152,12 @@ const AdminStaff = () => {
                 <Plus className="mr-2 h-4 w-4" /> Thêm nhân viên
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent
+              className="sm:max-w-xl"
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm nhân viên mới</DialogTitle>
                 <DialogDescription>

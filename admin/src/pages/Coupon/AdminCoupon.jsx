@@ -158,7 +158,12 @@ const AdminCoupon = () => {
                 <Plus className="mr-2 h-4 w-4" /> Thêm mã giảm giá
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl">
+            <DialogContent
+              className="sm:max-w-3xl"
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm mã giảm giá mới</DialogTitle>
                 <DialogDescription>

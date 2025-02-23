@@ -47,7 +47,12 @@ const EditCouponDialog = ({ coupon, isOpen, onClose, setCoupons }) => {
       {isLoading && <Loading />}
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogTrigger asChild></DialogTrigger>
-        <DialogContent className="max-w-2xl">
+        <DialogContent
+          className="max-w-2xl"
+          onPointerDownOutside={(e) => {
+            e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Sửa thông tin mã giảm giá</DialogTitle>
           </DialogHeader>

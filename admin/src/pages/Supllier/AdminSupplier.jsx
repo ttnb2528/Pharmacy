@@ -157,7 +157,11 @@ const AdminSupplier = () => {
                 <Plus className="mr-2 h-4 w-4" /> Thêm nhà cung cấp
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm nhà cung cấp mới</DialogTitle>
                 <DialogDescription>

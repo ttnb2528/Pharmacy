@@ -188,7 +188,12 @@ export default function Products() {
                 <Plus className="mr-2 h-4 w-4" /> Thêm thuốc
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent
+              className="max-w-4xl"
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm thuốc mới</DialogTitle>
               </DialogHeader>

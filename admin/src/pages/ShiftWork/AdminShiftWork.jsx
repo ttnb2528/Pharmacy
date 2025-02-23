@@ -131,7 +131,12 @@ const AdminShiftWork = () => {
                 <Plus className="mr-2 h-4 w-4" /> Thêm ca làm việc
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent
+              className="sm:max-w-lg"
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle>Thêm ca làm việc mới</DialogTitle>
                 <DialogDescription>
