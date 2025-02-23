@@ -134,144 +134,119 @@ const AdminCategory = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div>
       {isLoading && <Loading />}
       <Header title={"Danh sách danh mục"} />
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="relative">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Tìm kiếm danh mục..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Thêm danh mục
-            </Button>
-          </DialogTrigger>
-          <DialogContent
-            onPointerDownOutside={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <DialogHeader>
-              <DialogTitle>Thêm danh mục mới</DialogTitle>
-              <DialogDescription>
-                Nhập thông tin cho danh mục mới.
-              </DialogDescription>
-            </DialogHeader>
-            <AdminCategoryForm onSubmit={(data) => handleAddCategory(data)} />
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Tên</TableHead>
-            <TableHead>Mô tả</TableHead>
-            <TableHead>Hành động</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentCategories.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell>{category.id}</TableCell>
-              <TableCell>{category.name}</TableCell>
-              <TableCell>{category.description}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewCategory(category)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold">
-                          Thông tin danh mục
-                        </DialogTitle>
-                      </DialogHeader>
-                      <DialogDescription></DialogDescription>
-                      <AdminCategoryDetail category={selectedCategory} />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditCategory(category)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenConfirm(category)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <div className="flex justify-center mt-4">
-        {Array.from({
-          length: Math.ceil(filteredCategories.length / itemsPerPage),
-        }).map((_, index) => (
-          <Button
-            key={index}
-            variant={currentPage === index + 1 ? "default" : "outline"}
-            className="mx-1"
-            onClick={() => paginate(index + 1)}
-          >
-            {index + 1}
-          </Button>
-        ))}
-      </div>
-
-      {/* Edit Dialog */}
-      {/* This dialog is now nested within the TableCell */}
-
-      {/* Delete Dialog */}
-      {/* <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Xóa danh mục</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn xóa danh mục này không?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="destructive" onClick={handleDeleteCategory}>
-              Xóa
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
+      <main className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Tìm kiếm danh mục..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Thêm danh mục
+              </Button>
+            </DialogTrigger>
+            <DialogContent
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
             >
-              Hủy
+              <DialogHeader>
+                <DialogTitle>Thêm danh mục mới</DialogTitle>
+                <DialogDescription>
+                  Nhập thông tin cho danh mục mới.
+                </DialogDescription>
+              </DialogHeader>
+              <AdminCategoryForm onSubmit={(data) => handleAddCategory(data)} />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Tên</TableHead>
+              <TableHead>Mô tả</TableHead>
+              <TableHead>Hành động</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentCategories.map((category) => (
+              <TableRow key={category.id}>
+                <TableCell>{category.id}</TableCell>
+                <TableCell>{category.name}</TableCell>
+                <TableCell>{category.description}</TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewCategory(category)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle className="text-2xl font-bold">
+                            Thông tin danh mục
+                          </DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription></DialogDescription>
+                        <AdminCategoryDetail category={selectedCategory} />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditCategory(category)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenConfirm(category)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <div className="flex justify-center mt-4">
+          {Array.from({
+            length: Math.ceil(filteredCategories.length / itemsPerPage),
+          }).map((_, index) => (
+            <Button
+              key={index}
+              variant={currentPage === index + 1 ? "default" : "outline"}
+              className="mx-1"
+              onClick={() => paginate(index + 1)}
+            >
+              {index + 1}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog> */}
+          ))}
+        </div>
+      </main>
 
       {confirmDelete && (
         <ConfirmForm
