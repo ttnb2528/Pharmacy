@@ -17,7 +17,14 @@ import { apiClient } from "@/lib/api-admin.js";
 import { LOGIN_ROUTE } from "@/API/index.api.js";
 import Loading from "./component/Loading.jsx";
 
+// Authentication page for admin
+import { useAppStore } from "@/store/index.js";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
 const AdminLogin = () => {
+  const { setUserInfo } = useAppStore();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -33,8 +40,14 @@ const AdminLogin = () => {
       });
 
       if (res.status === 200 && res.data.status === 200) {
-        localStorage.setItem("user", JSON.stringify(res.data.data));
-        window.location.href = "/";
+        // localStorage.setItem("user", JSON.stringify(res.data.data));
+        console.log(res);
+
+        setUserInfo(res.data.data);
+        // window.location.href = "/";
+        navigate("/");
+      } else {
+        toast.error(res.data.message);
       }
     } catch (error) {
       console.error(error);

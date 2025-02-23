@@ -22,7 +22,6 @@ import ShiftWorkContextProvider from "./context/ShiftWorkContext.context.jsx";
 import AdminOrders from "./pages/Order/AdminOrders.jsx";
 import Login from "./pages/Login.jsx";
 import OrderContextProvider from "./context/OrderContext.context.jsx";
-import PrivateRoute from "./layout/PrivateRoute.jsx";
 import ProfilePage from "./pages/Profile/Profile.jsx";
 import ProfileContextProvider from "./context/ProfileContext.context.jsx";
 import UpdatePassword from "./pages/Profile/UpdatePassword.jsx";
@@ -33,7 +32,44 @@ import AdminBill from "./pages/Bill/AdminBill.jsx";
 import Statistics from "./pages/Statistics/Statistics.jsx";
 import BatchesContextProvider from "./context/BatchesContext.context.jsx";
 
+import PrivateRoute2 from "./layout/PrivateRoute2.jsx";
+import { useAppStore } from "./store/index.js";
+import { useEffect, useState } from "react";
+import { apiClient } from "./lib/api-admin.js";
+import { GET_CURRENT_STAFF } from "./API/index.api.js";
+import Loading from "./pages/component/Loading.jsx";
+
 const App = () => {
+  const { userInfo, setUserInfo } = useAppStore();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const res = await apiClient.get(GET_CURRENT_STAFF);
+        if (res.status === 200 && res.data.status === 200) {
+          setUserInfo(res.data.data);
+        } else {
+          setUserInfo(undefined);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!userInfo) {
+      getUserData();
+    } else {
+      setLoading(false);
+    }
+  }, [userInfo, setUserInfo]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -42,149 +78,155 @@ const App = () => {
         {
           index: true,
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <Overview />
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "products",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <MedicineContextProvider>
                 <Products />
               </MedicineContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "sell-medicine",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <SellProductContextProvider>
                 <SellMedicinePage />
               </SellProductContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "brands",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <AdminBrand />
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "categories",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <CategoryContextProvider>
                 <AdminCategory />
               </CategoryContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "coupons",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <CouponContextProvider>
                 <AdminCoupon />
               </CouponContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "customers",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <AdminCustomer />
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "employees",
           element: (
-            <PrivateRoute isAdmin>
+            <PrivateRoute2>
               <StaffContextProvider>
                 <AdminStaff />
               </StaffContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "manufacturers",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <ManufactureContextProvider>
                 <AdminManufacture />
               </ManufactureContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "orders",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <OrderContextProvider>
                 <AdminOrders />
               </OrderContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "bills",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <BillContextProvider>
                 <AdminBill />
               </BillContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "shift-works",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <ShiftWorkContextProvider>
                 <AdminShiftWork />
               </ShiftWorkContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "suppliers",
           element: (
-            <PrivateRoute>
+            <PrivateRoute2>
               <SupplierContextProvider>
                 <AdminSupplier />
               </SupplierContextProvider>
-            </PrivateRoute>
+            </PrivateRoute2>
           ),
         },
         {
           path: "reports",
           element: (
-            <BatchesContextProvider>
-              <Statistics />
-            </BatchesContextProvider>
+            <PrivateRoute2>
+              <BatchesContextProvider>
+                <Statistics />
+              </BatchesContextProvider>
+            </PrivateRoute2>
           ),
         },
         {
           path: "profile",
           element: (
-            <ProfileContextProvider>
-              <ProfilePage />
-            </ProfileContextProvider>
+            <PrivateRoute2>
+              <ProfileContextProvider>
+                <ProfilePage />
+              </ProfileContextProvider>
+            </PrivateRoute2>
           ),
         },
         {
           path: "change-password",
           element: (
-            <ProfileContextProvider>
-              <UpdatePassword />
-            </ProfileContextProvider>
+            <PrivateRoute2>
+              <ProfileContextProvider>
+                <UpdatePassword />
+              </ProfileContextProvider>
+            </PrivateRoute2>
           ),
         },
       ],

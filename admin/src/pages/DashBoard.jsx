@@ -41,6 +41,7 @@ import { apiClient } from "@/lib/api-admin.js";
 import { LOGOUT_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
 import { getInitials } from "@/utils/getInitialName.js";
+import { useAppStore } from "@/store/index.js";
 
 const sidebarItems = [
   { icon: Home, label: "Tổng quan", to: "/", roles: ["admin", "employee"] },
@@ -115,9 +116,11 @@ const sidebarItems = [
 ];
 
 const DashBoard = () => {
-  const userData = JSON.parse(localStorage.getItem("user"));
-  const userRole = userData
-    ? userData.isAdmin
+  // const userData = JSON.parse(localStorage.getItem("user"));
+  const { userInfo, setUserInfo } = useAppStore();
+  const userRole = userInfo
+    ? // ? userData.isAdmin
+      userInfo.isAdmin
       ? "admin"
       : "employee"
     : "employee"; // Determine role based on isAdmin flag
@@ -129,8 +132,9 @@ const DashBoard = () => {
     try {
       const res = await apiClient.post(LOGOUT_ROUTE);
       if (res.status === 200 && res.data.status === 200) {
+        setUserInfo(null);
         toast.success(res.data.message);
-        localStorage.removeItem("user");
+        // localStorage.removeItem("user");
         window.location.href = "/login";
       } else {
         toast.error(res.data.message);
@@ -170,13 +174,13 @@ const DashBoard = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start px-2">
                   <Avatar className="h-8 w-8 mr-2">
-                    <AvatarImage src={userData.avatar} alt={userData.name} />
+                    <AvatarImage src={userInfo?.avatar} alt={userInfo?.name} />
                     <AvatarFallback>
-                      {userData?.name ? getInitials(userData?.name) : "AD"}
+                      {userInfo?.name ? getInitials(userInfo?.name) : "AD"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{userData.name}</span>
+                    <span className="text-sm font-medium">{userInfo?.name}</span>
                     <span className="text-xs text-muted-foreground">
                       {userRole === "admin" ? "Quản trị viên" : "Nhân viên"}
                     </span>
