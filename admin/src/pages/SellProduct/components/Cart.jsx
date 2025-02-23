@@ -15,6 +15,10 @@ import { apiClient } from "@/lib/api-admin.js";
 import { CREATE_BILL_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
 
+import { useCallback, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import PrintInvoice from "./PrintInvoice.jsx";
+
 const Cart = ({
   cart,
   setCart,
@@ -26,6 +30,10 @@ const Cart = ({
   setInvoiceCreated,
   setIsLoading,
 }) => {
+  const componentRef = useRef(null);
+
+  const [invoice, setInvoice] = useState(null);
+
   const updateQuantity = (id, quantity) => {
     setCart(
       cart.map((item) =>
@@ -84,6 +92,7 @@ const Cart = ({
       const res = await apiClient.post(CREATE_BILL_ROUTE, billData);
 
       if (res.status === 200 && res.data.status === 201) {
+        setInvoice(res.data.data);
         setInvoiceCreated(true);
         toast.success(res.data.message);
       } else {
@@ -96,125 +105,151 @@ const Cart = ({
     }
   };
 
-  const handlePrintInvoice = () => {
-    console.log("Printing invoice");
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: `Hóa đơn ${invoice?.id || "new"}`,
+    removeAfterPrint: true,
+    onBeforePrint: useCallback(() => {
+      if (!invoice || !cart.length) {
+        toast.error("Không có dữ liệu để in");
+        return false;
+      }
+      return Promise.resolve();
+    }, [cart.length, invoice]),
+    onPrintError: (error) => {
+      console.error("Printing failed", error);
+      toast.error("Có lỗi xảy ra khi in");
+    },
+  });
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Mã</TableHead>
-            <TableHead>Tên thuốc</TableHead>
-            <TableHead>Thuốc kê đơn?</TableHead>
-            <TableHead>Đơn vị tính</TableHead>
-            <TableHead>Số lượng</TableHead>
-            <TableHead>Đơn giá</TableHead>
-            <TableHead>Thành tiền</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {cart.map((medicine) => (
-            <TableRow key={medicine.id}>
-              <TableCell>{medicine.id}</TableCell>
-              <TableCell>{medicine.name}</TableCell>
-              <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
-              <TableCell>{medicine.unit}</TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      updateQuantity(medicine.id, medicine.quantity - 1)
-                    }
-                    disabled={medicine.quantity <= 1}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={medicine.quantity}
-                    onChange={(e) =>
-                      updateQuantity(medicine.id, e.target.value)
-                    }
-                    className="w-16 mx-2 text-center"
-                    min="1"
-                    max={medicine.quantityStock}
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      updateQuantity(medicine.id, medicine.quantity + 1)
-                    }
-                    disabled={medicine.quantity >= medicine.quantityStock}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-              <TableCell>
-                {/* {getPrice(medicine.price).toLocaleString()} VND */}
-                {customerType === "business"
-                  ? convertVND(medicine?.batches[0]?.price)
-                  : convertVND(medicine?.batches[0]?.retailPrice)}
-              </TableCell>
-              <TableCell>
-                {/* {(
-                  getPrice(medicine.price) * medicine.quantity
-                ).toLocaleString()}{" "}
-                VND */}
-
-                {customerType === "business"
-                  ? convertVND(medicine?.batches[0]?.price * medicine.quantity)
-                  : convertVND(
-                      medicine?.batches[0]?.retailPrice * medicine.quantity
-                    )}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeFromCart(medicine.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TableCell>
+    <>
+      <div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Mã</TableHead>
+              <TableHead>Tên thuốc</TableHead>
+              <TableHead>Thuốc kê đơn?</TableHead>
+              <TableHead>Đơn vị tính</TableHead>
+              <TableHead>Số lượng</TableHead>
+              <TableHead>Đơn giá</TableHead>
+              <TableHead>Thành tiền</TableHead>
+              <TableHead></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Separator className="my-4" />
-      <div className="flex items-center justify-between mb-4">
-        <span className="font-semibold">Tổng cộng</span>
-        {cart && cart.length > 0 && (
-          <p className="text-2xl font-bold text-red-500">
-            {total.toLocaleString()} VND
-          </p>
-        )}
-      </div>
-      <div className="flex gap-2">
-        {cart &&
-          cart.length > 0 &&
-          (customerType === "walkin" ||
-            customerType === "business" ||
-            (selectedCustomer &&
-              (activeTab === "otc" ||
-                (prescriptionInfo.source && prescriptionInfo.number)))) && (
-            <Button onClick={handleCreateInvoice} disabled={invoiceCreated}>
-              Tạo hóa đơn
+          </TableHeader>
+          <TableBody>
+            {cart.map((medicine) => (
+              <TableRow key={medicine.id}>
+                <TableCell>{medicine.id}</TableCell>
+                <TableCell>{medicine.name}</TableCell>
+                <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
+                <TableCell>{medicine.unit}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        updateQuantity(medicine.id, medicine.quantity - 1)
+                      }
+                      disabled={medicine.quantity <= 1}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      type="number"
+                      value={medicine.quantity}
+                      onChange={(e) =>
+                        updateQuantity(medicine.id, e.target.value)
+                      }
+                      className="w-16 mx-2 text-center"
+                      min="1"
+                      max={medicine.quantityStock}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        updateQuantity(medicine.id, medicine.quantity + 1)
+                      }
+                      disabled={medicine.quantity >= medicine.quantityStock}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {/* {getPrice(medicine.price).toLocaleString()} VND */}
+                  {customerType === "business"
+                    ? convertVND(medicine?.batches[0]?.price)
+                    : convertVND(medicine?.batches[0]?.retailPrice)}
+                </TableCell>
+                <TableCell>
+                  {customerType === "business"
+                    ? convertVND(
+                        medicine?.batches[0]?.price * medicine.quantity
+                      )
+                    : convertVND(
+                        medicine?.batches[0]?.retailPrice * medicine.quantity
+                      )}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeFromCart(medicine.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Separator className="my-4" />
+        <div className="flex items-center justify-between mb-4">
+          <span className="font-semibold">Tổng cộng</span>
+          {cart && cart.length > 0 && (
+            <p className="text-2xl font-bold text-red-500">
+              {total.toLocaleString()} VND
+            </p>
+          )}
+        </div>
+        <div className="flex gap-2">
+          {cart &&
+            cart.length > 0 &&
+            (customerType === "walkin" ||
+              customerType === "business" ||
+              (selectedCustomer &&
+                (activeTab === "otc" ||
+                  (prescriptionInfo.source && prescriptionInfo.number)))) && (
+              <Button onClick={handleCreateInvoice} disabled={invoiceCreated}>
+                Tạo hóa đơn
+              </Button>
+            )}
+          {invoiceCreated && invoice && (
+            <Button
+              onClick={handlePrint}
+              disabled={!invoice || cart.length === 0}
+            >
+              <Printer className="mr-2 h-4 w-4" /> In hóa đơn
             </Button>
           )}
-        {invoiceCreated && (
-          <Button onClick={handlePrintInvoice}>
-            <Printer className="mr-2 h-4 w-4" /> In hóa đơn
-          </Button>
-        )}
+        </div>
+
+        {/* Print template */}
+
+        <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
+          <PrintInvoice
+            ref={componentRef}
+            invoice={invoice}
+            cart={cart}
+            customerType={customerType}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
