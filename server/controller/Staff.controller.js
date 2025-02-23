@@ -150,7 +150,9 @@ export const updateStaff = asyncHandler(async (req, res) => {
       );
     }
 
-    const newStaff = await Staff.findByIdAndUpdate(id, req.body);
+    const newStaff = await Staff.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
 
     res.json(
       jsonGenerate(StatusCode.OK, "Cập nhật nhân viên thành công", newStaff)
@@ -163,7 +165,7 @@ export const updateStaff = asyncHandler(async (req, res) => {
 export const updatePassword = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const { password } = req.body;
 
     const staff = await Staff.findById(id);
