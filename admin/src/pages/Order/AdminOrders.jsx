@@ -53,6 +53,8 @@ import Header from "../component/Header.jsx";
 export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
   const { orders, setOrders } = useContext(OrderContext);
+  console.log(orders);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -68,7 +70,7 @@ export default function AdminOrders() {
   // Filter orders based on search term
   const filteredOrders = orders.filter(
     (order) =>
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.nameCustomer.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

@@ -25,6 +25,9 @@ import { apiClient } from "@/lib/api-client.js";
 import { CREATE_ORDER_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
 
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import axios from "axios";
+
 const Checkout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenCoinGold, setIsOpenCoinGold] = useState(false);
@@ -106,6 +109,69 @@ const Checkout = () => {
       console.error("Lỗi khi tạo đơn hàng:", error);
     }
   };
+
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  const paypalOptions = {
+    "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
+    currency: "USD",
+  };
+
+  const createPayPalOrder = async (data, actions) => {
+    const exchangeRateResponse = await axios.get(
+      "https://api.exchangerate-api.com/v4/latest/VND"
+    );
+    const exchangeRate = exchangeRateResponse.data.rates.USD; // Tỷ giá USD so với VND
+    const usdAmount = (CalculateTotalPrice() * exchangeRate).toFixed(2);
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: usdAmount, // Chuyển đổi VND sang USD
+          },
+        },
+      ],
+    });
+  };
+
+  const onApprovePayPalPayment = async (data, actions) => {
+    try {
+      setIsProcessingPayment(true);
+      const details = await actions.order.capture();
+
+      // Gọi API tạo đơn hàng của bạn với thông tin thanh toán PayPal
+      const res = await apiClient.post(CREATE_ORDER_ROUTE, {
+        AccountId: userData.accountId._id,
+        nameCustomer: selectedAddress?.name,
+        total: CalculateTotalPrice(),
+        type: "online",
+        address: selectedAddress
+          ? `${selectedAddress.otherDetails}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
+          : "",
+        coupon: selectedCoupon?.coupon_code || "",
+        paymentMethod: "PAYPAL",
+        totalTemp: CalculateTotalPriceTemp(cart),
+        shippingFee: CalculateTotalPrice() > 100 ? 0 : 15000,
+        discountValue: selectedCoupon ? selectedCoupon.discount_value : 0,
+        discountProduct: CalculatePriceWithSale(cart),
+        note: note,
+        cart: cart,
+        paypalOrderId: details.id,
+        paypalPaymentStatus: details.status,
+      });
+
+      if (res.status === 200 && res.data.status === 201) {
+        toast.success("Thanh toán thành công!");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra trong quá trình thanh toán");
+      console.error(error);
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   return (
     <div className="relative grid gap-2.5 md:container md:grid-cols-1 md:items-start md:gap-4 md:pt-6 lg:grid-cols-[min(80%,calc(900rem/16)),1fr] md:mb-5">
       <CheckoutInfo
@@ -288,12 +354,34 @@ const Checkout = () => {
                 </div>
               </div>
 
-              <Button
+              {/* <Button
                 className="bg-green-500 text-white hover:bg-green-600"
                 onClick={handleSubmit}
               >
                 Đặt hàng
-              </Button>
+              </Button> */}
+
+              {paymentMethod === "COD" ? (
+                <Button
+                  className="bg-green-500 text-white hover:bg-green-600"
+                  onClick={handleSubmit}
+                >
+                  Đặt hàng
+                </Button>
+              ) : (
+                <PayPalScriptProvider options={paypalOptions}>
+                  <PayPalButtons
+                    style={{ layout: "horizontal" }}
+                    createOrder={createPayPalOrder}
+                    onApprove={onApprovePayPalPayment}
+                    onError={(err) => {
+                      toast.error("Có lỗi xảy ra với PayPal");
+                      console.error(err);
+                    }}
+                    disabled={isProcessingPayment}
+                  />
+                </PayPalScriptProvider>
+              )}
             </div>
           </div>
         </div>

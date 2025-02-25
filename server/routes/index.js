@@ -18,6 +18,7 @@ import StatisticRouter from "./Statistics.route.js";
 import BillRouter from "./Bill.route.js";
 import OTPRouter from "./OTP.route.js";
 import CloudinaryRouter from "./Cloudinary.route.js";
+import PaypalRouter from "./Paypal.route.js";
 
 const app = express();
 
@@ -41,5 +42,6 @@ app.use("/bill", BillRouter);
 
 app.use("/otp", OTPRouter);
 app.use("/cloudinary", CloudinaryRouter);
+app.use("/paypal", PaypalRouter);
 
 export default app;

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema({
   id: {
-    type: String,
+    type: Number,
     required: true,
   },
   AccountId: {
@@ -51,7 +51,7 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ["COD", "online"],
+    enum: ["COD", "PAYPAL"],
   },
   totalTemp: {
     type: Number,
@@ -72,6 +72,14 @@ const OrderSchema = new mongoose.Schema({
   note: {
     type: String,
     required: false,
+  },
+  paypalOrderId: {
+    type: String,
+    default: null,
+  },
+  paypalPaymentStatus: {
+    type: String,
+    default: null,
   },
 });
 
