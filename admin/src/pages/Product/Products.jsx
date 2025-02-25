@@ -38,7 +38,10 @@ import { useContext, useState } from "react";
 import { MedicineContext } from "@/context/ProductContext.context";
 import MedicineDetails from "./components/MedicineDetails.jsx";
 import { apiClient } from "@/lib/api-admin.js";
-import { DELETE_MEDICINE_ROUTE } from "@/API/index.api.js";
+import {
+  BULK_ADD_MEDICINES_ROUTE,
+  DELETE_MEDICINE_ROUTE,
+} from "@/API/index.api.js";
 import { toast } from "sonner";
 import ConfirmForm from "../component/ConfirmForm.jsx";
 import Loading from "../component/Loading.jsx";
@@ -46,6 +49,9 @@ import Header from "../component/Header.jsx";
 import AddMedicineForm from "./components/AddMedicineForm.jsx";
 import EditMedicineDialog from "./components/EditMedicineDialog.jsx";
 import ImportMedicineDialog from "./components/ImportMedicineDialog.jsx";
+
+import * as XLSX from "xlsx";
+import { Label } from "@/components/ui/label.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -95,6 +101,40 @@ export default function Products() {
     setIsAdding(false);
     setIsImport(false);
     setSelectedMedicine(null);
+  };
+
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      // console.log(jsonData);
+
+      try {
+        const res = await apiClient.post(BULK_ADD_MEDICINES_ROUTE, {
+          medicines: jsonData,
+        });
+
+        if (res.status === 200 && res.data.status === 201) {
+          toast.success(res.data.message);
+          setMedicines((prev) => [...prev, ...res.data.data]);
+        } else {
+          toast.error(res.data.message);
+          return;
+        }
+      } catch (error) {
+        toast.error("Có lỗi khi nhập dữ liệu từ Excel");
+        console.error(error);
+        return;
+      }
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   const filteredMedicines = medicines.filter((medicine) => {
@@ -181,26 +221,43 @@ export default function Products() {
               </SelectContent>
             </Select>
           </div>
-
-          <Dialog open={isAdding} onOpenChange={setIsAdding}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm thuốc
-              </Button>
-            </DialogTrigger>
-            <DialogContent
-              className="max-w-4xl"
-              onPointerDownOutside={(e) => {
-                e.preventDefault();
-              }}
+          <div className="flex space-x-2">
+            <Dialog open={isAdding} onOpenChange={setIsAdding}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Thêm thuốc
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                className="max-w-4xl"
+                onPointerDownOutside={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle>Thêm thuốc mới</DialogTitle>
+                </DialogHeader>
+                <DialogDescription></DialogDescription>
+                <AddMedicineForm handleCancel={handleCancel} />
+              </DialogContent>
+            </Dialog>
+            <Label
+              htmlFor="excel-upload"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 
+             shadow-sm text-sm font-medium rounded-md text-gray-700 
+             bg-white hover:bg-gray-50 cursor-pointer"
             >
-              <DialogHeader>
-                <DialogTitle>Thêm thuốc mới</DialogTitle>
-              </DialogHeader>
-              <DialogDescription></DialogDescription>
-              <AddMedicineForm handleCancel={handleCancel} />
-            </DialogContent>
-          </Dialog>
+              <Plus className="mr-2 h-4 w-4" />
+              Nhập từ Excel
+            </Label>
+            <Input
+              id="excel-upload"
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleExcelUpload}
+              className="hidden"
+            />
+          </div>
         </div>
         <Table>
           <TableHeader>

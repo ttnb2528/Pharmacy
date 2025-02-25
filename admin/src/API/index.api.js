@@ -11,6 +11,7 @@ export const GET_ALL_PRODUCTS_ROUTE = `${PRODUCT_ROUTES}/getMedicines`;
 export const UPDATE_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/updateMedicine`;
 export const UPDATE_IMAGES_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/updateImagesMedicine`;
 export const DELETE_MEDICINE_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine`;
+export const BULK_ADD_MEDICINES_ROUTE = `${PRODUCT_ROUTES}/bulkAddMedicines`;
 
 export const CATEGORY_ROUTES = "/api/v1/category";
 export const ADD_CATEGORY_ROUTE = `${CATEGORY_ROUTES}/addCategory`;

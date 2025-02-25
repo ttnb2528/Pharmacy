@@ -1,4 +1,5 @@
 import Medicine from "../model/Medicine.model.js";
+import Brand from "../model/Brand.model.js";
 import Category from "../model/Category.model.js";
 import Batch from "../model/Batch.model.js";
 import { jsonGenerate } from "../utils/helpers.js";
@@ -309,6 +310,192 @@ export const updateImagesMedicine = asyncHandler(async (req, res) => {
       StatusCode.OK,
       "Cập nhật hình ảnh thuốc thành công",
       newMedicine
+    )
+  );
+});
+
+export const bulkAddMedicines = asyncHandler(async (req, res) => {
+  const { medicines } = req.body;
+
+  if (!medicines || !Array.isArray(medicines) || medicines.length === 0) {
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, "Dữ liệu không hợp lệ")
+    );
+  }
+
+  const newMedicines = [];
+  const errors = [];
+
+  // for (const med of medicines) {
+  //   const medicineExist = await Medicine.findOne({ name: med.name });
+  //   if (medicineExist) {
+  //     errors.push(`Thuốc "${med.name}" đã tồn tại`);
+  //     continue;
+  //   }
+
+  //   // Tìm categoryId từ categoryName
+  //   let categoryId;
+  //   if (med.categoryName) {
+  //     const category = await Category.findOne({ name: med.categoryName });
+  //     if (!category) {
+  //       errors.push(`Danh mục "${med.categoryName}" không tồn tại`);
+  //       continue; // Bỏ qua nếu không tìm thấy danh mục
+  //     }
+  //     categoryId = category._id;
+  //   } else {
+  //     errors.push(`Thuốc "${med.name}" thiếu tên danh mục`);
+  //     continue;
+  //   }
+
+  //   // Tìm brandId từ brandName
+  //   let brandId;
+  //   if (med.brandName) {
+  //     let brand = await Brand.findOne({ name: med.brandName });
+  //     if (!brand) {
+  //       // Tạo mới thương hiệu nếu không tìm thấy
+  //       let id = await generateID(Brand);
+  //       brand = new Brand({ id, name: med.brandName });
+  //       await brand.save();
+  //       console.log(`Đã tạo thương hiệu mới: ${med.brandName}`);
+  //     }
+  //     brandId = brand._id;
+  //   } else {
+  //     errors.push(`Thuốc "${med.name}" thiếu tên thương hiệu`);
+  //     continue;
+  //   }
+
+  //   const id = await generateID(Medicine);
+  //   const newMedicine = new Medicine({
+  //     id,
+  //     name: med.name,
+  //     dosage: med.dosage,
+  //     unit: med.unit,
+  //     instruction: med.instruction,
+  //     description: med.description,
+  //     uses: med.uses,
+  //     packaging: med.packaging,
+  //     effect: med.effect,
+  //     isRx: med.isRx === "true" || med.isRx === true, // Chuyển đổi từ string sang boolean
+  //     drugUser: med.drugUser,
+  //     categoryId,
+  //     brandId,
+  //     isDiscount: med.isDiscount === "true" || med.isDiscount === true || false,
+  //     percentDiscount: Number(med.percentDiscount) || 0,
+  //     quantityStock: 0, // Mặc định khi thêm mới
+  //     images: med.images || [],
+  //   });
+
+  //   try {
+  //     const savedMedicine = await newMedicine.save();
+  //     newMedicines.push(savedMedicine);
+  //   } catch (error) {
+  //     errors.push(`Lỗi khi thêm "${med.name}": ${error.message}`);
+  //   }
+  // }
+
+  for (const med of medicines) {
+    // Ánh xạ từ tên cột tiếng Việt sang tên trường trong schema
+    const mappedMed = {
+      name: med["Tên thuốc"],
+      dosage: med["Liều lượng"],
+      unit: med["Đơn vị"],
+      instruction: med["Hướng dẫn"],
+      description: med["Mô tả"],
+      uses: med["Công dụng"],
+      packaging: med["Quy cách đóng gói"],
+      effect: med["Tác dụng phụ"],
+      isRx: med["Kê đơn"] === "True" || med["Kê đơn"] === true,
+      drugUser: med["Đối tượng sử dụng"],
+      categoryName: med["Tên danh mục"],
+      brandName: med["Tên thương hiệu"],
+      isDiscount:
+        med["Giảm giá"] === "True" || med["Giảm giá"] === true || false,
+      percentDiscount: Number(med["Phần trăm giảm giá"]) || 0,
+    };
+
+    // Kiểm tra dữ liệu bắt buộc
+    if (!mappedMed.name) {
+      errors.push(`Thiếu "Tên thuốc" trong dòng dữ liệu`);
+      continue;
+    }
+
+    const medicineExist = await Medicine.findOne({ name: mappedMed.name });
+    if (medicineExist) {
+      errors.push(`Thuốc "${mappedMed.name}" đã tồn tại`);
+      continue;
+    }
+
+    // Tìm categoryId từ categoryName
+    let categoryId;
+    if (mappedMed.categoryName) {
+      const category = await Category.findOne({ name: mappedMed.categoryName });
+      if (!category) {
+        errors.push(`Danh mục "${mappedMed.categoryName}" không tồn tại`);
+        continue;
+      }
+      categoryId = category._id;
+    } else {
+      errors.push(`Thuốc "${mappedMed.name}" thiếu "Tên danh mục"`);
+      continue;
+    }
+
+    // Tìm brandId từ brandName
+    let brandId;
+    if (mappedMed.brandName) {
+      const brand = await Brand.findOne({ name: mappedMed.brandName });
+      if (!brand) {
+        errors.push(`Thương hiệu "${mappedMed.brandName}" không tồn tại`);
+        continue;
+      }
+      brandId = brand._id;
+    } else {
+      errors.push(`Thuốc "${mappedMed.name}" thiếu "Tên thương hiệu"`);
+      continue;
+    }
+
+    const id = await generateID(Medicine);
+    const newMedicine = new Medicine({
+      id,
+      name: mappedMed.name,
+      dosage: mappedMed.dosage,
+      unit: mappedMed.unit,
+      instruction: mappedMed.instruction,
+      description: mappedMed.description,
+      uses: mappedMed.uses,
+      packaging: mappedMed.packaging,
+      effect: mappedMed.effect,
+      isRx: mappedMed.isRx,
+      drugUser: mappedMed.drugUser,
+      categoryId,
+      brandId,
+      isDiscount: mappedMed.isDiscount,
+      percentDiscount: mappedMed.percentDiscount,
+      quantityStock: 0,
+      images: [],
+    });
+
+    try {
+      const savedMedicine = await newMedicine.save();
+      newMedicines.push(savedMedicine);
+    } catch (error) {
+      errors.push(`Lỗi khi thêm "${mappedMed.name}": ${error.message}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.json(
+      jsonGenerate(StatusCode.PARTIAL_CONTENT, "Một số thuốc không được thêm", {
+        added: newMedicines,
+        errors,
+      })
+    );
+  }
+
+  res.json(
+    jsonGenerate(
+      StatusCode.CREATED,
+      "Thêm danh sách thuốc thành công",
+      newMedicines
     )
   );
 });

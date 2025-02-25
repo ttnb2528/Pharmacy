@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addMedicine,
+  bulkAddMedicines,
   deleteMedicine,
   getMedicine,
   getMedicineByBestSelling,
@@ -16,6 +17,7 @@ import {
 const router = express.Router();
 
 router.post("/addMedicine", addMedicine);
+router.post("/bulkAddMedicines", bulkAddMedicines);
 router.post("/getMedicineByHistory", getMedicineByHistory);
 router.get("/getMedicines", getMedicines);
 router.get("/getMedicinesByIsDiscount", getMedicinesByIsDiscount);
