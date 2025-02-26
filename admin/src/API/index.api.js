@@ -80,6 +80,7 @@ export const DELETE_SHIFT_WORK_ROUTE = `${SHIFT_WORK_ROUTES}/deleteShiftWork`;
 export const COUPON_ROUTES = "/api/v1/coupon";
 export const ADD_COUPON_ROUTE = `${COUPON_ROUTES}/createCoupon`;
 export const GET_ALL_COUPONS_ROUTE = `${COUPON_ROUTES}/getCoupons`;
+export const GET_ALL_COUPONS_ADMIN_ROUTE = `${COUPON_ROUTES}/getCouponsAdmin`;
 export const UPDATE_COUPON_ROUTE = `${COUPON_ROUTES}/updateCoupon`;
 export const DELETE_COUPON_ROUTE = `${COUPON_ROUTES}/deleteCoupon`;
 

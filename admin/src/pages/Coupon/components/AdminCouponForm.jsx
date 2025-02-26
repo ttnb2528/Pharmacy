@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.jsx";
+import { format } from "date-fns";
 // import { Textarea } from "@/components/ui/textarea";
 
 const AdminCouponForm = ({ coupon, onSubmit, mode }) => {
@@ -31,7 +32,7 @@ const AdminCouponForm = ({ coupon, onSubmit, mode }) => {
         description: coupon.description || "",
         discount_type: coupon.discount_type || "",
         discount_value: coupon.discount_value || "",
-        minimum_order_value: coupon.minimum_order_value || "",
+        minimum_order_value: coupon.minimum_order_value || 0,
         quantity: coupon.quantity || "",
         maximum_uses: coupon.maximum_uses || "",
         start_date: coupon.start_date || "",
@@ -167,7 +168,9 @@ const AdminCouponForm = ({ coupon, onSubmit, mode }) => {
           id="start_date"
           name="start_date"
           type="date"
-          value={formData.start_date}
+          value={
+            formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : ""
+          }
           onChange={handleChange}
           className="col-span-3"
         />
@@ -181,7 +184,9 @@ const AdminCouponForm = ({ coupon, onSubmit, mode }) => {
           id="end_date"
           name="end_date"
           type="date"
-          value={formData.end_date}
+          value={
+            formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : ""
+          }
           onChange={handleChange}
           className="col-span-3"
         />

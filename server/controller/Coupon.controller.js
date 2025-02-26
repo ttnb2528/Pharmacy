@@ -98,6 +98,59 @@ export const getCoupons = asyncHandler(async (req, res) => {
   }
 });
 
+export const getCouponsAdmin = asyncHandler(async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const today = new Date(currentDate.setHours(0, 0, 0, 0)); // Ngày hôm nay, 00:00:00
+
+    let coupons = await Coupon.find();
+
+    if (!coupons || coupons.length === 0) {
+      return res.json(
+        jsonGenerate(StatusCode.OK, "Không có coupon nào trong hệ thống", [])
+      );
+    }
+
+    // Cập nhật trạng thái dựa trên end_date và quantity
+    const updatedCoupons = await Promise.all(
+      coupons.map(async (coupon) => {
+        const endDate = new Date(coupon.end_date);
+        const endDateOnly = new Date(endDate.setHours(0, 0, 0, 0));
+        let status = coupon.status;
+
+        if (endDateOnly < today) {
+          status = "expired";
+        } else if (coupon.quantity <= 0) {
+          status = "inactive";
+        } else {
+          status = "active";
+        }
+
+        if (status !== coupon.status) {
+          const updatedCoupon = await Coupon.findByIdAndUpdate(
+            coupon._id,
+            { status },
+            { new: true }
+          );
+          return updatedCoupon;
+        }
+        return coupon;
+      })
+    );
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách coupon thành công",
+        updatedCoupons
+      )
+    );
+  } catch (error) {
+    console.error("Lỗi trong getCouponsAdmin:", error);
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const getCoupon = asyncHandler(async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -144,6 +197,16 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       );
     }
 
+    // Kiểm tra nếu mã đã hết hạn (trạng thái "expired")
+    if (coupon.status === "expired") {
+      return res.json(
+        jsonGenerate(
+          StatusCode.BAD_REQUEST,
+          "Không thể sửa mã giảm giá đã hết hạn"
+        )
+      );
+    }
+
     if (req.body.discount_value <= 0) {
       return res.json(
         jsonGenerate(StatusCode.BAD_REQUEST, "Giá trị giảm giá phải lớn hơn 0")
@@ -151,21 +214,43 @@ export const updateCoupon = asyncHandler(async (req, res) => {
     }
 
     if (req.body.coupon_code !== coupon.coupon_code) {
-      const couponExits = await Coupon.findOne({
+      const couponExists = await Coupon.findOne({
         coupon_code: req.body.coupon_code,
       });
-
-      if (couponExits) {
+      if (couponExists) {
         return res.json(
           jsonGenerate(StatusCode.BAD_REQUEST, "Mã giảm giá đã tồn tại")
         );
       }
     }
 
-    const updatedCoupon = await Coupon.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    // Chuẩn hóa ngày để chỉ so sánh phần ngày
+    const currentDate = new Date();
+    const today = new Date(currentDate.setHours(0, 0, 0, 0)); // Ngày hôm nay, 00:00:00
+    const endDateInput = new Date(req.body.end_date);
+
+    // Kiểm tra nếu end_date không hợp lệ
+    if (isNaN(endDateInput.getTime())) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Ngày kết thúc không hợp lệ")
+      );
+    }
+
+    const endDateOnly = new Date(endDateInput.setHours(0, 0, 0, 0)); // end_date, 00:00:00
+
+    // Debug: Ghi log để kiểm tra giá trị
+    console.log("Today:", today);
+    console.log("End Date:", endDateOnly);
+    console.log("Is endDateOnly < today?", endDateOnly < today);
+
+    // Cập nhật trạng thái: chỉ "expired" nếu end_date nhỏ hơn ngày hôm nay
+    const updatedStatus = endDateOnly < today ? "expired" : "active";
+
+    const updatedCoupon = await Coupon.findByIdAndUpdate(
+      id,
+      { ...req.body, status: updatedStatus }, // Cập nhật trạng thái
+      { new: true, runValidators: true }
+    );
 
     return res.json(
       jsonGenerate(
@@ -175,8 +260,7 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       )
     );
   } catch (error) {
-    console.log(error);
-
+    console.log("Lỗi trong updateCoupon:", error);
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });

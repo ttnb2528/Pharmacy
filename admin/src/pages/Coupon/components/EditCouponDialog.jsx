@@ -19,6 +19,12 @@ const EditCouponDialog = ({ coupon, isOpen, onClose, setCoupons }) => {
   const handleEditCoupon = async (data, coupon) => {
     try {
       setIsLoading(true);
+
+      if (coupon.status === "expired") {
+        toast.error("Không thể sửa mã giảm giá đã hết hạn");
+        return;
+      }
+
       const res = await apiClient.put(
         `${UPDATE_COUPON_ROUTE}/${coupon._id}`,
         data
@@ -28,7 +34,7 @@ const EditCouponDialog = ({ coupon, isOpen, onClose, setCoupons }) => {
         toast.success(res.data.message);
         setCoupons((prevCoupon) =>
           prevCoupon.map((item) =>
-            item._id === coupon._id ? { ...item, ...data } : item
+            item._id === coupon._id ? { ...item, ...res.data.data } : item
           )
         );
         onClose();
