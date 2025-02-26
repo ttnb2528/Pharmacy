@@ -42,6 +42,7 @@ export const CREATE_BATCH_ROUTE = `${BATCHES_ROUTES}/createBatch`;
 export const GET_ALL_BATCHES_ROUTE = `${BATCHES_ROUTES}/getBatches`;
 export const GET_ALL_BATCHES_FOR_MEDICINE_ROUTE = `${BATCHES_ROUTES}/getBatchesForMedicine`;
 export const GET_ALL_BATCHES_FOR_STATISTICS_ROUTE = `${BATCHES_ROUTES}/getBatchesForStatistics`;
+export const BULK_IMPORT_BATCHES_ROUTE = `${BATCHES_ROUTES}/bulkImportBatches`;
 
 export const STATISTICS_ROUTES = "/api/v1/statistic";
 export const GET_EXPIRING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiringMedicines`;

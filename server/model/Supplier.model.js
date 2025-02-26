@@ -11,11 +11,13 @@ const SupplierSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
+    // required: true,
+    default: "",
   },
   phone: {
     type: String,
-    required: true,
+    // required: true,
+    default: "",
   },
   isDeleted: {
     type: Boolean,

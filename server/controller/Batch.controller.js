@@ -1,5 +1,7 @@
 import Batch from "../model/Batch.model.js";
 import Medicine from "../model/Medicine.model.js";
+import Supplier from "../model/Supplier.model.js";
+import Manufacture from "../model/Manufacture.model.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
@@ -198,6 +200,134 @@ export const getBatchesForStatistics = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
+});
+
+export const bulkImportBatches = asyncHandler(async (req, res) => {
+  const { batches } = req.body;
+
+  if (!batches || !Array.isArray(batches) || batches.length === 0) {
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, "Dữ liệu không hợp lệ")
+    );
+  }
+
+  const newBatches = [];
+  const errors = [];
+
+  for (const batch of batches) {
+    // Ánh xạ từ tên cột tiếng Việt sang trường trong schema
+    const mappedBatch = {
+      medicineName: batch["Tên thuốc"],
+      batchNumber: batch["Mã lô"],
+      dateOfEntry: batch["Ngày nhập"],
+      dateOfManufacture: batch["Ngày sản xuất"],
+      expiryDate: batch["Hạn sử dụng"],
+      quantity: Number(batch["Số lượng"]),
+      price: Number(batch["Giá bán sỉ"]),
+      retailPrice: Number(batch["Giá bán lẻ"]),
+      supplierName: batch["Tên nhà cung cấp"],
+      country: batch["Nước sản xuất"],
+      manufactureName: batch["Tên nơi sản xuất"],
+    };
+
+    // Kiểm tra dữ liệu bắt buộc
+    if (!mappedBatch.medicineName || !mappedBatch.batchNumber) {
+      errors.push(`Thiếu "Tên thuốc" hoặc "Mã lô" trong dòng dữ liệu`);
+      continue;
+    }
+
+    // Tìm hoặc tạo MedicineId từ medicineName
+    const medicine = await Medicine.findOne({ name: mappedBatch.medicineName });
+    if (!medicine) {
+      errors.push(`Không tìm thấy thuốc "${mappedBatch.medicineName}"`);
+      continue;
+    }
+    const medicineId = medicine._id;
+
+    // Tìm hoặc tạo SupplierId từ supplierName
+    let supplierId;
+    if (mappedBatch.supplierName) {
+      let supplier = await Supplier.findOne({ name: mappedBatch.supplierName });
+      if (!supplier) {
+        // Tạo mới nhà cung cấp nếu không tìm thấy
+        let id = await generateID(Supplier);
+
+        supplier = new Supplier({ id, name: mappedBatch.supplierName });
+        await supplier.save();
+        console.log(`Đã tạo mới nhà cung cấp: ${mappedBatch.supplierName}`);
+      }
+      supplierId = supplier._id;
+    } else {
+      errors.push(`Thiếu "Tên nhà cung cấp" cho "${mappedBatch.medicineName}"`);
+      continue;
+    }
+
+    // Tìm hoặc tạo ManufactureId từ manufactureName
+    let manufactureId;
+    if (mappedBatch.manufactureName) {
+      let manufacture = await Manufacture.findOne({
+        name: mappedBatch.manufactureName,
+      });
+      if (!manufacture) {
+        // Tạo mới nơi sản xuất nếu không tìm thấy
+        let id = await generateID(Manufacture);
+        manufacture = new Manufacture({
+          id,
+          name: mappedBatch.manufactureName,
+          country: mappedBatch.country
+        });
+        await manufacture.save();
+        console.log(`Đã tạo mới nơi sản xuất: ${mappedBatch.manufactureName}`);
+      }
+      manufactureId = manufacture._id;
+    } else {
+      errors.push(`Thiếu "Tên nơi sản xuất" cho "${mappedBatch.medicineName}"`);
+      continue;
+    }
+
+    let id = await generateID(Batch);
+    const newBatch = new Batch({
+      id,
+      MedicineId: medicineId,
+      batchNumber: mappedBatch.batchNumber,
+      dateOfEntry: mappedBatch.dateOfEntry,
+      dateOfManufacture: mappedBatch.dateOfManufacture,
+      expiryDate: mappedBatch.expiryDate,
+      quantity: mappedBatch.quantity,
+      price: mappedBatch.price,
+      retailPrice: mappedBatch.retailPrice,
+      SupplierId: supplierId,
+      ManufactureId: manufactureId,
+    });
+
+    try {
+      const savedBatch = await newBatch.save();
+      await Medicine.findByIdAndUpdate(
+        medicineId,
+        {
+          $inc: { quantityStock: mappedBatch.quantity },
+          $push: { batches: savedBatch._id },
+        },
+        { new: true }
+      );
+      newBatches.push(savedBatch);
+    } catch (error) {
+      errors.push(
+        `Lỗi khi nhập kho "${mappedBatch.batchNumber}": ${error.message}`
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.json(
+      jsonGenerate(StatusCode.PARTIAL_CONTENT, "Một số lô không được nhập", {
+        added: newBatches,
+        errors,
+      })
+    );
+  }
+
+  res.json(jsonGenerate(StatusCode.CREATED, "Nhập kho thành công", newBatches));
 });
 
 const validate = (data) => {

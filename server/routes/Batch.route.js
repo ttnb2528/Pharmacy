@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticate } from "../middleware/authMiddleware.js";
 import {
+  bulkImportBatches,
   createBatch,
   deleteBatch,
   getBatchById,
@@ -12,9 +13,10 @@ import {
 const router = express.Router();
 
 router.post("/createBatch", authenticate, createBatch);
+router.post("/bulkImportBatches", authenticate, bulkImportBatches);
 router.get("/getBatches", authenticate, getBatches);
 router.get("/getBatchesForMedicine/:id", authenticate, getBatchesForMedicine);
-router.get("/getBatchesForStatistics", authenticate, getBatchesForStatistics)
+router.get("/getBatchesForStatistics", authenticate, getBatchesForStatistics);
 router.get("/getBatchById/:id", authenticate, getBatchById);
 router.put("/updateBatch/:id", authenticate, updateBatch);
 router.delete("/deleteBatch/:id", authenticate, deleteBatch);
