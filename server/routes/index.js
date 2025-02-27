@@ -16,6 +16,7 @@ import OrderRouter from "./Order.route.js";
 import PointHistoryRouter from "./PointHistory.route.js";
 import StatisticRouter from "./Statistics.route.js";
 import BillRouter from "./Bill.route.js";
+import CommentRouter from "./Comment.route.js";
 import OTPRouter from "./OTP.route.js";
 import CloudinaryRouter from "./Cloudinary.route.js";
 import PaypalRouter from "./Paypal.route.js";
@@ -39,6 +40,7 @@ app.use("/order", OrderRouter);
 app.use("/pointHistory", PointHistoryRouter);
 app.use("/statistic", StatisticRouter);
 app.use("/bill", BillRouter);
+app.use("/comment", CommentRouter);
 
 app.use("/otp", OTPRouter);
 app.use("/cloudinary", CloudinaryRouter);

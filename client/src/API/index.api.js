@@ -62,5 +62,10 @@ export const DELETE_ORDER_ROUTE = `${ORDER_ROUTES}/deleteOrder`;
 export const POINT_HISTORY_ROUTES = "/api/v1/pointHistory";
 export const GET_POINT_HISTORIES_ROUTE = `${POINT_HISTORY_ROUTES}/getPointHistories`;
 
+export const COMMENT_ROUTES = "/api/v1/comment";
+export const CREATE_COMMENT_ROUTE = `${COMMENT_ROUTES}/createComment`;
+export const GET_COMMENTS_ROUTE = `${COMMENT_ROUTES}/getCommentByProductId`;
+export const EDIT_COMMENT_ROUTE = `${COMMENT_ROUTES}/editComment`;
+
 export const PAYPAL_ROUTES = "/api/v1/paypal";
 export const CREATE_PAYPAL_ORDER_ROUTE = `${PAYPAL_ROUTES}/createOrder`;

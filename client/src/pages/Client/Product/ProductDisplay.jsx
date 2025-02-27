@@ -5,9 +5,9 @@ import ProductDetailInfo from "./components/ProductDetailInfo.jsx";
 import ProductDescription from "./components/ProductDescription.jsx";
 import ProductDetailRight from "./components/ProductDetailRight.jsx";
 import { useLocation } from "react-router-dom";
+import ProductComments from "./components/ProductComments.jsx";
 
 const ProductDisplay = () => {
-  
   const { state } = useLocation();
   const product = state.product;
   return (
@@ -35,6 +35,10 @@ const ProductDisplay = () => {
           </div>
 
           <ProductDetailRight product={product} />
+
+          {/* Thêm phần bình luận */}
+          <Separator />
+          <ProductComments productId={product?._id} />
         </div>
 
         {/* <div className="flex flex-col md:flex-row gap-8">
