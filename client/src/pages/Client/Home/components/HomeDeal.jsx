@@ -1,7 +1,7 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import moment from "moment";
 import Item from "@/pages/Client/Product/ProductItem/Item.jsx";
 import Loading from "@/pages/component/Loading.jsx";
@@ -14,6 +14,9 @@ const HomeDeal = () => {
   const [remainingTime, setRemainingTime] = useState(moment.duration(0));
   const [all_products, setAllProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const animationFrameRef = useRef(null);
+  const lastUpdateRef = useRef(null);
+
   useEffect(() => {
     const allProductsDiscount = async () => {
       try {
@@ -30,6 +33,39 @@ const HomeDeal = () => {
     };
 
     allProductsDiscount();
+  }, []);
+
+  useEffect(() => {
+    const updateRemainingTime = () => {
+      const now = moment();
+      const midnight = moment().endOf("day");
+      const diff = moment.duration(midnight.diff(now));
+
+      // Chỉ cập nhật state nếu đã qua 1 giây kể từ lần cập nhật cuối
+      const currentTime = Date.now();
+      if (
+        !lastUpdateRef.current ||
+        currentTime - lastUpdateRef.current >= 1000
+      ) {
+        setRemainingTime(diff);
+        lastUpdateRef.current = currentTime;
+      }
+
+      // Tiếp tục vòng lặp nếu còn thời gian
+      if (diff.asSeconds() > 0) {
+        animationFrameRef.current = requestAnimationFrame(updateRemainingTime);
+      }
+    };
+
+    // Bắt đầu đếm ngược
+    animationFrameRef.current = requestAnimationFrame(updateRemainingTime);
+
+    // Cleanup khi component unmount
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, []);
 
   function SampleNextArrow(props) {
@@ -157,9 +193,11 @@ const HomeDeal = () => {
             <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
               {remainingTime.hours().toString().padStart(2, "0")}
             </h5>
+            <span className="text-black text-lg">:</span>
             <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
               {remainingTime.minutes().toString().padStart(2, "0")}
             </h5>
+            <span className="text-black text-lg">:</span>
             <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
               {remainingTime.seconds().toString().padStart(2, "0")}
             </h5>
