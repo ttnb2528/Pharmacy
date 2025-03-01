@@ -1,5 +1,6 @@
 import { HomeContext } from "@/context/HomeContext.context.jsx";
 import Login from "@/pages/Client/Home/components/Login.jsx";
+import FloatingActions from "@/pages/component/FloatingActions.jsx";
 import Footer from "@/pages/component/Footer/Footer.jsx";
 import Navbar from "@/pages/component/Navbar/Navbar.jsx";
 import { useContext } from "react";
@@ -21,6 +22,8 @@ export const Layout = () => {
           <Footer />
         </div>
       </div>
+
+      <FloatingActions zaloLink="https://zalo.me/84866554764" />
     </>
   );
 };
