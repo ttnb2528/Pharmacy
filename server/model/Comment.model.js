@@ -16,6 +16,10 @@ const CommentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    rating: {
+      type: Number,
+      required: true,
+    },
     images: [
       {
         type: String, // URL của hình ảnh

@@ -56,6 +56,7 @@ export const GET_ORDERS_ROUTE = `${ORDER_ROUTES}/getOrders`;
 export const GET_CURRENT_USER_ORDER_ROUTE = `${ORDER_ROUTES}/getCurrentUserOrders`;
 export const GET_ORDER_BY_ID_ROUTE = `${ORDER_ROUTES}/getOrderById`;
 export const GET_ORDER_DETAIL_ROUTE = `${ORDER_ROUTES}/getOrderDetail`;
+export const CHECK_PURCHASE_ROUTE = `${ORDER_ROUTES}/checkPurchase`;
 export const UPDATE_STATUS_ORDER_ROUTE = `${ORDER_ROUTES}/updateStatusOrder`;
 export const DELETE_ORDER_ROUTE = `${ORDER_ROUTES}/deleteOrder`;
 
@@ -65,6 +66,7 @@ export const GET_POINT_HISTORIES_ROUTE = `${POINT_HISTORY_ROUTES}/getPointHistor
 export const COMMENT_ROUTES = "/api/v1/comment";
 export const CREATE_COMMENT_ROUTE = `${COMMENT_ROUTES}/createComment`;
 export const GET_COMMENTS_ROUTE = `${COMMENT_ROUTES}/getCommentByProductId`;
+export const GET_COMMENT_PRODUCT_CURRENT_USER_ROUTE = `${COMMENT_ROUTES}/getCommentProductCurrentUser`;
 export const EDIT_COMMENT_ROUTE = `${COMMENT_ROUTES}/editComment`;
 
 export const PAYPAL_ROUTES = "/api/v1/paypal";

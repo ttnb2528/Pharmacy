@@ -32,13 +32,13 @@ const ProductDisplay = () => {
             <Separator />
 
             <ProductDescription product={product} />
+            
+            {/* Thêm phần bình luận */}
+            <Separator />
+            <ProductComments productId={product?._id} />
           </div>
 
           <ProductDetailRight product={product} />
-
-          {/* Thêm phần bình luận */}
-          <Separator />
-          <ProductComments productId={product?._id} />
         </div>
 
         {/* <div className="flex flex-col md:flex-row gap-8">

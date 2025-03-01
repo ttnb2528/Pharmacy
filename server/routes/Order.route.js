@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  checkPurchase,
   createOrder,
   deleteOrder,
   getCurrentUserOrders,
@@ -17,6 +18,7 @@ router.get("/getOrders", getOrders);
 router.get("/getCurrentUserOrders", authenticate, getCurrentUserOrders);
 router.get("/getOrderById", getOrderById);
 router.get("/getOrderDetail/:orderId", getOrderDetail);
+router.get("/checkPurchase/:userId/:productId", checkPurchase);
 router.put("/updateStatusOrder/:orderId", updateStatusOrder);
 router.delete("/deleteOrder", deleteOrder);
 

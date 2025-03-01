@@ -303,7 +303,7 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
     if (req.body.status === "cancelled") {
       // Lấy chi tiết đơn hàng
       const orderDetail = await OrderDetail.findOne({ orderId: order._id });
-      
+
       // Hoàn trả số lượng sản phẩm
       const bulkOps = orderDetail.items.map((item) => ({
         updateOne: {
@@ -316,7 +316,7 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
           },
         },
       }));
-      
+
       await Medicine.bulkWrite(bulkOps);
 
       // Nếu đơn hàng có sử dụng coupon
@@ -367,7 +367,6 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
 
       // Cập nhật status của đơn hàng thành cancelled
       await Order.findByIdAndUpdate(order._id, { status: "cancelled" });
-      
     } else if (req.body.status === "processing") {
       // Giữ nguyên logic xử lý cho trạng thái processing
       const existingPointHistory = await PointHistory.findOne({
@@ -433,6 +432,36 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
     );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+export const checkPurchase = asyncHandler(async (req, res) => {
+  const { userId, productId } = req.params;
+
+  try {
+    const orders = await Order.find({
+      AccountId: userId,
+      status: "completed",
+    });
+
+    console.log(orders);
+    
+
+    for (const order of orders) {
+      const orderDetail = await OrderDetail.findOne({ orderId: order._id });
+      if (
+        orderDetail &&
+        orderDetail.items.some(
+          (item) => item.productId.toString() === productId
+        )
+      ) {
+        return res.json({ hasPurchased: true });
+      }
+    }
+    return res.json({ hasPurchased: false });
+  } catch (error) {
+    console.error("Error checking purchase:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
