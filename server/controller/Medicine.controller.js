@@ -512,6 +512,7 @@ const validate = (data) => {
     effect: Joi.string().required().label("Tác dụng phụ"),
     isRx: Joi.boolean().required().label("Thuốc kê đơn"),
     drugUser: Joi.string().required().label("Đối tượng sử dụng"),
+    ingredients: Joi.string().required().label("Thành phần"),
     categoryId: Joi.string().required().label("Danh mục"),
     brandId: Joi.string().required().label("Thương hiệu"),
   })

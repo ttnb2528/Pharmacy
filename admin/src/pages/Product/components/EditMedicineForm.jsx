@@ -40,6 +40,7 @@ const EditMedicineForm = ({ medicine, handleCancel }) => {
     packaging: medicine.packaging,
     effect: medicine.effect,
     drugUser: medicine.drugUser,
+    ingredient: medicine.ingredient,
     isRx: medicine.isRx,
     isDiscount: medicine.isDiscount,
     percentDiscount: medicine.percentDiscount,
@@ -340,6 +341,7 @@ const EditMedicineForm = ({ medicine, handleCancel }) => {
       {renderTextArea("Hướng dẫn sử dụng", "instruction")}
       {renderTextArea("Mô tả", "description")}
       {renderTextArea("Công dụng", "uses")}
+      {renderField("Thành phần", "ingredient")}
       {renderField("Đóng gói", "packaging")}
       {renderTextArea("Tác dụng phụ", "effect")}
       {renderField("Đối tượng sử dụng", "drugUser")}

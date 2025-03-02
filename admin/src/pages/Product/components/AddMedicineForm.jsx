@@ -37,6 +37,7 @@ const AddMedicineForm = ({ handleCancel }) => {
     packaging: "",
     effect: "",
     drugUser: "",
+    ingredient: "",
     isRx: false,
     isDiscount: false,
     percentDiscount: 0,
@@ -183,6 +184,7 @@ const AddMedicineForm = ({ handleCancel }) => {
       {renderTextArea("Hướng dẫn sử dụng", "instruction")}
       {renderTextArea("Mô tả", "description")}
       {renderTextArea("Công dụng", "uses")}
+      {renderTextArea("Thành phần", "ingredient")}
       {renderField("Đóng gói", "packaging")}
       {renderTextArea("Tác dụng phụ", "effect")}
       {renderField("Đối tượng sử dụng", "drugUser")}
