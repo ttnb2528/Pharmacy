@@ -69,10 +69,7 @@ const MedicineSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  ingredients: {
-    type: String,
-    required: true,
-  },
+  ingredients: [{ type: String }],
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",

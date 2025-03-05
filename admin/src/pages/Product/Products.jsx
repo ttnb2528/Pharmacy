@@ -110,35 +110,35 @@ export default function Products() {
   const handleExcelUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-      // console.log(jsonData);
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("zipFile", file);
+    
 
-      try {
-        const res = await apiClient.post(BULK_ADD_MEDICINES_ROUTE, {
-          medicines: jsonData,
-        });
+    try {
+      const res = await apiClient.post(BULK_ADD_MEDICINES_ROUTE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        if (res.status === 200 && res.data.status === 201) {
-          toast.success(res.data.message);
-          setMedicines((prev) => [...prev, ...res.data.data]);
-        } else {
-          toast.error(res.data.message);
-          return;
-        }
-      } catch (error) {
-        toast.error("Có lỗi khi nhập dữ liệu từ Excel");
-        console.error(error);
-        return;
+      if (res.status === 200 && res.data.status === 201) {
+        toast.success(res.data.message);
+        setMedicines((prev) => [...prev, ...res.data.data]);
+      } else {
+        toast.error(res.data.message);
       }
-    };
-    reader.readAsArrayBuffer(file);
+    } catch (error) {
+      toast.error("Có lỗi khi nhập dữ liệu từ file zip");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+      if (inputMedicineRef.current) {
+        inputMedicineRef.current.value = "";
+      }
+    }
   };
 
   const handleExcelImport = async (e) => {
@@ -317,6 +317,22 @@ export default function Products() {
               </DialogContent>
             </Dialog>
             <Label
+              htmlFor="zip-upload"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 
+               shadow-sm text-sm font-medium rounded-md text-gray-700 
+               bg-white hover:bg-gray-50 cursor-pointer"
+            >
+              <Upload className="mr-2 h-4 w-4" /> Nhập thuốc (zip)
+            </Label>
+            <Input
+              id="zip-upload"
+              type="file"
+              accept=".zip"
+              onChange={handleExcelUpload}
+              className="hidden"
+              ref={inputMedicineRef}
+            />
+            {/* <Label
               htmlFor="excel-upload"
               className="inline-flex items-center px-4 py-2 border border-gray-300 
              shadow-sm text-sm font-medium rounded-md text-gray-700 
@@ -332,7 +348,7 @@ export default function Products() {
               onChange={handleExcelUpload}
               className="hidden"
               ref={inputMedicineRef}
-            />
+            /> */}
 
             <Label
               htmlFor="excel-import-upload"

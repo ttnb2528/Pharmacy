@@ -39,6 +39,9 @@ const ProductDetailRight = ({ product }) => {
     getSimilarProduct();
   }, [category]);
 
+  console.log(productSimilar);
+  
+
   return (
     <div className="hidden md:block">
       <div
@@ -97,7 +100,8 @@ const ProductDetailRight = ({ product }) => {
           {productSimilar.map((product) => (
             <div key={product._id} className="flex gap-4 items-center">
               <img
-                src={product?.images[0]}
+                // src={product?.product?.images[0] || refundProduct}
+                src={refundProduct}
                 alt=""
                 className="w-20 h-20 object-cover border rounded-lg"
               />

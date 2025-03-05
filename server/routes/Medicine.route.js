@@ -13,11 +13,15 @@ import {
   updateImagesMedicine,
   updateMedicine,
 } from "../controller/Medicine.controller.js";
+import multer from "multer";
 
 const router = express.Router();
 
+const upload = multer({ storage: multer.memoryStorage() });
+
 router.post("/addMedicine", addMedicine);
-router.post("/bulkAddMedicines", bulkAddMedicines);
+// router.post("/bulkAddMedicines", bulkAddMedicines);
+router.post("/bulkAddMedicines", upload.single("zipFile"), bulkAddMedicines);
 router.post("/getMedicineByHistory", getMedicineByHistory);
 router.get("/getMedicines", getMedicines);
 router.get("/getMedicinesByIsDiscount", getMedicinesByIsDiscount);
