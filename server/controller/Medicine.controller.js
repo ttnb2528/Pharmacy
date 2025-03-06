@@ -457,7 +457,9 @@ export const bulkAddMedicines = async (req, res) => {
   console.log("Received zipFile:", zipFile ? zipFile.originalname : "No file");
 
   if (!zipFile) {
-    return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng gửi file .zip"));
+    return res.json(
+      jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng gửi file .zip")
+    );
   }
 
   try {
@@ -493,7 +495,12 @@ export const bulkAddMedicines = async (req, res) => {
 
     if (!excelData) {
       console.log("No Excel data found in zip");
-      return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Không tìm thấy file Excel trong zip"));
+      return res.json(
+        jsonGenerate(
+          StatusCode.BAD_REQUEST,
+          "Không tìm thấy file Excel trong zip"
+        )
+      );
     }
 
     console.log("Processing medicines...");
@@ -503,12 +510,24 @@ export const bulkAddMedicines = async (req, res) => {
       let imageUrls = [];
 
       if (medicineData["Hình ảnh"]) {
-        const imageFileNames = medicineData["Hình ảnh"].split(",").map((name) => name.trim());
-        console.log("Image file names for", medicineData["Tên thuốc"], ":", imageFileNames);
+        const imageFileNames = medicineData["Hình ảnh"]
+          .split(",")
+          .map((name) => name.trim());
+        console.log(
+          "Image file names for",
+          medicineData["Tên thuốc"],
+          ":",
+          imageFileNames
+        );
 
         for (const imageFileName of imageFileNames) {
           const imageBuffer = imageBuffers.get(imageFileName);
-          console.log("Image buffer for", imageFileName, ":", imageBuffer ? "Found" : "Not found");
+          console.log(
+            "Image buffer for",
+            imageFileName,
+            ":",
+            imageBuffer ? "Found" : "Not found"
+          );
 
           if (imageBuffer) {
             try {
@@ -517,7 +536,12 @@ export const bulkAddMedicines = async (req, res) => {
               imageUrls.push(url);
               console.log("Uploaded", imageFileName, ":", url);
             } catch (uploadError) {
-              console.error("Failed to upload", imageFileName, ":", uploadError.message);
+              console.error(
+                "Failed to upload",
+                imageFileName,
+                ":",
+                uploadError.message
+              );
             }
           } else {
             console.warn(`Không tìm thấy ảnh ${imageFileName} trong zip`);
@@ -526,9 +550,15 @@ export const bulkAddMedicines = async (req, res) => {
       }
 
       console.log("Creating medicine:", medicineData["Tên thuốc"]);
-      const categoryId = await findOrCreateCategory(medicineData["Tên danh mục"]);
+      const categoryId = await findOrCreateCategory(
+        medicineData["Tên danh mục"]
+      );
       const brandId = await findOrCreateBrand(medicineData["Tên thương hiệu"]);
       const medicineId = await generateID(Medicine);
+
+      console.log("Medicine ID:", medicineId);
+      console.log("Category ID:", categoryId);
+      console.log("Brand ID:", brandId);
 
       const newMedicine = new Medicine({
         id: medicineId,
@@ -540,11 +570,11 @@ export const bulkAddMedicines = async (req, res) => {
         uses: medicineData["Công dụng"] || "",
         packaging: medicineData["Quy cách đóng gói"],
         effect: medicineData["Tác dụng phụ"] || "",
-        isRx: medicineData["Kê đơn"] === "True",
+        isRx: medicineData["Kê đơn"] === "TRUE",
         drugUser: medicineData["Đối tượng sử dụng"] || "",
         brandId: brandId,
         categoryId: categoryId,
-        discount: medicineData["Giảm giá"] === "True",
+        discount: medicineData["Giảm giá"] === "TRUE",
         discountPercentage: Number(medicineData["Phần trăm giảm giá"]) || 0,
         ingredients: medicineData["Thành phần"]?.split(", ") || [], // Giữ nguyên mảng
         images: imageUrls,
@@ -557,12 +587,19 @@ export const bulkAddMedicines = async (req, res) => {
 
     console.log("Processing complete, sending response...");
     return res.json(
-      jsonGenerate(StatusCode.CREATED, "Nhập thuốc thành công", uploadedMedicines)
+      jsonGenerate(
+        StatusCode.CREATED,
+        "Nhập thuốc thành công",
+        uploadedMedicines
+      )
     );
   } catch (error) {
     console.error("Error in bulkAddMedicines:", error);
     return res.json(
-      jsonGenerate(StatusCode.INTERNAL_SERVER_ERROR, "Lỗi máy chủ khi nhập thuốc: " + error.message)
+      jsonGenerate(
+        StatusCode.INTERNAL_SERVER_ERROR,
+        "Lỗi máy chủ khi nhập thuốc: " + error.message
+      )
     );
   }
 };
@@ -598,7 +635,8 @@ const findOrCreateCategory = async (categoryName) => {
 const findOrCreateBrand = async (brandName) => {
   let brand = await Brand.findOne({ name: brandName });
   if (!brand) {
-    brand = new Brand({ name: brandName });
+    let id = await generateID(Brand);
+    brand = new Brand({ id, name: brandName });
     await brand.save();
   }
   return brand._id;
