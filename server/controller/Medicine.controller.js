@@ -556,9 +556,13 @@ export const bulkAddMedicines = async (req, res) => {
       const brandId = await findOrCreateBrand(medicineData["Tên thương hiệu"]);
       const medicineId = await generateID(Medicine);
 
-      console.log("Medicine ID:", medicineId);
-      console.log("Category ID:", categoryId);
-      console.log("Brand ID:", brandId);
+      // Chuẩn hóa giá trị "True"/"False" thành boolean
+      const isRxValue = String(medicineData["Kê đơn"]).trim().toLowerCase();
+      const discountValue = String(medicineData["Giảm giá"]).trim().toLowerCase();
+
+      // console.log("Medicine ID:", medicineId);
+      // console.log("Category ID:", categoryId);
+      // console.log("Brand ID:", brandId);
 
       const newMedicine = new Medicine({
         id: medicineId,
@@ -570,11 +574,11 @@ export const bulkAddMedicines = async (req, res) => {
         uses: medicineData["Công dụng"] || "",
         packaging: medicineData["Quy cách đóng gói"],
         effect: medicineData["Tác dụng phụ"] || "",
-        isRx: medicineData["Kê đơn"] === "TRUE",
+        isRx: isRxValue === "true",
         drugUser: medicineData["Đối tượng sử dụng"] || "",
         brandId: brandId,
         categoryId: categoryId,
-        discount: medicineData["Giảm giá"] === "TRUE",
+        discount: discountValue === "true",
         discountPercentage: Number(medicineData["Phần trăm giảm giá"]) || 0,
         ingredients: medicineData["Thành phần"]?.split(", ") || [], // Giữ nguyên mảng
         images: imageUrls,
