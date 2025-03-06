@@ -16,7 +16,7 @@ const SwiperProduct = (props) => {
       {/* swiper */}
       <div className="flex h-full w-full items-center">
         <Swiper
-          className="border rounded-lg border-gray-300 w-full h-full"
+          className="border rounded-lg border-gray-300 w-full h-full max-h-96"
           spaceBetween={0}
           slidesPerView={1}
           modules={[Thumbs]}
@@ -26,7 +26,11 @@ const SwiperProduct = (props) => {
         >
           {productImage?.map((item) => (
             <SwiperSlide key={item}>
-              <img src={item} alt="product" className="h-full w-full" />
+              <img
+                src={item}
+                alt="product"
+                className="h-full w-full max-h-96 object-contain"
+              />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -37,19 +41,20 @@ const SwiperProduct = (props) => {
         <div className="relative flex h-full w-full items-center">
           <Swiper
             spaceBetween={10}
-            slidesPerView={productImage?.length}
+            slidesPerView={productImage?.length > 4 ? 4 : productImage?.length}
             modules={[Thumbs]}
             watchSlidesProgress
             // onSlideChange={() => console.log("slide change")}
             onSwiper={setThumbsSwiper}
+            className="!ml-0"
           >
             {productImage?.map((item, index) => (
-              <SwiperSlide key={item}>
+              <SwiperSlide key={item} className="!w-20">
                 <img
                   key={index}
                   src={item}
                   alt="product"
-                  className={`w-[20%] border rounded-lg ${
+                  className={`h-20 w-20 object-container border-2 rounded-lg ${
                     index === currentThumbIndex ? "border-green-400" : "" // Sử dụng currentThumbIndex để kiểm tra
                   }`}
                 />

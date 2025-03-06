@@ -109,7 +109,7 @@ const MedicineDetails = ({ medicine }) => {
               )
             )}
             {medicine.isDiscount &&
-              renderField("Phần trăm giảm giá", `${medicine.percentDiscount}%`)}
+              renderField("Phần trăm giảm giá", `${medicine.discountPercentage}%`)}
             {renderField("Thương hiệu", medicine.brandId.name)}
             <div className="grid grid-cols-[200px_1fr] items-start gap-4 py-2">
               <Label className="font-medium text-gray-700">Hình ảnh:</Label>

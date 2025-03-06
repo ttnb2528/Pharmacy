@@ -96,22 +96,34 @@ const ProductDetailInfo = ({ product }) => {
           {product?.isDiscount && (
             <div className="flex flex-row items-center md:mb-1">
               <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
-                Giảm {product?.percentDiscount}%
+                Giảm {product?.discountPercentage}%
               </span>
-              <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
-                {convertVND(product?.batches[0]?.price)}
-              </del>
+              {product?.batches[0]?.price ? (
+                <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                  {convertVND(product?.batches[0]?.price)}
+                </del>
+              ) : (
+                <span className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                  Đang cập nhật
+                </span>
+              )}
             </div>
           )}
 
-          <div className="text-xl font-bold md:mb-2 md:text-[28px]">
-            {convertVND(
-              CalculateProductWithSale(
-                product?.batches[0]?.price,
-                product?.percentDiscount
-              )
-            )}
-          </div>
+          {product?.batches[0]?.price ? (
+            <div className="text-xl font-bold md:mb-2 md:text-[28px]">
+              {convertVND(
+                CalculateProductWithSale(
+                  product?.batches[0]?.price,
+                  product?.percentDiscount
+                )
+              )}
+            </div>
+          ) : (
+            <div className="text-xl text-gray-500 font-bold md:mb-2 md:text-[28px]">
+              Đang cập nhật
+            </div>
+          )}
 
           <p className="text-[12px] leading-[20px] font-normal text-neutral-700 md:text-sm mb-1.5 md:mb-1">
             Giá đã bao gồm thuế. Phí vận chuyển và các chi phí khác (nếu có) sẽ
@@ -119,14 +131,20 @@ const ProductDetailInfo = ({ product }) => {
           </p>
 
           <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
-            <span className="text-xs font-semibold text-gold-500 md:text-sm">
-              Tích lũy{" "}
-              {CalculatePointEarned(
-                product?.batches[0]?.price,
-                product?.percentDiscount
-              )}{" "}
-              Xu
-            </span>
+            {product?.batches[0]?.price ? (
+              <span className="text-xs font-semibold text-gold-500 md:text-sm">
+                Tích lũy{" "}
+                {CalculatePointEarned(
+                  product?.batches[0]?.price,
+                  product?.percentDiscount
+                )}{" "}
+                Xu
+              </span>
+            ) : (
+              <span className="text-xs font-semibold text-gold-500 md:text-sm">
+                Tích lũy 0 Xu
+              </span>
+            )}
             <div>
               <span className="inline-flex align-[-0.175em] justify-center max-h-full max-w-full h-3 w-3 items-center text-neutral-700 md:h-4 md:w-4">
                 <svg
@@ -263,7 +281,7 @@ const ProductDetailInfo = ({ product }) => {
                   </div>
                   <p className="text-[12px] leading-[20px] first-letter:uppercase md:text-sm">
                     <span className="inline pe-1 font-semibold">
-                      Deal Giảm {product?.percentDiscount}%
+                      Deal Giảm {product?.discountPercentage}%
                     </span>
                   </p>
                 </div>
@@ -292,7 +310,8 @@ const ProductDetailInfo = ({ product }) => {
                   Nhà sản xuất
                 </p>
                 <div className="md:text-base">
-                  {product?.batches[0]?.ManufactureId?.name}
+                  {product?.batches[0]?.ManufactureId?.name ??
+                    "(Đang cập nhật)"}
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[1fr,291px]">

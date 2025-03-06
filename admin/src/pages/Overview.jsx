@@ -34,7 +34,6 @@ const Overview = () => {
       try {
         setIsLoading(true);
         const res = await apiClient.get(GET_DASHBOARD_OVERVIEW_ROUTE);
-        console.log(res);
 
         if (res.status === 200 && res.data.status === 200) {
           setData(res.data.data);
@@ -85,7 +84,7 @@ const Overview = () => {
               </div>
               <p className="text-xs text-muted-foreground">
                 {data.revenueChange > 0
-                  ? `+${data.revenueChange}%`
+                  ? `${data.revenueChange}%`
                   : `${data.revenueChange}%`}{" "}
                 so với tháng trước
               </p>
@@ -99,7 +98,7 @@ const Overview = () => {
             <CardContent>
               <div className="text-2xl font-bold">+{data.totalOrders}</div>
               <p className="text-xs text-muted-foreground">
-                +{data.ordersChange}% so với tháng trước
+                {data.ordersChange}% so với tháng trước
               </p>
             </CardContent>
           </Card>
@@ -114,7 +113,7 @@ const Overview = () => {
               <div className="text-2xl font-bold">+{data.newCustomers}</div>
               <p className="text-xs text-muted-foreground">
                 {data.customersChange > 0
-                  ? `+${data.customersChange}%`
+                  ? `${data.customersChange}%`
                   : `${data.customersChange}%`}{" "}
                 so với tháng trước
               </p>
@@ -129,10 +128,10 @@ const Overview = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {data.bestSellingProduct.name}
+                {data?.bestSellingProduct?.name || "Không có dữ liệu"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {data.bestSellingProduct.sold} đơn vị đã bán
+                {data.bestSellingProduct?.sold} đơn vị đã bán
               </p>
             </CardContent>
           </Card>

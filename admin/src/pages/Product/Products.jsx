@@ -110,12 +110,10 @@ export default function Products() {
   const handleExcelUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
 
     setIsLoading(true);
     const formData = new FormData();
     formData.append("zipFile", file);
-    
 
     try {
       const res = await apiClient.post(BULK_ADD_MEDICINES_ROUTE, formData, {
@@ -226,6 +224,16 @@ export default function Products() {
     return isMatchCategory && isMatchSearch && isNotDeleted;
   });
 
+  const handleFilterChange = (value) => {
+    setSelectedCategory(value);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   const totalPages = Math.ceil(filteredMedicines.length / itemsPerPage);
   const paginatedMedicines = filteredMedicines.slice(
     (currentPage - 1) * itemsPerPage,
@@ -277,13 +285,10 @@ export default function Products() {
             <Input
               placeholder="Tìm kiếm thuốc..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-64"
             />
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
+            <Select value={selectedCategory} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[180px] text-gray-500">
                 <SelectValue placeholder="Chọn danh mục" />
               </SelectTrigger>
@@ -368,6 +373,7 @@ export default function Products() {
             />
           </div>
         </div>
+
         <Table>
           <TableHeader>
             <TableRow>
@@ -380,91 +386,108 @@ export default function Products() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedMedicines.map((medicine) => (
-              <TableRow key={medicine._id}>
-                <TableCell>{medicine.id}</TableCell>
-                <TableCell>{medicine.name}</TableCell>
-                <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
-                <TableCell>{medicine.categoryId.name}</TableCell>
-                <TableCell>{medicine.quantityStock}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        {/* view product */}
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleView(medicine)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
-                        <DialogHeader>
-                          <DialogTitle>Chi tiết thuốc</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <MedicineDetails medicine={selectedMedicine} />
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleEdit(medicine)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+            {paginatedMedicines.length > 0 ? (
+              paginatedMedicines.map((medicine) => (
+                <TableRow key={medicine._id}>
+                  <TableCell>{medicine.id}</TableCell>
+                  <TableCell>{medicine.name}</TableCell>
+                  <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
+                  <TableCell>{medicine.categoryId.name}</TableCell>
+                  <TableCell>{medicine.quantityStock}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          {/* view product */}
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleView(medicine)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>Chi tiết thuốc</DialogTitle>
+                          </DialogHeader>
+                          <DialogDescription></DialogDescription>
+                          <MedicineDetails medicine={selectedMedicine} />
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEdit(medicine)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleImport(medicine)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleImport(medicine)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleOpenConfirm(medicine)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleOpenConfirm(medicine)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={6} className="text-center py-10">
+                  Không có dữ liệu
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-        <Pagination className="mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
       </main>
 
       {isEditing && (

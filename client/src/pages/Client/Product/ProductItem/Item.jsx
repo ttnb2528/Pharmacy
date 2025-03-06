@@ -115,28 +115,25 @@ const Item = ({
   return (
     <>
       <div className=" p-2" onMouseDown={handleMouseDown}>
-        <div className=" border border-green-500 rounded-lg hover:border hover:border-red-300 hover:rounded-lg">
-          <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm">
-            <div className="product-card-image">
-              <div className="relative">
+        <div className="border border-green-500 rounded-lg hover:border hover:border-red-300 h-full flex flex-col">
+          <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm flex flex-col">
+            <div className="product-card-image flex-shrink-0">
+              <div className="relative min-h-48">
                 <div onClick={handleClick}>
                   <img
-                    className="max-h-full max-w-full object-contain cursor-pointer"
+                    className="w-full h-full object-contain cursor-pointer max-h-48"
                     src={product?.images[0]}
                     alt="product"
-                    width="500"
-                    height="500"
                   />
                 </div>
                 {product.isDiscount && (
                   <span className="absolute top-2 left-2 bg-red-400 py-1 px-3 text-xs font-bold text-white rounded-xl">
-                    {product.percentDiscount}%
+                    {product.discountPercentage}%
                   </span>
                 )}
-                <div className="absolute bottom-0 left-0 flex h-6 w-full"></div>
               </div>
             </div>
-            <div className="p-2 pb-1 font-medium">
+            <div className="p-2 pb-1 font-medium flex-grow flex flex-col justify-between">
               <div>
                 <h3 className="line-clamp-2 h-10 text-sm font-semibold">
                   {product?.name}
@@ -180,9 +177,9 @@ const Item = ({
               {product?.batches.length > 0 && product?.quantityStock > 0 ? (
                 <Button
                   className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
-                  onClick={() => {
-                    hasLogin ? AddToCart(product.id) : setShowLogin(true);
-                  }}
+                  onClick={() =>
+                    hasLogin ? AddToCart(product.id) : setShowLogin(true)
+                  }
                 >
                   Thêm giỏ hàng
                 </Button>

@@ -20,7 +20,8 @@ const ProductDescription = ({ product }) => {
     {
       id: "origin",
       label: "Nơi sản xuất",
-      content: product?.batches[0]?.ManufactureId?.country,
+      content:
+        product?.batches[0]?.ManufactureId?.country ?? "Dữ liệu đang cập nhật",
     },
   ];
 

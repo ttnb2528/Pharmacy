@@ -32,7 +32,7 @@ const ProductDisplay = () => {
             <Separator />
 
             <ProductDescription product={product} />
-            
+
             {/* Thêm phần bình luận */}
             <Separator />
             <ProductComments productId={product?._id} />

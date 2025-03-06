@@ -65,7 +65,7 @@ const MedicineSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  percentDiscount: {
+  discountPercentage: {
     type: Number,
     default: 0,
   },

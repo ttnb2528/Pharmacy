@@ -6,6 +6,7 @@ import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCT_BY_CATEGORY_ROUTE } from "@/API/index.api.js";
 import { useEffect, useState } from "react";
 import Fuse from "fuse.js";
+import { convertVND } from "@/utils/ConvertVND.js";
 
 const ProductDetailRight = ({ product }) => {
   const category = product?.categoryId?._id;
@@ -22,7 +23,7 @@ const ProductDetailRight = ({ product }) => {
 
         const fuse = new Fuse(allProducts, {
           keys: ["name"], // Tìm kiếm theo trường name
-          threshold: 0.3, // Mức độ tương đồng (0.0 là chính xác, 1.0 là khớp mờ)
+          threshold: 0.7, // Mức độ tương đồng (0.0 là chính xác, 1.0 là khớp mờ)
         });
 
         const result = fuse.search(product.name);
@@ -40,7 +41,6 @@ const ProductDetailRight = ({ product }) => {
   }, [category]);
 
   console.log(productSimilar);
-  
 
   return (
     <div className="hidden md:block">
@@ -98,18 +98,22 @@ const ProductDetailRight = ({ product }) => {
           <h1 className="text-xl font-bold">Sản phẩm tương tự</h1>
 
           {productSimilar.map((product) => (
-            <div key={product._id} className="flex gap-4 items-center">
+            <div key={product.item._id} className="flex gap-4 items-center">
               <img
                 // src={product?.product?.images[0] || refundProduct}
-                src={refundProduct}
+                src={product?.item?.images[0] || refundProduct}
                 alt=""
-                className="w-20 h-20 object-cover border rounded-lg"
+                className="w-20 h-20 object-cover border p-1 rounded-lg"
               />
               <div>
                 <h1 className="text-base font-medium line-clamp-2">
-                  {product?.name}
+                  {product?.item?.name}
                 </h1>
-                <span className="text-orange-400">519.800&nbsp;₫</span>
+                <span className="text-orange-400">
+                  {product?.item?.batches[0]?.retailPrice
+                    ? convertVND(product?.item?.batches[0]?.retailPrice)
+                    : "Đang cập nhật"}
+                </span>
               </div>
             </div>
           ))}

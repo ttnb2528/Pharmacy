@@ -578,7 +578,7 @@ export const bulkAddMedicines = async (req, res) => {
         drugUser: medicineData["Đối tượng sử dụng"] || "",
         brandId: brandId,
         categoryId: categoryId,
-        discount: discountValue === "true",
+        isDiscount: discountValue === "true",
         discountPercentage: Number(medicineData["Phần trăm giảm giá"]) || 0,
         ingredients: medicineData["Thành phần"]?.split(", ") || [], // Giữ nguyên mảng
         images: imageUrls,
