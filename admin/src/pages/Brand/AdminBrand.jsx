@@ -53,7 +53,6 @@ const AdminBrand = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(brands.length / itemsPerPage);
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -141,6 +140,11 @@ const AdminBrand = () => {
     setSelectedBrand(brand);
   };
 
+  const totalPages = Math.ceil(filterBrands.length / itemsPerPage);
+  const paginatedBrands = filterBrands.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
   return (
     <div>
       {isLoading && <Loading />}
@@ -186,83 +190,100 @@ const AdminBrand = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filterBrands.map((brand) => (
-              <TableRow key={brand._id}>
-                <TableCell>{brand.id || "..."}</TableCell>
-                <TableCell>{brand.name || "..."}</TableCell>
-                <TableCell>{brand.description || "..."}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewBrand(brand)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
+            {paginatedBrands.length > 0 ? (
+              paginatedBrands.map((brand) => (
+                <TableRow key={brand._id}>
+                  <TableCell>{brand.id || "..."}</TableCell>
+                  <TableCell>{brand.name || "..."}</TableCell>
+                  <TableCell>{brand.description || "..."}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewBrand(brand)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
 
-                      {/* Nội dung Dialog */}
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Thông tin thương hiệu</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <AdminBrandDetail brand={selectedBrand} />
-                      </DialogContent>
-                    </Dialog>
+                        {/* Nội dung Dialog */}
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Thông tin thương hiệu</DialogTitle>
+                          </DialogHeader>
+                          <DialogDescription></DialogDescription>
+                          <AdminBrandDetail brand={selectedBrand} />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(brand)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(brand)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(brand)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(brand)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={6} className="text-center py-10">
+                  Không có dữ liệu
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-        <Pagination className="mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
       </main>
       {confirmDelete && (
         <ConfirmForm

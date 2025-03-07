@@ -39,6 +39,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import { OrderContext } from "@/context/OrderContext.context.jsx";
 import { convertVND } from "@/utils/convertVND.js";
 import Loading from "../component/Loading.jsx";
@@ -54,7 +63,7 @@ export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
   const { orders, setOrders } = useContext(OrderContext);
   console.log(orders);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -68,18 +77,17 @@ export default function AdminOrders() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Filter orders based on search term
-  const filteredOrders = orders.filter(
-    (order) =>
-      // order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.nameCustomer.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = orders.filter((order) =>
+    // order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.nameCustomer.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Update order status
   const handleUpdateStatus = async (orderId, newStatus) => {
@@ -207,61 +215,91 @@ export default function AdminOrders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.nameCustomer}</TableCell>
-                <TableCell>{formatDate(order.date)}</TableCell>
-                <TableCell>{convertVND(order.total)}</TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(order.status)}>
-                    {order.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setIsDetailsDialogOpen(true);
-                      }}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={order.status === "cancelled"}
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setIsStatusUpdateDialogOpen(true);
-                      }}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </div>
+            {paginatedOrders.length > 0 ? (
+              paginatedOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableCell>{order.nameCustomer}</TableCell>
+                  <TableCell>{formatDate(order.date)}</TableCell>
+                  <TableCell>{convertVND(order.total)}</TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusBadgeVariant(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setIsDetailsDialogOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={order.status === "cancelled"}
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setIsStatusUpdateDialogOpen(true);
+                        }}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không tìm thấy đơn hàng
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
 
-        <div className="flex justify-center mt-4">
-          {Array.from({
-            length: Math.ceil(filteredOrders.length / itemsPerPage),
-          }).map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              className="mx-1"
-              onClick={() => paginate(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </div>
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
 
         {/* Order Details Dialog */}
         <Dialog
@@ -331,7 +369,7 @@ export default function AdminOrders() {
                     <TableBody>
                       {selectedOrderDetail?.items.map((item) => (
                         <TableRow key={item._id}>
-                          <TableCell>{item.productId.id}</TableCell>
+                          <TableCell>{item?.productId?.id || "1"}</TableCell>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.unit}</TableCell>
                           <TableCell>{item.quantity}</TableCell>

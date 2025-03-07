@@ -20,6 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { CouponContext } from "@/context/CouponContext.context.jsx";
 import { convertVND } from "@/utils/convertVND.js";
@@ -56,14 +64,11 @@ const AdminCoupon = () => {
   );
 
   // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCoupons = filteredCoupons.slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  const totalPages = Math.ceil(filteredCoupons.length / itemsPerPage);
+  const paginatedCoupons = filteredCoupons.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // view coupon
   const handleView = (coupon) => {
@@ -188,99 +193,92 @@ const AdminCoupon = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentCoupons.map((coupon) => (
-              <TableRow key={coupon.id}>
-                <TableCell className="font-medium">
-                  {coupon.coupon_code}
-                </TableCell>
-                <TableCell>
-                  {coupon.discount_type === "percentage"
-                    ? "Phần trăm"
-                    : "Số tiền cố định"}
-                </TableCell>
-                <TableCell>
-                  {coupon.discount_type === "percentage"
-                    ? coupon.discount_value + "%"
-                    : convertVND(coupon.discount_value)}
-                </TableCell>
-                <TableCell>{formatDate(coupon.start_date)}</TableCell>
-                <TableCell>{formatDate(coupon.end_date)}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      coupon.status === "active"
-                        ? "success"
+            {paginatedCoupons.length > 0 ? (
+              paginatedCoupons.map((coupon) => (
+                <TableRow key={coupon.id}>
+                  <TableCell className="font-medium">
+                    {coupon.coupon_code}
+                  </TableCell>
+                  <TableCell>
+                    {coupon.discount_type === "percentage"
+                      ? "Phần trăm"
+                      : "Số tiền cố định"}
+                  </TableCell>
+                  <TableCell>
+                    {coupon.discount_type === "percentage"
+                      ? coupon.discount_value + "%"
+                      : convertVND(coupon.discount_value)}
+                  </TableCell>
+                  <TableCell>{formatDate(coupon.start_date)}</TableCell>
+                  <TableCell>{formatDate(coupon.end_date)}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        coupon.status === "active"
+                          ? "success"
+                          : coupon.status === "inactive"
+                          ? "secondary"
+                          : "destructive"
+                      }
+                    >
+                      {coupon.status === "active"
+                        ? "Hoạt động"
                         : coupon.status === "inactive"
-                        ? "secondary"
-                        : "destructive"
-                    }
-                  >
-                    {coupon.status === "active"
-                      ? "Hoạt động"
-                      : coupon.status === "inactive"
-                      ? "Hết mã"
-                      : "Hết hạn"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleView(coupon)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">
-                            Chi tiết mã giảm giá
-                          </DialogTitle>
-                          <DialogDescription></DialogDescription>
-                        </DialogHeader>
-                        <AdminCouponDetail coupon={selectedCoupon} />
-                      </DialogContent>
-                    </Dialog>
+                        ? "Hết mã"
+                        : "Hết hạn"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleView(coupon)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">
+                              Chi tiết mã giảm giá
+                            </DialogTitle>
+                            <DialogDescription></DialogDescription>
+                          </DialogHeader>
+                          <AdminCouponDetail coupon={selectedCoupon} />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditCoupon(coupon)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditCoupon(coupon)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(coupon)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(coupon)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không tìm thấy mã giảm giá
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-
-        <div className="flex justify-center mt-4">
-          {Array.from({
-            length: Math.ceil(filteredCoupons.length / itemsPerPage),
-          }).map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              className="mx-1"
-              onClick={() => paginate(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </div>
 
         {/* Delete Dialog */}
         {confirmDelete && (
@@ -306,6 +304,43 @@ const AdminCoupon = () => {
           />
         )}
       </main>
+
+      {totalPages > 1 && (
+        <Pagination className="mt-4">
+          <PaginationContent>
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+            )}
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(index + 1)}
+                  isActive={currentPage === index + 1}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

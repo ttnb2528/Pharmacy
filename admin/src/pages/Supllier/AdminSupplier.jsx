@@ -19,7 +19,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Badge } from "@/components/ui/badge";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+// import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-admin.js";
 import { ADD_SUPPLIER_ROUTE, DELETE_SUPPLIER_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
@@ -59,14 +68,11 @@ const AdminSupplier = () => {
   });
 
   // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentSuppliers = filteredSuppliers.slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+  const paginatedSuppliers = filteredSuppliers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // View Supplier
   const handleViewSupplier = (supplier) => {
@@ -180,84 +186,114 @@ const AdminSupplier = () => {
               <TableHead>Tên</TableHead>
               <TableHead>Địa chỉ</TableHead>
               <TableHead>Số điện thoại</TableHead>
-              <TableHead>Trạng thái</TableHead>
+              {/* <TableHead>Trạng thái</TableHead> */}
               <TableHead>Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentSuppliers.map((supplier) => (
-              <TableRow key={supplier.id}>
-                <TableCell>{supplier.id}</TableCell>
-                <TableCell>{supplier.name}</TableCell>
-                <TableCell>{supplier.address}</TableCell>
-                <TableCell>{supplier.phone}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={supplier.isDeleted ? "destructive" : "success"}
-                  >
-                    {supplier.isDeleted ? "Đã xóa" : "Hoạt động"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewSupplier(supplier)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">
-                            Thông tin nhà cung cấp
-                          </DialogTitle>
-                          <DialogDescription></DialogDescription>
-                        </DialogHeader>
-                        <AdminSupplierDetail supplier={selectedSupplier} />
-                      </DialogContent>
-                    </Dialog>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditSupplier(supplier)}
+            {paginatedSuppliers.length > 0 ? (
+              paginatedSuppliers.map((supplier) => (
+                <TableRow key={supplier.id}>
+                  <TableCell>{supplier.id}</TableCell>
+                  <TableCell>{supplier.name}</TableCell>
+                  <TableCell>{supplier.address || "..."}</TableCell>
+                  <TableCell>{supplier.phone || "..."}</TableCell>
+                  {/* <TableCell>
+                    <Badge
+                      variant={supplier.isDeleted ? "destructive" : "success"}
                     >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      {supplier.isDeleted ? "Đã xóa" : "Hoạt động"}
+                    </Badge>
+                  </TableCell> */}
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewSupplier(supplier)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">
+                              Thông tin nhà cung cấp
+                            </DialogTitle>
+                            <DialogDescription></DialogDescription>
+                          </DialogHeader>
+                          <AdminSupplierDetail supplier={selectedSupplier} />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(supplier)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditSupplier(supplier)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(supplier)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={6} className="text-center">
+                  Không tìm thấy nhà cung cấp nào.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </main>
 
-      <div className="flex justify-center mt-4">
-        {Array.from({
-          length: Math.ceil(filteredSuppliers.length / itemsPerPage),
-        }).map((_, index) => (
-          <Button
-            key={index}
-            variant={currentPage === index + 1 ? "default" : "outline"}
-            className="mx-1"
-            onClick={() => paginate(index + 1)}
-          >
-            {index + 1}
-          </Button>
-        ))}
-      </div>
+      {totalPages > 1 && (
+        <Pagination className="mt-4">
+          <PaginationContent>
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+            )}
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(index + 1)}
+                  isActive={currentPage === index + 1}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
 
       {/* Delete Dialog */}
       {confirmDelete && (

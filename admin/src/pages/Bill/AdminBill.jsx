@@ -16,6 +16,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Check, Search, X } from "lucide-react";
 import Header from "../component/Header";
 import BillDetails from "./components/BillDetais.jsx";
@@ -42,6 +51,15 @@ const AdminBill = () => {
       ? true
       : false;
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(filteredBills.length / itemsPerPage);
+  const paginatedBrands = filteredBills.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div>
@@ -72,45 +90,91 @@ const AdminBill = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredBills.map((bill) => (
-              <TableRow key={bill.id}>
-                <TableCell>{bill.id}</TableCell>
-                <TableCell>{bill.customer.name ?? "Khách vãng lai"}</TableCell>
-                <TableCell>
-                  {new Date(bill.createdAt).toLocaleDateString("vi")}
-                </TableCell>
-                <TableCell>{bill.prescription.number || "..."}</TableCell>
-                <TableCell>{bill.prescription.source || "..."}</TableCell>
-                <TableCell>
-                  {bill.billIsRx ? (
-                    <Check className="text-green-500" />
-                  ) : (
-                    <X className="text-red-500" />
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        onClick={() => setSelectedBill(bill)}
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl">
-                      <DialogHeader>
-                        <DialogTitle>Chi tiết hóa đơn</DialogTitle>
-                      </DialogHeader>
-                      <DialogDescription></DialogDescription>
-                      {selectedBill && <BillDetails bill={selectedBill} />}
-                    </DialogContent>
-                  </Dialog>
+            {paginatedBrands.length > 0 ? (
+              paginatedBrands.map((bill) => (
+                <TableRow key={bill.id}>
+                  <TableCell>{bill.id}</TableCell>
+                  <TableCell>
+                    {bill.customer.name ?? "Khách vãng lai"}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(bill.createdAt).toLocaleDateString("vi")}
+                  </TableCell>
+                  <TableCell>{bill.prescription.number || "..."}</TableCell>
+                  <TableCell>{bill.prescription.source || "..."}</TableCell>
+                  <TableCell>
+                    {bill.billIsRx ? (
+                      <Check className="text-green-500" />
+                    ) : (
+                      <X className="text-red-500" />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSelectedBill(bill)}
+                        >
+                          Xem chi tiết
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                          <DialogTitle>Chi tiết hóa đơn</DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription></DialogDescription>
+                        {selectedBill && <BillDetails bill={selectedBill} />}
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan="7" className="text-center">
+                  Không tìm thấy hóa đơn nào
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
       </main>
     </div>
   );

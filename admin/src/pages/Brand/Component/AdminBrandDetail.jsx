@@ -4,6 +4,8 @@ import { Separator } from "@/components/ui/separator";
 import { Tag, FileText, Info } from "lucide-react";
 
 const AdminBrandDetail = ({ brand }) => {
+  console.log(brand);
+  
   return (
     <Card className="w-full max-w-3xl mx-auto max-h-[calc(100vh-120px)] h-fit overflow-y-auto">
       <CardHeader className="pb-4">

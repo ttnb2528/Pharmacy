@@ -42,6 +42,8 @@ import { LOGOUT_ROUTE } from "@/API/index.api.js";
 import { toast } from "sonner";
 import { getInitials } from "@/utils/getInitialName.js";
 import { useAppStore } from "@/store/index.js";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const sidebarItems = [
   { icon: Home, label: "Tổng quan", to: "/", roles: ["admin", "employee"] },
@@ -144,6 +146,13 @@ const DashBoard = () => {
     }
   };
 
+  const [activeTab, setActiveTab] = useState(window.location.pathname);
+  const location = useLocation();
+
+  useEffect(() => {
+    setActiveTab(location.pathname);
+  }, [location.pathname]);
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
@@ -157,9 +166,22 @@ const DashBoard = () => {
                 <SidebarMenu>
                   {filteredSidebarItems.map((item, index) => (
                     <SidebarMenuItem key={index}>
-                      <Link to={item?.to}>
-                        <SidebarMenuButton>
-                          <item.icon className="mr-2 h-4 w-4" />
+                      <Link
+                        to={item?.to}
+                        onClick={() => setActiveTab(item?.to)}
+                      >
+                        <SidebarMenuButton
+                          className={
+                            activeTab === item?.to
+                              ? "bg-primary/10 text-primary font-medium"
+                              : ""
+                          }
+                        >
+                          <item.icon
+                            className={`mr-2 h-4 w-4 ${
+                              activeTab === item?.to ? "text-primary" : ""
+                            }`}
+                          />
                           {item.label}
                         </SidebarMenuButton>
                       </Link>
@@ -180,7 +202,9 @@ const DashBoard = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{userInfo?.name}</span>
+                    <span className="text-sm font-medium">
+                      {userInfo?.name}
+                    </span>
                     <span className="text-xs text-muted-foreground">
                       {userRole === "admin" ? "Quản trị viên" : "Nhân viên"}
                     </span>

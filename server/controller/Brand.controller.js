@@ -45,11 +45,30 @@ export const getBrands = asyncHandler(async (req, res) => {
   try {
     const brands = await Brand.find();
 
+    const productCounts = await Medicine.aggregate([
+      {
+        $group: {
+          _id: "$brandId",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const brandsWithCount = brands.map((brand) => {
+      const count = productCounts.find(
+        (item) => item._id.toString() === brand._id.toString()
+      );
+      return {
+        ...brand.toObject(), // Chuyển Mongoose Document thành plain object
+        productCount: count ? count.count : 0,
+      };
+    });
+
     res.json(
       jsonGenerate(
         StatusCode.OK,
         "Lấy danh sách thương hiệu thành công",
-        brands
+        brandsWithCount
       )
     );
   } catch (error) {

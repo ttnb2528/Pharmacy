@@ -23,6 +23,8 @@ const ExpiredMedicines = () => {
       try {
         setIsLoading(true);
         const res = await apiClient.get(GET_EXPIRED_MEDICINES_ROUTE);
+        console.log(res);
+        
         if (res.status === 200 && res.data.status === 200) {
           const expired = res.data.data.map((batch) => ({
             name: batch.MedicineId.name,
@@ -42,7 +44,6 @@ const ExpiredMedicines = () => {
 
     fetchExpiredMedicines();
   }, []);
-
   if (isLoading) {
     return <Loading />;
   }

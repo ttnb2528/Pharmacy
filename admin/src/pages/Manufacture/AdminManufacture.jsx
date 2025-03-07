@@ -19,6 +19,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import { apiClient } from "@/lib/api-admin.js";
 import {
   ADD_MANUFACTURE_ROUTE,
@@ -61,14 +70,11 @@ const AdminManufacture = () => {
   });
 
   // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCategories = filteredManufactures.slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  const totalPages = Math.ceil(filteredManufactures.length / itemsPerPage);
+  const paginatedManufactures = filteredManufactures.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // View Manufacture
   const handleViewManufacture = (manufacture) => {
@@ -188,73 +194,102 @@ const AdminManufacture = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentCategories.map((manufacture) => (
-              <TableRow key={manufacture.id}>
-                <TableCell>{manufacture.id}</TableCell>
-                <TableCell>{manufacture.name}</TableCell>
-                <TableCell>{manufacture.country}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewManufacture(manufacture)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">
-                            Thông tin nhà sản xuất
-                          </DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <AdminManufactureDetail
-                          manufacture={selectedManufacture}
-                        />
-                      </DialogContent>
-                    </Dialog>
+            {paginatedManufactures.length > 0 ? (
+              paginatedManufactures.map((manufacture) => (
+                <TableRow key={manufacture.id}>
+                  <TableCell>{manufacture.id}</TableCell>
+                  <TableCell>{manufacture.name}</TableCell>
+                  <TableCell>{manufacture.country}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewManufacture(manufacture)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">
+                              Thông tin nhà sản xuất
+                            </DialogTitle>
+                          </DialogHeader>
+                          <DialogDescription></DialogDescription>
+                          <AdminManufactureDetail
+                            manufacture={selectedManufacture}
+                          />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditManufacture(manufacture)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditManufacture(manufacture)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(manufacture)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(manufacture)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={4} className="text-center">
+                  Không có dữ liệu
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-
-        <div className="flex justify-center mt-4">
-          {Array.from({
-            length: Math.ceil(filteredManufactures.length / itemsPerPage),
-          }).map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              className="mx-1"
-              onClick={() => paginate(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </div>
       </main>
+      {totalPages > 1 && (
+        <Pagination className="mt-4">
+          <PaginationContent>
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+            )}
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(index + 1)}
+                  isActive={currentPage === index + 1}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
 
       {/* Delete Dialog */}
       {confirmDelete && (

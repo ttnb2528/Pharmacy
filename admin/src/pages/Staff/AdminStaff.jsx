@@ -18,6 +18,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import Loading from "../component/Loading.jsx";
 import { StaffContext } from "@/context/StaffContext.context.jsx";
 import { apiClient } from "@/lib/api-admin.js";
@@ -57,11 +66,11 @@ const AdminStaff = () => {
   });
 
   // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentStaff = filteredStaff.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
+  const paginatedStaffs = filteredStaff.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // View Staff
   const handleViewStaff = (staff) => {
@@ -181,74 +190,104 @@ const AdminStaff = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentStaff.map((s) => (
-              <TableRow key={s._id}>
-                <TableCell className="font-medium">
-                  {s?.name ?? "..."}
-                </TableCell>
-                <TableCell>{s?.gender ?? "..."}</TableCell>
-                <TableCell>{s?.date ? formatDate(s?.date) : "..."}</TableCell>
-                <TableCell>{s?.phone ?? "..."}</TableCell>
-                <TableCell>{s?.username ?? "..."}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewStaff(s)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">
-                            Thông tin nhân viên
-                          </DialogTitle>
-                          <DialogDescription></DialogDescription>
-                        </DialogHeader>
-                        <AdminStaffDetail staff={selectedStaff} />
-                      </DialogContent>
-                    </Dialog>
+            {paginatedStaffs.length > 0 ? (
+              paginatedStaffs.map((s) => (
+                <TableRow key={s._id}>
+                  <TableCell className="font-medium">
+                    {s?.name ?? "..."}
+                  </TableCell>
+                  <TableCell>{s?.gender ?? "..."}</TableCell>
+                  <TableCell>{s?.date ? formatDate(s?.date) : "..."}</TableCell>
+                  <TableCell>{s?.phone ?? "..."}</TableCell>
+                  <TableCell>{s?.username ?? "..."}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewStaff(s)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">
+                              Thông tin nhân viên
+                            </DialogTitle>
+                            <DialogDescription></DialogDescription>
+                          </DialogHeader>
+                          <AdminStaffDetail staff={selectedStaff} />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditStaff(s)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditStaff(s)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(s)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(s)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không có nhân viên nào
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
 
-        <div className="flex justify-center mt-4">
-          {Array.from({
-            length: Math.ceil(filteredStaff.length / itemsPerPage),
-          }).map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              className="mx-1"
-              onClick={() => paginate(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </div>
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
 
         {/* Delete Dialog */}
         {confirmDelete && (

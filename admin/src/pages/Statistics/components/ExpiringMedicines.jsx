@@ -77,48 +77,56 @@ const ExpiringMedicines = () => {
         <CardTitle>Thuốc sắp hết hạn (Trong vòng 30 ngày)</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={expiringData}>
-            <XAxis
-              dataKey="name"
-              interval={0}
-              angle={-45}
-              textAnchor="end"
-              height={100}
-            />{" "}
-            {/* X-axis with rotation */}
-            <YAxis
-              yAxisId="left"
-              orientation="left"
-              stroke="black"
-              label={{
-                value: "Ngày còn lại",
-                angle: -90,
-                position: "insideLeft",
-              }}
-            />
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              stroke="black"
-              label={{ value: "Số lượng", angle: -90, position: "insideRight" }}
-            />
-            <Tooltip content={<CustomTooltip />} /> {/* Add tooltip */}
-            <Legend /> {/* Add legend */}
-            <Bar
-              yAxisId="left"
-              dataKey="daysLeft"
-              fill="#ff7474"
-              name="Ngày còn lại"
-            />
-            <Bar
-              yAxisId="right"
-              dataKey="quantity"
-              fill="#e9d700"
-              name="Số lượng"
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {expiringData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={expiringData}>
+              <XAxis
+                dataKey="name"
+                interval={0}
+                angle={-45}
+                textAnchor="end"
+                height={100}
+              />{" "}
+              {/* X-axis with rotation */}
+              <YAxis
+                yAxisId="left"
+                orientation="left"
+                stroke="black"
+                label={{
+                  value: "Ngày còn lại",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                stroke="black"
+                label={{
+                  value: "Số lượng",
+                  angle: -90,
+                  position: "insideRight",
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} /> {/* Add tooltip */}
+              <Legend /> {/* Add legend */}
+              <Bar
+                yAxisId="left"
+                dataKey="daysLeft"
+                fill="#ff7474"
+                name="Ngày còn lại"
+              />
+              <Bar
+                yAxisId="right"
+                dataKey="quantity"
+                fill="#e9d700"
+                name="Số lượng"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-center">Chưa có thuốc sắp hết hạn.</p>
+        )}
       </CardContent>
     </Card>
   );
