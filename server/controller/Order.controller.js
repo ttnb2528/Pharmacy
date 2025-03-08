@@ -145,7 +145,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         price: medicine.batches[0].price,
         name: medicine.name,
         unit: medicine.unit,
-        discount: medicine.isDiscount ? medicine.percentDiscount : 0,
+        discount: medicine.isDiscount ? medicine.discountPercentage : 0,
       };
     });
 

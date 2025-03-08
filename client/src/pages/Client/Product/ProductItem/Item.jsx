@@ -150,7 +150,7 @@ const Item = ({
                         {convertVND(
                           CalculateProductWithSale(
                             product?.batches[0]?.price,
-                            product?.percentDiscount
+                            product?.discountPercentage
                           )
                         )}
                       </span>

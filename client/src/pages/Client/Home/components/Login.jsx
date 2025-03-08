@@ -85,6 +85,8 @@ const Login = ({ close }) => {
     try {
       if (validateSignup()) {
         const res = await apiClient.post(SIGNUP_ROUTE, { email, password });
+        console.log(res);
+        
         if (res.status === 200 && res.data.status === 201) {
           toast.success(res.data.message);
           setUserInfo(res.data.data);

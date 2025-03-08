@@ -195,10 +195,10 @@ const CheckoutInfo = ({
         </p>
         <div className="grid gap-4">
           {allProducts.map(
-            (product) =>
+            (product, index) =>
               cart[product.id] > 0 && (
                 <div key={product._id}>
-                  <div className="grid grid-flow-col">
+                  <div className="grid grid-flow-col py-2">
                     <div className="grid grid-cols-[calc(68rem/16)_1fr] items-start gap-2">
                       <div className="relative h-[calc(68rem/16)] w-[calc(68rem/16)] rounded-sm border border-neutral-100">
                         <img
@@ -226,7 +226,7 @@ const CheckoutInfo = ({
                                   title="Deal Hot Giảm 25%"
                                   className="line-clamp-1 text-sm font-semibold text-orange-600"
                                 >
-                                  Deal Hot Giảm {product?.percentDiscount}%
+                                  Deal Hot Giảm {product?.discountPercentage}%
                                 </p>
                               )}
                             </div>
@@ -252,7 +252,7 @@ const CheckoutInfo = ({
                               ? convertVND(
                                   CalculateProductWithSale(
                                     product?.batches[0].price,
-                                    product?.percentDiscount
+                                    product?.discountPercentage
                                   )
                                 )
                               : convertVND(product?.batches[0]?.price)}
@@ -261,7 +261,7 @@ const CheckoutInfo = ({
                       </div>
                     </div>
                   </div>
-                  <Separator />
+                  {index < allProducts.length - 1 && <Separator />}
                 </div>
               )
           )}

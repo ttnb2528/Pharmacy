@@ -190,7 +190,7 @@ const PharmacyContextProvider = (props) => {
         if (product?.batches?.[0]?.price) {
           totalPrice +=
             carts[item] *
-            ((product.percentDiscount / 100) * product.batches[0].price);
+            ((product.discountPercentage / 100) * product.batches[0].price);
         }
       }
     }
@@ -208,7 +208,7 @@ const PharmacyContextProvider = (props) => {
           totalPrice +=
             carts[item] *
             (product.batches[0].price -
-              (product.percentDiscount / 100) * product.batches[0].price);
+              (product.discountPercentage / 100) * product.batches[0].price);
         }
       }
     }

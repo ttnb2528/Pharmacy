@@ -7,6 +7,7 @@ import generateToken from "../utils/createToken.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Staff from "../model/Staff.model.js";
 import LoyaltyProgram from "../model/LoyaltyProgram.model.js";
+import { generateID } from "../utils/generateID.js";
 
 export const signup = asyncHandler(async (req, res) => {
   try {
@@ -30,7 +31,9 @@ export const signup = asyncHandler(async (req, res) => {
     }
 
     const user = await Account.create({ email, password, cartData: cart });
-    await Customer.create({ accountId: user._id });
+    
+    let idCus = await generateID(Customer);
+    await Customer.create({ accountId: user._id, id: idCus });
 
     const loyaltyProgram = await LoyaltyProgram.create({ AccountId: user._id });
 

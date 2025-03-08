@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { FaShippingFast } from "react-icons/fa";
-import testProductImage from "@/assets/test_product_image1.jpg";
+// import testProductImage from "@/assets/test_product_image1.jpg";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input.jsx";
 import { FaMinus, FaPlus, FaTrashAlt } from "react-icons/fa";
@@ -332,8 +332,9 @@ const CartItemBox = () => {
                           <div className="relative h-[calc(68rem/16)] w-[calc(68rem/16)] rounded-sm border border-neutral-100">
                             <div
                               onClick={() => handleNavigateToProduct(product)}
+                              className="w-full h-full cursor-pointer"
                             >
-                              <img src={testProductImage} alt="" />
+                              <img src={product?.images[0]} alt="" className="w-full h-full object-contain"/>
                             </div>
                           </div>
 
@@ -362,7 +363,7 @@ const CartItemBox = () => {
                                   {convertVND(
                                     CalculateProductWithSale(
                                       product.batches[0].price,
-                                      product.percentDiscount
+                                      product.discountPercentage
                                     )
                                   )}
                                 </p>
@@ -429,7 +430,7 @@ const CartItemBox = () => {
                                   {convertVND(
                                     CalculateTotalPrice(
                                       product.batches[0].price,
-                                      product.percentDiscount,
+                                      product.discountPercentage,
                                       cart[product.id]
                                     )
                                   )}

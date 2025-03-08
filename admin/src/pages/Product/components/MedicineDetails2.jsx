@@ -65,7 +65,7 @@ const MedicineDetails = ({
     drugUser: medicine?.drugUser || "",
     isRx: medicine?.isRx || false,
     isDiscount: medicine?.isDiscount || false,
-    percentDiscount: medicine?.percentDiscount || 0,
+    discountPercentage: medicine?.discountPercentage || 0,
     categoryId: medicine?.categoryId?._id || "",
     brandId: medicine?.brandId?._id || "",
     images: medicine?.images || [],
@@ -370,8 +370,8 @@ const MedicineDetails = ({
             : medicine?.isDiscount) &&
             renderField(
               "Phần trăm giảm giá",
-              "percentDiscount",
-              "percentDiscount",
+              "discountPercentage",
+              "discountPercentage",
               "number"
             )}
 

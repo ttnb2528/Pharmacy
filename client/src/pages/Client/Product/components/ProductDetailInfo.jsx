@@ -115,7 +115,7 @@ const ProductDetailInfo = ({ product }) => {
               {convertVND(
                 CalculateProductWithSale(
                   product?.batches[0]?.price,
-                  product?.percentDiscount
+                  product?.discountPercentage
                 )
               )}
             </div>
@@ -136,7 +136,7 @@ const ProductDetailInfo = ({ product }) => {
                 Tích lũy{" "}
                 {CalculatePointEarned(
                   product?.batches[0]?.price,
-                  product?.percentDiscount
+                  product?.discountPercentage
                 )}{" "}
                 Xu
               </span>

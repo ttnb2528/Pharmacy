@@ -32,20 +32,26 @@ const SelectCoupon = ({
           </SheetDescription>
         </SheetHeader>
         <div className="mt-4 space-y-4">
-          {couponData?.map((coupon) => (
-            <div key={coupon._id} className="rounded-lg border p-3">
-              <h3 className="font-semibold">{coupon.coupon_code}</h3>
-              <p className="text-sm text-gray-500">{coupon.description}</p>
-              <Button
-                className="mt-2 bg-green-500 hover:bg-green-600"
-                size="sm"
-                onClick={() => handleApplyCoupon(coupon)}
-                disabled={!coupon.canUse}
-              >
-                {coupon.canUse ? "Áp dụng" : "Đã hết lượt sử dụng"}
-              </Button>
+          {couponData.length > 0 ? (
+            couponData?.map((coupon) => (
+              <div key={coupon._id} className="rounded-lg border p-3">
+                <h3 className="font-semibold">{coupon.coupon_code}</h3>
+                <p className="text-sm text-gray-500">{coupon.description}</p>
+                <Button
+                  className="mt-2 bg-green-500 hover:bg-green-600"
+                  size="sm"
+                  onClick={() => handleApplyCoupon(coupon)}
+                  disabled={!coupon.canUse}
+                >
+                  {coupon.canUse ? "Áp dụng" : "Đã hết lượt sử dụng"}
+                </Button>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 font-semibold">
+              Tạm thời chưa có mã khuyến mãi
             </div>
-          ))}
+          )}
         </div>
       </SheetContent>
     </Sheet>

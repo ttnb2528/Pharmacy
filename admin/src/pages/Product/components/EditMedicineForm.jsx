@@ -43,7 +43,7 @@ const EditMedicineForm = ({ medicine, handleCancel }) => {
     ingredient: medicine.ingredient,
     isRx: medicine.isRx,
     isDiscount: medicine.isDiscount,
-    percentDiscount: medicine.percentDiscount,
+    discountPercentage: medicine.discountPercentage,
     categoryId: medicine?.categoryId._id,
     brandId: medicine?.brandId._id,
     images: medicine.images,
@@ -349,7 +349,7 @@ const EditMedicineForm = ({ medicine, handleCancel }) => {
       {renderSwitch("Giảm giá", "isDiscount")}
 
       {formData.isDiscount &&
-        renderField("Phần trăm giảm giá", "percentDiscount", "number")}
+        renderField("Phần trăm giảm giá", "discountPercentage", "number")}
 
       <div className="grid grid-cols-4 items-center gap-4">
         <Label className="text-right">Danh mục</Label>

@@ -40,7 +40,7 @@ const AddMedicineForm = ({ handleCancel }) => {
     ingredient: "",
     isRx: false,
     isDiscount: false,
-    percentDiscount: 0,
+    discountPercentage: 0,
     categoryId: "",
     brandId: "",
     images: [],
@@ -193,18 +193,18 @@ const AddMedicineForm = ({ handleCancel }) => {
 
       {formData.isDiscount && (
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="percentDiscount" className="text-right">
+          <Label htmlFor="discountPercentage" className="text-right">
             Phần trăm giảm giá
           </Label>
           <Input
-            id="percentDiscount"
+            id="discountPercentage"
             type="number"
             min="0"
             max="100"
-            value={formData.percentDiscount}
+            value={formData.discountPercentage}
             onChange={(e) =>
               handleInputChange(
-                "percentDiscount",
+                "discountPercentage",
                 Number.parseInt(e.target.value)
               )
             }

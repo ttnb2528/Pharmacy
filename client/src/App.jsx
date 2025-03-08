@@ -153,7 +153,7 @@ const App = () => {
 
   return (
     <HomeContextProvider>
-      <RouterProvider router={createBrowserRouter(routes)} />;
+      <RouterProvider router={createBrowserRouter(routes)} />
     </HomeContextProvider>
   );
 };
