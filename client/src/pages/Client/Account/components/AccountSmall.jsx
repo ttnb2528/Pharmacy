@@ -8,8 +8,6 @@ import goldRankIcon from "@/assets/gold-rank.png";
 import { Separator } from "@/components/ui/separator.jsx";
 import { Progress } from "@/components/ui/progress";
 import { NavLink } from "react-router-dom";
-import { useContext } from "react";
-import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 
 import { FaRegUserCircle } from "react-icons/fa";
 import { LuNotepadText } from "react-icons/lu";
@@ -22,9 +20,10 @@ import {
   CalculateRemainingAccumulated,
 } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
+import { useAppStore } from "@/store/index.js";
 
 const AccountSmall = () => {
-  const { userData } = useContext(PharmacyContext);
+  const { userInfo } = useAppStore();
 
   return (
     <div>
@@ -34,28 +33,28 @@ const AccountSmall = () => {
             <div className="flex items-center gap-2">
               {/* chỉnh lại lấy ảnh sao */}
               <Avatar className="w-16 h-16">
-                {userData?.avatar ? (
+                {userInfo?.avatar ? (
                   <AvatarImage
-                    src={userData?.avatar}
+                    src={userInfo?.avatar}
                     alt="User avatar"
                     className="object-cover w-full h-full bg-black"
                   />
                 ) : (
                   <div className="uppercase h-16 w-16 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
-                    {userData?.name ? getInitials(userData.name) : "KH"}
+                    {userInfo?.name ? getInitials(userInfo.name) : "KH"}
                   </div>
                 )}
               </Avatar>
 
               <div className="flex-1 text-sm font-medium">
                 <div className="text-neutral-900 text-base font-bold capitalize">
-                  {userData?.name ? userData.name : "Khách hàng"}
+                  {userInfo?.name ? userInfo.name : "Khách hàng"}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   <div className="mt-1 flex w-fit items-center gap-1 rounded-full bg-orange-100 px-2 py-1 text-sm font-semibold">
                     <CoinSvg />
                     <span className="font-medium text-neutral-900">
-                      {userData?.accountId?.loyaltyProgramId?.points} Xu
+                      {userInfo?.accountId?.loyaltyProgramId?.points} Xu
                     </span>
                   </div>
                 </div>
@@ -81,8 +80,8 @@ const AccountSmall = () => {
                 <div className="relative min-w-[30px] overflow-hidden rounded-xl text-center text-[10px] font-semibold h-2 w-[100%] bg-white">
                   <Progress
                     value={CalculatePercentProgress(
-                      userData?.accountId?.loyaltyProgramId?.rank,
-                      userData?.accountId?.loyaltyProgramId?.totalSpending
+                      userInfo?.accountId?.loyaltyProgramId?.rank,
+                      userInfo?.accountId?.loyaltyProgramId?.totalSpending
                     )}
                     className="w-full bg-white [&>div]:bg-gray-400"
                   />
@@ -101,8 +100,8 @@ const AccountSmall = () => {
                   Chi tiêu thêm{" "}
                   {convertVND(
                     CalculateRemainingAccumulated(
-                      userData?.accountId?.loyaltyProgramId?.rank,
-                      userData?.accountId?.loyaltyProgramId?.totalSpending
+                      userInfo?.accountId?.loyaltyProgramId?.rank,
+                      userInfo?.accountId?.loyaltyProgramId?.totalSpending
                     )
                   )}{" "}
                   để thăng hạng vàng

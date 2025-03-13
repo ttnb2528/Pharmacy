@@ -47,7 +47,7 @@ const Login = ({ close }) => {
         const res = await apiClient.post(LOGIN_ROUTE, { email, password });
         if (res.status === 200 && res.data.status === 200) {
           setUserInfo(res.data.data);
-          localStorage.setItem("token", res.data.data.token);
+          // localStorage.setItem("token", res.data.data.token);
 
           // Redirect to the page user tried to access before login
           const from = location.state?.from?.pathname || "/";

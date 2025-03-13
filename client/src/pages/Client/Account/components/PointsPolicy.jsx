@@ -11,14 +11,13 @@ import silverIcon from "@/assets/silver-rank.png";
 import goldIcon from "@/assets/gold-rank.png";
 import diamondIcon from "@/assets/diamond-rank.png";
 import { Progress } from "@/components/ui/progress.jsx";
-import { useContext } from "react";
-import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import {
   CalculatePercentProgressGold,
   CalculatePercentProgressSilver,
   CalculateRemainingAccumulated,
 } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
+import { useAppStore } from "@/store/index.js";
 
 const TierContent = ({ upgradeCriteria, benefits }) => (
   <Card className="rounded-none border-t-0">
@@ -47,7 +46,7 @@ const TierContent = ({ upgradeCriteria, benefits }) => (
 );
 
 const PointsPolicy = () => {
-  const { userData } = useContext(PharmacyContext);
+  const { userInfo } = useAppStore();
   const tiers = [
     {
       id: "bac",
@@ -90,7 +89,7 @@ const PointsPolicy = () => {
                   <p className="flex items-center gap-2 pt-4 text-base font-semibold ">
                     Hạng thành viên{" "}
                     <span className="text-2xl font-bold uppercase">
-                      {userData?.accountId?.loyaltyProgramId?.rank}
+                      {userInfo?.accountId?.loyaltyProgramId?.rank}
                     </span>
                   </p>
                 </div>
@@ -106,8 +105,8 @@ const PointsPolicy = () => {
                     <div className="relative min-w-[30px] overflow-hidden py-[2px] text-center text-[10px] font-semibold h-2 w-[100%] rounded-none bg-neutral-200">
                       <Progress
                         value={CalculatePercentProgressSilver(
-                          userData?.accountId?.loyaltyProgramId?.rank,
-                          userData?.accountId?.loyaltyProgramId?.totalSpending
+                          userInfo?.accountId?.loyaltyProgramId?.rank,
+                          userInfo?.accountId?.loyaltyProgramId?.totalSpending
                         )}
                         className="w-full bg-white [&>div]:bg-gray-400"
                       />
@@ -121,8 +120,8 @@ const PointsPolicy = () => {
                     <div className="relative min-w-[30px] overflow-hidden py-[2px] text-center text-[10px] font-semibold h-2 w-[100%] rounded-none bg-neutral-200">
                       <Progress
                         value={CalculatePercentProgressGold(
-                          userData?.accountId?.loyaltyProgramId?.rank,
-                          userData?.accountId?.loyaltyProgramId?.totalSpending
+                          userInfo?.accountId?.loyaltyProgramId?.rank,
+                          userInfo?.accountId?.loyaltyProgramId?.totalSpending
                         )}
                         className="w-full bg-white [&>div]:bg-gray-400"
                       />
@@ -142,8 +141,8 @@ const PointsPolicy = () => {
                       Chi tiêu thêm{" "}
                       {convertVND(
                         CalculateRemainingAccumulated(
-                          userData?.accountId?.loyaltyProgramId?.rank,
-                          userData?.accountId?.loyaltyProgramId?.totalSpending
+                          userInfo?.accountId?.loyaltyProgramId?.rank,
+                          userInfo?.accountId?.loyaltyProgramId?.totalSpending
                         )
                       )}{" "}
                       để thăng hạng

@@ -4,7 +4,7 @@ import {
   GET_ALL_PRODUCTS_ROUTE,
   GET_COUPONS_ROUTE,
   GET_PRODUCT_BY_BEST_SELLING_ROUTE,
-  GET_USER_INFO,
+  // GET_USER_INFO,
 } from "@/API/index.api.js";
 import { apiClient } from "@/lib/api-client.js";
 import { createContext, useEffect, useState } from "react";
@@ -21,7 +21,7 @@ const getDefaultCart = () => {
 };
 
 const PharmacyContextProvider = (props) => {
-  const [userData, setUserData] = useState(null);
+  // const [userData, setUserData] = useState(null);
   const [addressData, setAddressData] = useState([]);
   const [couponData, setCouponData] = useState([]);
   const [cart, setCart] = useState(getDefaultCart());
@@ -33,19 +33,19 @@ const PharmacyContextProvider = (props) => {
 
   useEffect(() => {
     setLoading(true);
-    const fetchUserData = async () => {
-      try {
-        const resUser = await apiClient.get(GET_USER_INFO);
-        if (resUser.status === 200) {
-          setUserData(resUser.data.data);
-          setCart(resUser.data.data?.accountId?.cartData);
-        } else {
-          setUserData(null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin người dùng:", error);
-      }
-    };
+    // const fetchUserData = async () => {
+    //   try {
+    //     const resUser = await apiClient.get(GET_USER_INFO);
+    //     if (resUser.status === 200) {
+    //       setUserData(resUser.data.data);
+    //       setCart(resUser.data.data?.accountId?.cartData);
+    //     } else {
+    //       setUserData(null);
+    //     }
+    //   } catch (error) {
+    //     console.error("Lỗi khi lấy thông tin người dùng:", error);
+    //   }
+    // };
 
     const fetchAddressData = async () => {
       try {
@@ -114,7 +114,7 @@ const PharmacyContextProvider = (props) => {
       }
     };
 
-    fetchUserData();
+    // fetchUserData();
     fetchAddressData();
     fetchCouponData();
     fetchCategories();
@@ -149,9 +149,9 @@ const PharmacyContextProvider = (props) => {
   //   fetchData();
   // }, []);
 
-  const updateUserData = (newUserData) => {
-    setUserData(newUserData);
-  };
+  // const updateUserData = (newUserData) => {
+  //   setUserData(newUserData);
+  // };
 
   const CalculateTotalItems = (carts) => {
     let totalItems = 0;
@@ -237,8 +237,8 @@ const PharmacyContextProvider = (props) => {
 
   const contextValue = {
     loading,
-    userData,
-    updateUserData,
+    // userData,
+    // updateUserData,
     addressData,
     setAddressData,
     couponData,

@@ -2,6 +2,7 @@ import { ADD_TO_CART_ROUTE } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
+import { useAppStore } from "@/store/index.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useEffect, useState } from "react";
@@ -13,10 +14,11 @@ const Item = ({
   product,
   setIsLoading,
   setViewedProducts,
-  hasLogin,
+  // hasLogin,
   setShowLogin,
 }) => {
   // const { setSelectedProduct } = useContext(ProductContext);
+  const { userInfo } = useAppStore();
   const navigate = useNavigate();
   const { setCart } = useContext(PharmacyContext);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
@@ -66,6 +68,9 @@ const Item = ({
         productId: productId,
         quantity: 1,
       });
+
+      console.log(res);
+      
 
       if (res.status === 200 && res.data.status === 200) {
         setCart((prev) => {
@@ -178,7 +183,7 @@ const Item = ({
                 <Button
                   className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
                   onClick={() =>
-                    hasLogin ? AddToCart(product.id) : setShowLogin(true)
+                    userInfo ? AddToCart(product.id) : setShowLogin(true)
                   }
                 >
                   Thêm giỏ hàng

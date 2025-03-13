@@ -36,12 +36,13 @@ import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { toast } from "sonner";
 import Loading from "../../Loading.jsx";
 import slugify from "slugify";
+import { useAppStore } from "@/store/index.js";
 
 const NavSearch = () => {
+  const { userInfo } = useAppStore();
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
   const {
-    userData,
     cart,
     setCart,
     CalculateTotalItems,
@@ -79,6 +80,10 @@ const NavSearch = () => {
   const handleFocus = () => {
     setShowResults(true);
   };
+
+  useEffect(() => {
+    setCart(userInfo?.accountId?.cartData);
+  }, [userInfo, setCart]);
 
   // Xử lý click outside input
   useEffect(() => {
@@ -345,16 +350,16 @@ const NavSearch = () => {
       </DropdownMenu>
 
       {/* user */}
-      {userData ? (
+      {userInfo ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div
               // variant="outline"
               className="bg-white rounded-full h-10 flex w-36 items-center gap-2 px-3 focus-visible:ring-0"
             >
-              {userData?.avatar ? (
+              {userInfo?.avatar ? (
                 <img
-                  src={userData?.avatar}
+                  src={userInfo?.avatar}
                   alt="avatar user"
                   className="h-8 w-8 rounded-full object-cover"
                 />
@@ -384,7 +389,7 @@ const NavSearch = () => {
                 </svg>
               )}
               <div className="line-clamp-1 flex-1 text-left text-xs font-bold">
-                {userData.name ? `Chào, ${userData.name}` : "Chào, Khach Hang"}
+                {userInfo.name ? `Chào, ${userInfo.name}` : "Chào, Khach Hang"}
               </div>
             </div>
           </DropdownMenuTrigger>

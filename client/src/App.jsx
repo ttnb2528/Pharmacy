@@ -16,16 +16,47 @@ import PointsPolicy from "./pages/Client/Account/components/PointsPolicy.jsx";
 import UpdatePassword from "./pages/Client/Account/components/UpdatePassword.jsx";
 import NotFound from "./pages/component/NotFound.jsx";
 import SearchResult from "./pages/Client/Product/SearchResult.jsx";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { PharmacyContext } from "./context/Pharmacy.context.jsx";
 import slugify from "slugify";
 import Loading from "./pages/component/Loading.jsx";
 import OrderDetail from "./pages/Client/Account/components/OrderDetail.jsx";
-import PrivateRoute from "./layout/PrivateRoute.jsx";
+// import PrivateRoute from "./layout/PrivateRoute.jsx";
+import PrivateRoute2 from "./layout/PrivateRoute2.jsx";
 import HomeContextProvider from "./context/HomeContext.context.jsx";
+import { apiClient } from "./lib/api-client.js";
+import { GET_USER_INFO } from "./API/index.api.js";
+import { useAppStore } from "./store/index.js";
 
 const App = () => {
+  const { userInfo, setUserInfo } = useAppStore();
   const { categories, loading } = useContext(PharmacyContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await apiClient.get(GET_USER_INFO);
+
+        if (res.status === 200 && res.data.status === 200) {
+          setUserInfo(res.data.data);
+        } else {
+          setUserInfo(undefined);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (!userInfo) {
+      getUserData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [userInfo, setUserInfo, setIsLoading]);
 
   const routes = useMemo(() => {
     // Public routes - không cần đăng nhập
@@ -80,17 +111,17 @@ const App = () => {
       {
         path: "/checkout",
         element: (
-          <PrivateRoute>
+          <PrivateRoute2>
             <Checkout />
-          </PrivateRoute>
+          </PrivateRoute2>
         ),
       },
       {
         path: "/account",
         element: (
-          <PrivateRoute>
+          <PrivateRoute2>
             <Account />
-          </PrivateRoute>
+          </PrivateRoute2>
         ),
         children: [
           {
@@ -143,7 +174,7 @@ const App = () => {
     ];
   }, [categories]);
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
         <Loading />

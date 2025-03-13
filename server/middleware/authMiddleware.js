@@ -6,10 +6,9 @@ import { jsonGenerate } from "../utils/helpers.js";
 import { StatusCode } from "../utils/constants.js";
 
 export const authenticate = asyncHandler(async (req, res, next) => {
-  let token;
-
   // Read JWT from the 'jwt' cookie
-  token = req.cookies.jwt;
+  const role = req.headers["x-role"]; // Header tùy chỉnh
+  let token = role === "admin" ? req.cookies.jwt_admin : req.cookies.jwt_client;
 
   if (token) {
     try {

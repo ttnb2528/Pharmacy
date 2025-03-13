@@ -48,7 +48,7 @@ export const signup = asyncHandler(async (req, res) => {
       populate: { path: "loyaltyProgramId" },
     });
 
-    generateToken(res, user._id);
+    generateToken(res, user._id, false);
 
     return res.json(
       jsonGenerate(StatusCode.CREATED, "Đăng ký thành công", populatedUser)
@@ -92,7 +92,7 @@ export const login = asyncHandler(async (req, res) => {
       const user = populatedUser.toObject();
       delete user.accountId.password;
 
-      const token = generateToken(res, userExist._id);
+      const token = generateToken(res, userExist._id, false);
 
       res.json(
         jsonGenerate(StatusCode.OK, "Đăng nhập thành công", { user, token })
@@ -131,7 +131,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     );
 
     if (isPasswordCorrect) {
-      generateToken(res, userExist._id);
+      generateToken(res, userExist._id, true);
 
       delete userExist.password;
       res.json(jsonGenerate(StatusCode.OK, "Đăng nhập thành công", userExist));

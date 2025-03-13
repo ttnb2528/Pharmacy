@@ -1,6 +1,6 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+// import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import Loading from "@/pages/component/Loading.jsx";
 
@@ -39,9 +39,11 @@ import {
 } from "@/API/index.api.js";
 import { normalizeWhitespace } from "@/utils/normalizeWhiteSpace.jsx";
 import { getInitials } from "@/utils/getInitialName.jsx";
+import { useAppStore } from "@/store/index.js";
 
 const PersonalInfo = () => {
-  const { userData, updateUserData } = useContext(PharmacyContext);
+  const { userInfo, setUserInfo } = useAppStore();
+  // const { updateUserData } = useContext(PharmacyContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -65,24 +67,24 @@ const PersonalInfo = () => {
   });
 
   useEffect(() => {
-    if (userData) {
-      setName(userData?.name || "Khach hang");
-      setGender(userData?.gender || "");
-      setPhone(userData?.phone || "");
-      setDate(userData?.date || "");
+    if (userInfo) {
+      setName(userInfo?.name || "Khach hang");
+      setGender(userInfo?.gender || "");
+      setPhone(userInfo?.phone || "");
+      setDate(userInfo?.date || "");
     }
 
-    if (userData?.avatar) {
-      setAvatar(userData.avatar);
+    if (userInfo?.avatar) {
+      setAvatar(userInfo.avatar);
     }
 
     setInitialValues({
-      name: userData?.name || "Khach hang",
-      gender: userData?.gender || "",
-      phone: userData?.phone || "",
-      date: userData?.date || "",
+      name: userInfo?.name || "Khach hang",
+      gender: userInfo?.gender || "",
+      phone: userInfo?.phone || "",
+      date: userInfo?.date || "",
     });
-  }, [userData]);
+  }, [userInfo]);
 
   const handleFileInputClick = () => {
     fileInputRef.current.click();
@@ -119,7 +121,7 @@ const PersonalInfo = () => {
 
           if (response.status === 200 && response.data.status === 200) {
             toast.success("Ảnh đã được cập nhật");
-            updateUserData({ ...userData, avatar: data.secure_url });
+            setUserInfo({ ...userInfo, avatar: data.secure_url });
           } else {
             toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
           }
@@ -137,7 +139,7 @@ const PersonalInfo = () => {
     try {
       const res = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE);
       if (res.status === 200) {
-        updateUserData({ ...userData, avatar: null });
+        setUserInfo({ ...userInfo, avatar: null });
         toast.success("Ảnh đã được xóa");
         setAvatar(null);
       }
@@ -178,7 +180,7 @@ const PersonalInfo = () => {
     const { updatedName, updatedPhone } = handleNormalize();
     setIsLoading(true);
     try {
-      const res = await apiClient.put(`${UPDATE_USER_ROUTE}/${userData._id}`, {
+      const res = await apiClient.put(`${UPDATE_USER_ROUTE}/${userInfo._id}`, {
         name: updatedName,
         phone: updatedPhone,
         gender,
@@ -188,8 +190,8 @@ const PersonalInfo = () => {
       console.log(res);
       if (res.status === 200 || res.data.status === 200) {
         toast.success("Cập nhật thông tin thành công");
-        updateUserData({
-          ...userData,
+        setUserInfo({
+          ...userInfo,
           name: updatedName,
           phone: updatedPhone,
           gender,
@@ -232,7 +234,7 @@ const PersonalInfo = () => {
               >
                 {/* logic set image */}
                 <Avatar className="w-20 h-20">
-                  {userData?.avatar ? (
+                  {userInfo?.avatar ? (
                     <AvatarImage
                       src={avatar}
                       alt="User avatar"
@@ -241,12 +243,12 @@ const PersonalInfo = () => {
                   ) : (
                     // <AvatarFallback className="border border-green-400 bg-green-400 text-white">
                     //   <span className="text-xl font-bold">
-                    //     {userData?.name ? userData.name : "KH"}
+                    //     {userInfo?.name ? userInfo.name : "KH"}
                     //   </span>
                     // </AvatarFallback>
 
                     <div className="uppercase h-20 w-20 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
-                      {userData?.name ? getInitials(userData.name) : "KH"}
+                      {userInfo?.name ? getInitials(userInfo.name) : "KH"}
                     </div>
                   )}
                 </Avatar>
@@ -254,12 +256,12 @@ const PersonalInfo = () => {
                   <div
                     className="absolute inset-0 top-1 flex items-center w-20 h-20 justify-center bg-black/50 ring-fuchsia-50 rounded-full"
                     onClick={
-                      userData?.avatar
+                      userInfo?.avatar
                         ? handleDeleteImage
                         : handleFileInputClick
                     }
                   >
-                    {userData?.avatar ? (
+                    {userInfo?.avatar ? (
                       <FaTrash className="text-white text-xl cursor-pointer" />
                     ) : (
                       <FaPlus className="text-white text-xl cursor-pointer" />
@@ -378,7 +380,7 @@ const PersonalInfo = () => {
                       <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
                         <p>Email</p>
                         <p className="font-medium text-neutral-600 break-all">
-                          {userData?.accountId?.email || "Chưa cập nhật"}
+                          {userInfo?.accountId?.email || "Chưa cập nhật"}
                         </p>
                       </div>
                       <div

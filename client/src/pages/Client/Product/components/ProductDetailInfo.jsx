@@ -6,6 +6,7 @@ import { HomeContext } from "@/context/HomeContext.context.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import Loading from "@/pages/component/Loading.jsx";
+import { useAppStore } from "@/store/index.js";
 import {
   CalculatePointEarned,
   CalculateProductWithSale,
@@ -16,7 +17,8 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 import { toast } from "sonner";
 
 const ProductDetailInfo = ({ product }) => {
-  const { hasLogin, setShowLogin } = useContext(HomeContext);
+  const { userInfo } = useAppStore();
+  const { setShowLogin } = useContext(HomeContext);
   const { setCart } = useContext(PharmacyContext);
   const [qty, setQty] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -228,7 +230,7 @@ const ProductDetailInfo = ({ product }) => {
               className="w-full bg-green-500 hover:bg-green-600 disabled:text-neutral-200 disabled:bg-neutral-500"
               onClick={() => {
                 if (qty > 0) {
-                  hasLogin ? AddToCart(product?.id, qty) : setShowLogin(true);
+                  userInfo ? AddToCart(product?.id, qty) : setShowLogin(true);
                 } else {
                   toast.error("Số lượng phải lớn hơn 0");
                 }

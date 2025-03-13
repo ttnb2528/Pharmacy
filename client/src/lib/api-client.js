@@ -4,4 +4,5 @@ import { HOST } from "@/API/index.api.js";
 export const apiClient = axios.create({
   baseURL: HOST,
   withCredentials: true,
+  headers: { "X-Role": "client" },
 });

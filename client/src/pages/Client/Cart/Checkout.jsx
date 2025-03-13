@@ -27,8 +27,10 @@ import { toast } from "sonner";
 
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import axios from "axios";
+import { useAppStore } from "@/store/index.js";
 
 const Checkout = () => {
+  const { userInfo } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenCoinGold, setIsOpenCoinGold] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("COD");
@@ -46,7 +48,6 @@ const Checkout = () => {
     CalculateTotalPriceTemp,
     CalculatePriceWithSale,
     CalculateTotalPrice,
-    userData,
   } = useContext(PharmacyContext);
 
   const handleApplyCoupon = (coupon) => {
@@ -78,7 +79,7 @@ const Checkout = () => {
       }
 
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
-        AccountId: userData.accountId._id,
+        AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
         total: CalculateTotalPrice(),
         type: "online",
@@ -141,7 +142,7 @@ const Checkout = () => {
 
       // Gọi API tạo đơn hàng của bạn với thông tin thanh toán PayPal
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
-        AccountId: userData.accountId._id,
+        AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
         total: CalculateTotalPrice(),
         type: "online",
