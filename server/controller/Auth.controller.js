@@ -31,7 +31,7 @@ export const signup = asyncHandler(async (req, res) => {
     }
 
     const user = await Account.create({ email, password, cartData: cart });
-    
+
     let idCus = await generateID(Customer);
     await Customer.create({ accountId: user._id, id: idCus });
 
@@ -147,7 +147,14 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
 export const logout = asyncHandler(async (req, res) => {
   try {
-    res.clearCookie("jwt");
+    const { role } = req.body;
+
+    if (role === "admin") {
+      res.clearCookie("jwt_admin");
+      return res.json(jsonGenerate(StatusCode.OK, "Đăng xuất thành công"));
+    }
+
+    res.clearCookie("jwt_client");
     return res.json(jsonGenerate(StatusCode.OK, "Đăng xuất thành công"));
   } catch (error) {
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));

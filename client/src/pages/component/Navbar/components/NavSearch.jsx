@@ -39,7 +39,7 @@ import slugify from "slugify";
 import { useAppStore } from "@/store/index.js";
 
 const NavSearch = () => {
-  const { userInfo } = useAppStore();
+  const { userInfo, setUserInfo } = useAppStore();
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
   const {
@@ -454,7 +454,10 @@ const NavSearch = () => {
               className="flex items-center"
               onClick={async () => {
                 localStorage.removeItem("token");
-                await apiClient.post(LOGOUT_ROUTE);
+                setUserInfo(null);
+                await apiClient.post(LOGOUT_ROUTE, {
+                  role: "client",
+                });
                 window.location.reload();
               }}
             >

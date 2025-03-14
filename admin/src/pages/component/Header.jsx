@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const Header = ({ title }) => {
   const handleLogout = async () => {
     try {
-      const res = await apiClient.post(LOGOUT_ROUTE);
+      const res = await apiClient.post(LOGOUT_ROUTE, { role: "admin" });
       if (res.status === 200 && res.data.status === 200) {
         toast.success(res.data.message);
         localStorage.removeItem("user");

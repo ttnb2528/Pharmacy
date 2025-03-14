@@ -12,9 +12,11 @@ import {
   GET_USER_INFO,
 } from "@/API/index.api.js";
 import axios from "axios";
+import { useAppStore } from "@/store/index.js";
 
 const ProductComments = ({ productId }) => {
-  const { hasLogin, setShowLogin } = useContext(HomeContext);
+  const { userInfo } = useAppStore();
+  const { setShowLogin } = useContext(HomeContext);
   const [userData, setUserData] = useState({});
   const [text, setText] = useState("");
   const [comments, setComments] = useState([]);
@@ -74,8 +76,8 @@ const ProductComments = ({ productId }) => {
     };
 
     fetchComments();
-    if (hasLogin) fetchUserData();
-  }, [productId, hasLogin, userData._id]);
+    if (userInfo) fetchUserData();
+  }, [productId, userInfo, userData._id]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -107,7 +109,7 @@ const ProductComments = ({ productId }) => {
 
   // Hàm xử lý gửi bình luận
   const handleSubmitComment = async () => {
-    if (!hasLogin) {
+    if (!userInfo) {
       setShowLogin(true);
       return;
     }
@@ -301,7 +303,7 @@ const ProductComments = ({ productId }) => {
 
         {/* Phần viết đánh giá hoặc hiển thị bình luận của user */}
         <div className="flex flex-col gap-4">
-          {hasLogin && hasPurchased ? (
+          {userInfo && hasPurchased ? (
             userComment && !editCommentId ? (
               <div
                 className={`border p-4 rounded-lg bg-gray-50 ${
@@ -396,7 +398,7 @@ const ProductComments = ({ productId }) => {
                 </Button>
               </>
             )
-          ) : hasLogin && !hasPurchased ? (
+          ) : userInfo && !hasPurchased ? (
             <p className="text-gray-500">
               Bạn cần mua sản phẩm này để có thể đánh giá.
             </p>
