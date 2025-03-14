@@ -77,6 +77,10 @@ const OrderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  paypalCaptureId: {
+    type: String,
+    default: null,
+  },
   paypalPaymentStatus: {
     type: String,
     default: null,

@@ -9,6 +9,9 @@ import {
 import { convertVND } from "@/utils/ConvertVND.js";
 import { IoIosArrowBack } from "react-icons/io";
 import { Button } from "@/components/ui/button.jsx";
+import { toast } from "sonner";
+import axios from "axios";
+import Loading from "@/pages/component/Loading.jsx";
 
 const orderStatuses = [
   { value: import.meta.env.VITE_STATUS_ORDER_COMPLETED, vi: "Hoàn thành" },
@@ -23,6 +26,8 @@ const OrderDetail = () => {
   const { orderId } = useParams();
   const [orderDetail, setOrderDetail] = useState(null);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const resOrderDetail = async () => {
       try {
@@ -40,8 +45,79 @@ const OrderDetail = () => {
     resOrderDetail();
   }, [orderId]);
 
+  // Hàm lấy access token PayPal
+  const getPayPalAccessToken = async () => {
+    const authResponse = await axios.post(
+      "https://api-m.sandbox.paypal.com/v1/oauth2/token",
+      "grant_type=client_credentials",
+      {
+        headers: {
+          Authorization: `Basic ${btoa(
+            `${import.meta.env.VITE_PAYPAL_CLIENT_ID}:${
+              import.meta.env.VITE_PAYPAL_SECRET
+            }`
+          )}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return authResponse.data.access_token;
+  };
+
+  // Hàm refund PayPal
+  const refundPayPalPayment = async (paypalCaptureId, amount) => {
+    try {
+      setIsLoading(true);
+      const accessToken = await getPayPalAccessToken();
+      const exchangeRateResponse = await axios.get(
+        "https://api.exchangerate-api.com/v4/latest/VND"
+      );
+      const exchangeRate = exchangeRateResponse.data.rates.USD;
+      const usdAmount = (amount * exchangeRate).toFixed(2);
+
+      const refundResponse = await axios.post(
+        `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalCaptureId}/refund`,
+        {
+          amount: {
+            value: usdAmount,
+            currency_code: "USD",
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(refundResponse);
+
+      if (refundResponse.status === 201) {
+        toast.success("Hoàn tiền qua PayPal thành công!");
+        return refundResponse.data;
+      }
+    } catch (error) {
+      console.error("Lỗi khi hoàn tiền qua PayPal:", error);
+      throw new Error("Không thể hoàn tiền qua PayPal");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCancelOrder = async () => {
     try {
+      if (
+        orderDetail?.orderId?.paymentMethod === "PAYPAL" &&
+        orderDetail?.orderId?.paypalCaptureId
+      ) {
+        // Thực hiện refund trước khi hủy đơn
+        await refundPayPalPayment(
+          orderDetail.orderId.paypalCaptureId,
+          orderDetail.orderId.total
+        );
+      }
+
       const res = await apiClient.put(
         `${UPDATE_STATUS_ORDER_ROUTE}/${orderId}`,
         { status: import.meta.env.VITE_STATUS_ORDER_CANCELED }
@@ -61,163 +137,168 @@ const OrderDetail = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-semibold mb-6 flex items-center">
-        <IoIosArrowBack
-          className="px-4 w-auto cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
-        Chi tiết đơn hàng
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Card>
+    <>
+      {isLoading && <Loading />}
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-semibold mb-6 flex items-center">
+          <IoIosArrowBack
+            className="px-4 w-auto cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
+          Chi tiết đơn hàng
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin người nhận</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                <strong>Tên:</strong> {orderDetail?.orderId.nameCustomer}
+              </p>
+              {orderDetail?.orderId.address && (
+                <p>
+                  <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin đơn hàng</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                <strong>Mã đơn hàng:</strong> {orderDetail?.orderId.id}
+              </p>
+              <p>
+                <strong>Ngày đặt:</strong>{" "}
+                {new Date(orderDetail?.orderId.date).toLocaleString("vi-VN")}
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>{" "}
+                {orderDetail?.orderId.status &&
+                  orderStatuses.find(
+                    (status) => status.value === orderDetail?.orderId.status
+                  )?.vi}
+              </p>
+              {orderDetail?.orderId?.status === "pending" && (
+                <div className="flex justify-end">
+                  <Button
+                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    onClick={handleCancelOrder}
+                  >
+                    Hủy đơn hàng
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Thông tin người nhận</CardTitle>
+            <CardTitle>Sản phẩm</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>
-              <strong>Tên:</strong> {orderDetail?.orderId.nameCustomer}
-            </p>
-            {orderDetail?.orderId.address && (
-              <p>
-                <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
-              </p>
-            )}
+            <div>
+              {orderDetail?.items.map((item, index) => (
+                <div key={index}>
+                  <div className="grid grid-cols-[1fr_calc(26rem/2)] gap-10 py-2">
+                    <div className="flex items-center">
+                      <div>
+                        <img
+                          src={item?.productId?.images[0]}
+                          alt=""
+                          className="w-10 h-10 object-cover border mr-4"
+                        />
+                      </div>
+                      <div>
+                        <div className="line-clamp-1">{item.name}</div>
+                        <div className="text-sm text-gray-500">{item.unit}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 flex justify-between">
+                      <div>{item.quantity}x</div>
+                      <div>
+                        {item.discount > 0 ? (
+                          <>
+                            <span className="line-through mr-2 text-gray-500">
+                              {convertVND(item.price)}
+                            </span>
+                            <span className="font-semibold">
+                              {convertVND(
+                                item.price * (1 - item.discount / 100)
+                              )}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="font-semibold">
+                            {convertVND(item.price)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {index < orderDetail.items.length - 1 && (
+                    <div className="border-b my-2"></div>
+                  )}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Thông tin đơn hàng</CardTitle>
+            <CardTitle>Chi tiết thanh toán</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>
-              <strong>Mã đơn hàng:</strong> {orderDetail?.orderId.id}
-            </p>
-            <p>
-              <strong>Ngày đặt:</strong>{" "}
-              {new Date(orderDetail?.orderId.date).toLocaleString("vi-VN")}
-            </p>
-            <p>
-              <strong>Trạng thái:</strong>{" "}
-              {orderDetail?.orderId.status &&
-                orderStatuses.find(
-                  (status) => status.value === orderDetail?.orderId.status
-                )?.vi}
-            </p>
-            {orderDetail?.orderId?.status === "pending" && (
-              <div className="flex justify-end">
-                <Button
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                  onClick={handleCancelOrder}
-                >
-                  Hủy đơn hàng
-                </Button>
+            <div className="flex justify-between mb-2">
+              <span>Tiền hàng</span>
+              <span>{convertVND(orderDetail?.orderId?.totalTemp)}</span>
+            </div>
+            <div className="flex justify-between mb-2">
+              <span>Phí vận chuyển</span>
+              <span>{convertVND(orderDetail?.orderId?.shippingFee)}</span>
+            </div>
+            {orderDetail?.orderId?.discountValue > 0 && (
+              <div className="flex justify-between mb-2">
+                <span>Giảm giá ưu đãi</span>
+                <span>
+                  -
+                  {orderDetail?.orderId?.discountValue <= 100
+                    ? `${orderDetail?.orderId?.discountValue}%`
+                    : convertVND(orderDetail?.orderId?.discountValue)}
+                </span>
               </div>
             )}
+            <div className="flex justify-between mb-2">
+              <span>Giảm giá sản phẩm</span>
+              <span>-{convertVND(orderDetail?.orderId?.discountProduct)}</span>
+            </div>
+            <div className="border-t mt-2 pt-2">
+              <div className="flex justify-between font-bold text-lg">
+                <span>
+                  Tổng tiền (
+                  {orderDetail?.items.reduce(
+                    (sum, item) => sum + item.quantity,
+                    0
+                  )}{" "}
+                  sản phẩm)
+                </span>
+                <span className="text-red-600">
+                  {convertVND(orderDetail?.orderId?.total)}
+                </span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <strong>Phương thức thanh toán:</strong>{" "}
+              {orderDetail?.orderId?.paymentMethod}
+            </div>
           </CardContent>
         </Card>
       </div>
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Sản phẩm</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>
-            {orderDetail?.items.map((item, index) => (
-              <div key={index}>
-                <div className="grid grid-cols-[1fr_calc(26rem/2)] gap-10 py-2">
-                  <div className="flex items-center">
-                    <div>
-                      <img
-                        src={item?.productId?.images[0]}
-                        alt=""
-                        className="w-10 h-10 object-cover border mr-4"
-                      />
-                    </div>
-                    <div>
-                      <div className="line-clamp-1">{item.name}</div>
-                      <div className="text-sm text-gray-500">{item.unit}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 flex justify-between">
-                    <div>{item.quantity}x</div>
-                    <div>
-                      {item.discount > 0 ? (
-                        <>
-                          <span className="line-through mr-2 text-gray-500">
-                            {convertVND(item.price)}
-                          </span>
-                          <span className="font-semibold">
-                            {convertVND(item.price * (1 - item.discount / 100))}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="font-semibold">
-                          {convertVND(item.price)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {index < orderDetail.items.length - 1 && (
-                  <div className="border-b my-2"></div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Chi tiết thanh toán</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-between mb-2">
-            <span>Tiền hàng</span>
-            <span>{convertVND(orderDetail?.orderId?.totalTemp)}</span>
-          </div>
-          <div className="flex justify-between mb-2">
-            <span>Phí vận chuyển</span>
-            <span>{convertVND(orderDetail?.orderId?.shippingFee)}</span>
-          </div>
-          {orderDetail?.orderId?.discountValue > 0 && (
-            <div className="flex justify-between mb-2">
-              <span>Giảm giá ưu đãi</span>
-              <span>
-                -
-                {orderDetail?.orderId?.discountValue <= 100
-                  ? `${orderDetail?.orderId?.discountValue}%`
-                  : convertVND(orderDetail?.orderId?.discountValue)}
-              </span>
-            </div>
-          )}
-          <div className="flex justify-between mb-2">
-            <span>Giảm giá sản phẩm</span>
-            <span>-{convertVND(orderDetail?.orderId?.discountProduct)}</span>
-          </div>
-          <div className="border-t mt-2 pt-2">
-            <div className="flex justify-between font-bold text-lg">
-              <span>
-                Tổng tiền (
-                {orderDetail?.items.reduce(
-                  (sum, item) => sum + item.quantity,
-                  0
-                )}{" "}
-                sản phẩm)
-              </span>
-              <span className="text-red-600">
-                {convertVND(orderDetail?.orderId?.total)}
-              </span>
-            </div>
-          </div>
-          <div className="mt-4">
-            <strong>Phương thức thanh toán:</strong>{" "}
-            {orderDetail?.orderId?.paymentMethod}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    </>
   );
 };
 

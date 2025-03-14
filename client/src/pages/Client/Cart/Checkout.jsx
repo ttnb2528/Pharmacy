@@ -140,6 +140,9 @@ const Checkout = () => {
       setIsProcessingPayment(true);
       const details = await actions.order.capture();
 
+      // Lấy captureId từ details
+      const captureId = details.purchase_units[0].payments.captures[0].id;
+
       // Gọi API tạo đơn hàng của bạn với thông tin thanh toán PayPal
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
@@ -158,6 +161,7 @@ const Checkout = () => {
         note: note,
         cart: cart,
         paypalOrderId: details.id,
+        paypalCaptureId: captureId,
         paypalPaymentStatus: details.status,
       });
 
