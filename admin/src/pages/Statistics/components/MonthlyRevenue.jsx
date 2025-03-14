@@ -22,13 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.jsx";
+import useExportChart from "@/hooks/useExportChart.jsx";
+import { Button } from "@/components/ui/button.jsx";
 
 const MonthlyRevenue = () => {
-  // const { bills, orders } = useContext(BatchesContext);
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [filterType, setFilterType] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const { chartRef, exportChartToPNG } = useExportChart(
+    "monthly_revenue_chart"
+  );
 
   useEffect(() => {
     const fetchMonthlyRevenue = async () => {
@@ -58,7 +62,7 @@ const MonthlyRevenue = () => {
         <div className="bg-white border p-2 rounded">
           <p className="font-semibold text-gray-500">Tháng: {data.month}</p>
           <p className="text-gray-500">
-            tổng doanh thu: {convertVND(data.total)}
+            Tổng doanh thu: {convertVND(data.total)}
           </p>
         </div>
       );
@@ -76,7 +80,7 @@ const MonthlyRevenue = () => {
         <CardTitle>Doanh thu theo tháng</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Chọn năm */}
+        {/* Chọn năm và loại doanh thu */}
         <div className="mb-4">
           <div className="flex justify-between">
             <div className="flex items-center space-x-4">
@@ -116,23 +120,41 @@ const MonthlyRevenue = () => {
             )}
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={monthlyRevenue} margin={{ left: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="month"
-              tickFormatter={(month) => `Tháng ${month}`}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis
-              tickFormatter={(value) => convertVND(value)}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip content={CustomTooltip} />
-            <Legend />
-            <Bar dataKey="total" name="Tổng doanh thu" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
+
+        {/* Kiểm tra dữ liệu và hiển thị */}
+        {monthlyRevenue.length > 0 ? (
+          <div>
+            <div ref={chartRef}>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={monthlyRevenue} margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="month"
+                    tickFormatter={(month) => `Tháng ${month}`}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    tickFormatter={(value) => convertVND(value)}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Bar dataKey="total" name="Tổng doanh thu" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <Button
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={exportChartToPNG}
+            >
+              Xuất biểu đồ
+            </Button>
+          </div>
+        ) : (
+          <p className="text-center text-lg text-muted-foreground">
+            Chưa có dữ liệu doanh thu cho năm {selectedYear}.
+          </p>
+        )}
       </CardContent>
     </Card>
   );

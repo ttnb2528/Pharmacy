@@ -13,10 +13,15 @@ import { format, differenceInDays } from "date-fns";
 import { apiClient } from "@/lib/api-admin.js";
 import { GET_EXPIRED_MEDICINES_ROUTE } from "@/API/index.api.js";
 import Loading from "@/pages/component/Loading.jsx";
+import useExportChart from "@/hooks/useExportChart.jsx";
+import { Button } from "@/components/ui/button.jsx";
 
 const ExpiredMedicines = () => {
   const [expiredData, setExpiredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { chartRef, exportChartToPNG } = useExportChart(
+    "expired_medicines_chart"
+  );
 
   useEffect(() => {
     const fetchExpiredMedicines = async () => {
@@ -24,7 +29,7 @@ const ExpiredMedicines = () => {
         setIsLoading(true);
         const res = await apiClient.get(GET_EXPIRED_MEDICINES_ROUTE);
         console.log(res);
-        
+
         if (res.status === 200 && res.data.status === 200) {
           const expired = res.data.data.map((batch) => ({
             name: batch.MedicineId.name,
@@ -71,35 +76,45 @@ const ExpiredMedicines = () => {
       </CardHeader>
       <CardContent>
         {expiredData.length > 0 ? ( // Kiểm tra nếu có dữ liệu
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={expiredData}>
-              <XAxis
-                dataKey="name"
-                interval={0}
-                angle={-45}
-                textAnchor="end"
-                height={150}
-              />
-              <YAxis
-                yAxisId="left"
-                orientation="left"
-                stroke="black"
-                label={{
-                  value: "Số lượng",
-                  angle: -90,
-                  position: "insideLeft",
-                }}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              {/* <Legend /> */}
-              <Bar
-                yAxisId="left"
-                dataKey="quantity"
-                fill="red"
-                name="Ngày đã hết hạn"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <>
+            <div ref={chartRef}>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={expiredData}>
+                  <XAxis
+                    dataKey="name"
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={150}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    orientation="left"
+                    stroke="black"
+                    label={{
+                      value: "Số lượng",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  {/* <Legend /> */}
+                  <Bar
+                    yAxisId="left"
+                    dataKey="quantity"
+                    fill="red"
+                    name="Ngày đã hết hạn"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <Button
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={exportChartToPNG}
+            >
+              Xuất biểu đồ
+            </Button>
+          </>
         ) : (
           <p className="text-center text-gray-500">Chưa có thuốc hết hạn.</p> // Hiển thị thông báo
         )}

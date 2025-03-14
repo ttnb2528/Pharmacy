@@ -27,12 +27,14 @@ import { Input } from "@/components/ui/input.jsx";
 import { cn } from "@/lib/utils.js";
 import { formatDate } from "@/utils/formatDate.js";
 import { convertVND } from "@/utils/convertVND.js";
+import useExportChart from "@/hooks/useExportChart.jsx"; // Import hook
 
 const DailyRevenue = () => {
   const [revenueData, setRevenueData] = useState([]);
   const [date, setDate] = useState({ from: new Date(), to: new Date() });
   const [isLoading, setIsLoading] = useState(false);
   const [filterType, setFilterType] = useState("all"); // "all", "bills", "orders"
+  const { chartRef, exportChartToPNG } = useExportChart("daily_revenue_chart"); // Sử dụng hook
 
   useEffect(() => {
     const fetchDailyRevenue = async () => {
@@ -82,7 +84,7 @@ const DailyRevenue = () => {
               filterType === "bills" && "text-[#FF9800]"
             )}
           >
-            tổng doanh thu: {data.totalRevenue}
+            Tổng doanh thu: {convertVND(data.totalRevenue)}
           </p>
         </div>
       );
@@ -112,7 +114,6 @@ const DailyRevenue = () => {
                 setDate({ ...date, from: new Date(e.target.value) })
               }
             />
-
             <span className="font-semibold">Chọn ngày kết thúc</span>
             <Input
               type="date"
@@ -140,70 +141,80 @@ const DailyRevenue = () => {
 
         {/* Biểu đồ */}
         {hasData ? (
-          displayedData.length > 5 ? (
-            <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
-              <LineChart data={displayedData}>
-                <XAxis dataKey="date" />
-                <YAxis
-                  tickFormatter={(value) => convertVND(value)}
-                  tick={{ fontSize: 12 }}
-                />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip content={CustomTooltip} />
-                <Legend />
-                {filterType === "all" && (
-                  <Line
-                    type="monotone"
-                    dataKey="totalRevenue"
-                    stroke="#8884d8"
-                  />
-                )}
-                {filterType === "orders" && (
-                  <Line type="monotone" dataKey="orders" stroke="#4CAF50" />
-                )}
-                {filterType === "bills" && (
-                  <Line type="monotone" dataKey="bills" stroke="#FF9800" />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <ResponsiveContainer width="100%" height={400} className={"mt-5"}>
-              <BarChart data={displayedData} margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis
-                  tickFormatter={(value) => convertVND(value)}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip content={CustomTooltip} />
-                <Legend />
-                {filterType === "all" && (
-                  <Bar
-                    name="Tổng doanh thu"
-                    dataKey="totalRevenue"
-                    fill="#8884d8"
-                  />
-                )}
-                {filterType === "orders" && (
-                  <Bar
-                    name="Doanh thu theo đơn hàng"
-                    dataKey="orders"
-                    fill="#4CAF50"
-                  />
-                )}
-                {filterType === "bills" && (
-                  <Bar
-                    name="Doanh thu theo hóa đơn"
-                    dataKey="bills"
-                    fill="#FF9800"
-                  />
-                )}
-              </BarChart>
-            </ResponsiveContainer>
-          )
+          <div>
+            <div ref={chartRef}>
+              {displayedData.length > 5 ? (
+                <ResponsiveContainer width="100%" height={400} className="mt-5">
+                  <LineChart data={displayedData}>
+                    <XAxis dataKey="date" />
+                    <YAxis
+                      tickFormatter={(value) => convertVND(value)}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    {filterType === "all" && (
+                      <Line
+                        type="monotone"
+                        dataKey="totalRevenue"
+                        stroke="#8884d8"
+                      />
+                    )}
+                    {filterType === "orders" && (
+                      <Line type="monotone" dataKey="orders" stroke="#4CAF50" />
+                    )}
+                    {filterType === "bills" && (
+                      <Line type="monotone" dataKey="bills" stroke="#FF9800" />
+                    )}
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <ResponsiveContainer width="100%" height={400} className="mt-5">
+                  <BarChart data={displayedData} margin={{ left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis
+                      tickFormatter={(value) => convertVND(value)}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    {filterType === "all" && (
+                      <Bar
+                        name="Tổng doanh thu"
+                        dataKey="totalRevenue"
+                        fill="#8884d8"
+                      />
+                    )}
+                    {filterType === "orders" && (
+                      <Bar
+                        name="Doanh thu theo đơn hàng"
+                        dataKey="orders"
+                        fill="#4CAF50"
+                      />
+                    )}
+                    {filterType === "bills" && (
+                      <Bar
+                        name="Doanh thu theo hóa đơn"
+                        dataKey="bills"
+                        fill="#FF9800"
+                      />
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+            <button
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={exportChartToPNG}
+            >
+              Xuất biểu đồ
+            </button>
+          </div>
         ) : (
           <div className="mt-5 text-center text-lg text-muted-foreground">
-            Không có dữ liệu
+            Không có dữ liệu doanh thu trong khoảng thời gian này.
           </div>
         )}
       </CardContent>
