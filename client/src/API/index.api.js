@@ -56,6 +56,7 @@ export const GET_ORDERS_ROUTE = `${ORDER_ROUTES}/getOrders`;
 export const GET_CURRENT_USER_ORDER_ROUTE = `${ORDER_ROUTES}/getCurrentUserOrders`;
 export const GET_ORDER_BY_ID_ROUTE = `${ORDER_ROUTES}/getOrderById`;
 export const GET_ORDER_DETAIL_ROUTE = `${ORDER_ROUTES}/getOrderDetail`;
+export const GET_ORDER_BY_VNP_TXN_REF = `${ORDER_ROUTES}/by-vnp-txn-ref`;
 export const CHECK_PURCHASE_ROUTE = `${ORDER_ROUTES}/checkPurchase`;
 export const UPDATE_STATUS_ORDER_ROUTE = `${ORDER_ROUTES}/updateStatusOrder`;
 export const DELETE_ORDER_ROUTE = `${ORDER_ROUTES}/deleteOrder`;
@@ -71,3 +72,7 @@ export const EDIT_COMMENT_ROUTE = `${COMMENT_ROUTES}/editComment`;
 
 export const PAYPAL_ROUTES = "/api/v1/paypal";
 export const CREATE_PAYPAL_ORDER_ROUTE = `${PAYPAL_ROUTES}/createOrder`;
+
+export const VNPAY_ROUTES = "/api/v1/vnpay";
+export const CREATE_VNPAY_ORDER_ROUTE = `${VNPAY_ROUTES}/create_payment_url`;
+export const VNPAY_RETURN_ROUTE = `${VNPAY_ROUTES}/vnpay_return`;

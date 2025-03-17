@@ -51,7 +51,7 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ["COD", "PAYPAL"],
+    enum: ["COD", "PAYPAL", "VNPAY"],
   },
   totalTemp: {
     type: Number,
@@ -85,6 +85,7 @@ const OrderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  vnpTxnRef: String,
 });
 
 const Order = mongoose.model("Order", OrderSchema);

@@ -5,6 +5,7 @@ import {
   deleteOrder,
   getCurrentUserOrders,
   getOrderById,
+  getOrderByVnpTxnRef,
   getOrderDetail,
   getOrders,
   updateStatusOrder,
@@ -19,6 +20,7 @@ router.get("/getCurrentUserOrders", authenticate, getCurrentUserOrders);
 router.get("/getOrderById", getOrderById);
 router.get("/getOrderDetail/:orderId", getOrderDetail);
 router.get("/checkPurchase/:userId/:productId", checkPurchase);
+router.get("/by-vnp-txn-ref", getOrderByVnpTxnRef);
 router.put("/updateStatusOrder/:orderId", updateStatusOrder);
 router.delete("/deleteOrder", deleteOrder);
 

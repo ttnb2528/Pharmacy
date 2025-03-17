@@ -27,6 +27,7 @@ import HomeContextProvider from "./context/HomeContext.context.jsx";
 import { apiClient } from "./lib/api-client.js";
 import { GET_USER_INFO } from "./API/index.api.js";
 import { useAppStore } from "./store/index.js";
+import PaymentReturn from "./pages/Client/Payment/PaymentReturn.jsx";
 
 const App = () => {
   const { userInfo, setUserInfo } = useAppStore();
@@ -108,6 +109,10 @@ const App = () => {
 
     // Protected routes - cần đăng nhập
     const protectedRoutes = [
+      {
+        path: "/payment-return",
+        element: <PaymentReturn />,
+      },
       {
         path: "/checkout",
         element: (

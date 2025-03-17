@@ -22,7 +22,10 @@ import CoinSvg from "@/pages/component/CoinSvg.jsx";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { handleRenderPriceWithCoupon } from "@/utils/Calculate.js";
 import { apiClient } from "@/lib/api-client.js";
-import { CREATE_ORDER_ROUTE } from "@/API/index.api.js";
+import {
+  CREATE_ORDER_ROUTE,
+  CREATE_VNPAY_ORDER_ROUTE,
+} from "@/API/index.api.js";
 import { toast } from "sonner";
 
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
@@ -174,6 +177,54 @@ const Checkout = () => {
       console.error(error);
     } finally {
       setIsProcessingPayment(false);
+    }
+  };
+
+  // VNPay Payment
+  const handleVNPayPayment = async () => {
+    try {
+      if (!selectedAddress) {
+        showNotification({
+          title: "Chưa chọn địa chỉ",
+          message: "Vui lòng chọn địa chỉ giao hàng",
+          type: "error",
+        });
+        return;
+      }
+
+      const orderId = `ORDER_${Date.now()}`;
+      const res = await apiClient.post(CREATE_ORDER_ROUTE, {
+        AccountId: userInfo.accountId._id,
+        nameCustomer: selectedAddress?.name,
+        total: CalculateTotalPrice(),
+        type: "online",
+        address: selectedAddress
+          ? `${selectedAddress.otherDetails}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
+          : "",
+        coupon: selectedCoupon?.coupon_code || "",
+        paymentMethod: "VNPAY",
+        totalTemp: CalculateTotalPriceTemp(cart),
+        shippingFee: CalculateTotalPrice() > 100 ? 0 : 15000,
+        discountValue: selectedCoupon ? selectedCoupon.discount_value : 0,
+        discountProduct: CalculatePriceWithSale(cart),
+        note: note,
+        cart: cart,
+        status: "pending",
+        vnpTxnRef: orderId,
+      });
+
+      if (res.status === 200 && res.data.status === 201) {
+        const vnpayRes = await apiClient.post(CREATE_VNPAY_ORDER_ROUTE, {
+          orderId,
+          amount: CalculateTotalPrice(),
+          bankCode: "NCB", // Tùy chọn, có thể để trống
+          language: "vn",
+        });
+        window.location.href = vnpayRes.data.paymentUrl;
+      }
+    } catch (error) {
+      toast.error("Lỗi khi tạo thanh toán VNPay");
+      console.error(error);
     }
   };
 
@@ -373,7 +424,7 @@ const Checkout = () => {
                 >
                   Đặt hàng
                 </Button>
-              ) : (
+              ) : paymentMethod === "PAYPAL" ? (
                 <PayPalScriptProvider options={paypalOptions}>
                   <PayPalButtons
                     style={{ layout: "horizontal" }}
@@ -386,7 +437,14 @@ const Checkout = () => {
                     disabled={isProcessingPayment}
                   />
                 </PayPalScriptProvider>
-              )}
+              ) : paymentMethod === "VNPAY" ? (
+                <Button
+                  className="bg-blue-500 text-white hover:bg-blue-600"
+                  onClick={handleVNPayPayment}
+                >
+                  Thanh toán qua VNPay
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>

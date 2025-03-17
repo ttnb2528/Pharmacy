@@ -20,6 +20,7 @@ import CommentRouter from "./Comment.route.js";
 import OTPRouter from "./OTP.route.js";
 import CloudinaryRouter from "./Cloudinary.route.js";
 import PaypalRouter from "./Paypal.route.js";
+import VNPAYRouter from "./VNPAY.route.js"
 
 const app = express();
 
@@ -45,5 +46,6 @@ app.use("/comment", CommentRouter);
 app.use("/otp", OTPRouter);
 app.use("/cloudinary", CloudinaryRouter);
 app.use("/paypal", PaypalRouter);
+app.use("/vnpay", VNPAYRouter);
 
 export default app;

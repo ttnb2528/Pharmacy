@@ -271,6 +271,21 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
   }
 });
 
+export const getOrderByVnpTxnRef = asyncHandler(async (req, res) => {
+  const { vnpTxnRef } = req.query;
+  console.log(vnpTxnRef);
+  
+  const order = await Order.findOne({ vnpTxnRef });
+  if (!order) {
+    return res.json(
+      jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy đơn hàng")
+    );
+  }
+  return res.json(
+    jsonGenerate(StatusCode.OK, "Lấy đơn hàng thành công", { order })
+  );
+});
+
 export const deleteOrder = asyncHandler(async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -445,7 +460,6 @@ export const checkPurchase = asyncHandler(async (req, res) => {
     });
 
     console.log(orders);
-    
 
     for (const order of orders) {
       const orderDetail = await OrderDetail.findOne({ orderId: order._id });

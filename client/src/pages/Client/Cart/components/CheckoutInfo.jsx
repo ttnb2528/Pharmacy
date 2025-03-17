@@ -519,10 +519,17 @@ const CheckoutInfo = ({
               </Label>
             </div>
             <div className="flex items-center space-x-4 space-y-0 mt-2">
-              <RadioGroupItem value="online" id="online" />
-              <Label htmlFor="online" className="flex items-center space-x-4">
+              <RadioGroupItem value="PAYPAL" id="PAYPAL" />
+              <Label htmlFor="PAYPAL" className="flex items-center space-x-4">
                 <FaCcPaypal className="w-8 h-8 text-blue-600" />
                 <span>PayPal</span>
+              </Label>
+            </div>
+            <div className="flex items-center space-x-4 space-y-0 mt-2">
+              <RadioGroupItem value="VNPAY" id="VNPAY" />
+              <Label htmlFor="VNPAY" className="flex items-center space-x-4">
+                <FaCcPaypal className="w-8 h-8 text-blue-600" />
+                <span>VNPay</span>
               </Label>
             </div>
           </RadioGroup>
