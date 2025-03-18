@@ -76,3 +76,4 @@ export const CREATE_PAYPAL_ORDER_ROUTE = `${PAYPAL_ROUTES}/createOrder`;
 export const VNPAY_ROUTES = "/api/v1/vnpay";
 export const CREATE_VNPAY_ORDER_ROUTE = `${VNPAY_ROUTES}/create_payment_url`;
 export const VNPAY_RETURN_ROUTE = `${VNPAY_ROUTES}/vnpay_return`;
+export const REFUND_ROUTE = `${VNPAY_ROUTES}/refund`;

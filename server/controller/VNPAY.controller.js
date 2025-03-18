@@ -1,6 +1,7 @@
 import moment from "moment";
 import querystring from "qs";
 import crypto from "crypto";
+import axios from "axios";
 
 // Hàm sắp xếp object
 const sortObject = (obj) => {
@@ -68,6 +69,11 @@ export const createPaymentUrl = (req, res, next) => {
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
   vnp_Params["vnp_SecureHash"] = signed;
 
+  console.log("VNPay Payment Params:", vnp_Params);
+  console.log("Sign Data:", signData);
+  console.log("Secret Key (masked):", secretKey.slice(0, 4) + "***");
+  console.log("Secret Key (masked):", secretKey);
+
   const paymentUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, {
     encode: false,
   })}`;
@@ -95,5 +101,105 @@ export const vnpayReturn = (req, res, next) => {
     res.json({ code: vnp_Params["vnp_ResponseCode"], message: "Success" });
   } else {
     res.json({ code: "97", message: "Checksum failed" });
+  }
+};
+
+// Controller: Hoàn tiền
+export const refund = async (req, res, next) => {
+  try {
+    process.env.TZ = "Asia/Ho_Chi_Minh";
+
+    const date = new Date();
+
+    const vnp_TmnCode = process.env.VNPAY_TMN_CODE;
+    const secretKey = process.env.VNPAY_HASH_SECRET;
+    const vnpApi = process.env.VNPAY_API;
+
+    const { orderId, transDate, amount, transType, user } = req.body;
+
+    if (!orderId || !transDate || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin: orderId, transDate, hoặc amount",
+      });
+    }
+
+    // Chuẩn bị các thông số
+    const vnp_TxnRef = orderId;
+    const vnp_TransactionDate = transDate;
+    const vnp_Amount = amount * 100;
+    const vnp_TransactionType = transType;
+    const vnp_CreateBy = user;
+
+    const currCode = "VND";
+
+    const vnp_RequestId = moment(date).format("HHmmss");
+    const vnp_Version = "2.1.0";
+    const vnp_Command = "refund";
+    const vnp_OrderInfo = `Hoan tien GD ma: ${vnp_TxnRef}`;
+
+    // Lấy IP address
+    const vnp_IpAddr =
+      req.headers["x-forwarded-for"] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket?.remoteAddress;
+
+    const vnp_CreateDate = moment(date).format("YYYYMMDDHHmmss");
+
+    const vnp_TransactionNo = "0";
+
+    // Tạo chuỗi hash
+    const data = [
+      vnp_RequestId,
+      vnp_Version,
+      vnp_Command,
+      vnp_TmnCode,
+      vnp_TransactionType,
+      vnp_TxnRef,
+      vnp_Amount,
+      vnp_TransactionNo,
+      vnp_TransactionDate,
+      vnp_CreateBy,
+      vnp_CreateDate,
+      vnp_IpAddr,
+      vnp_OrderInfo,
+    ].join("|");
+
+    const hmac = crypto.createHmac("sha512", secretKey);
+    const vnp_SecureHash = hmac
+      .update(Buffer.from(data, "utf-8"))
+      .digest("hex");
+
+    // Tạo object dữ liệu gửi đi
+    const dataObj = {
+      vnp_RequestId,
+      vnp_Version,
+      vnp_Command,
+      vnp_TmnCode,
+      vnp_TransactionType,
+      vnp_TxnRef,
+      vnp_Amount,
+      vnp_TransactionNo,
+      vnp_CreateBy,
+      vnp_OrderInfo,
+      vnp_TransactionDate,
+      vnp_CreateDate,
+      vnp_IpAddr,
+      vnp_SecureHash,
+    };
+
+    // Gửi request với axios
+    const response = await axios.post(vnpApi, dataObj, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(response.data);
+    res.json(response.data); // Trả về response cho client
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

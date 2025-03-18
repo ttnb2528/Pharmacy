@@ -2,56 +2,62 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiClient } from "@/lib/api-client.js";
 import {
-  // UPDATE_STATUS_ORDER_ROUTE,
+  GET_ORDER_BY_VNP_TXN_REF,
+  UPDATE_STATUS_ORDER_ROUTE,
   VNPAY_RETURN_ROUTE,
-  // GET_ORDER_BY_VNP_TXN_REF,
-} from "@/API/index.api.js"; // Thêm route mới
+} from "@/API/index.api.js";
 import { toast } from "sonner";
 
 const PaymentReturn = () => {
   const [searchParams] = useSearchParams();
-  // const navigate = useNavigate();
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
     const handleVNPayResponse = async () => {
-      // const vnpTxnRef = searchParams.get("vnp_TxnRef");
+      const vnpTxnRef = searchParams.get("vnp_TxnRef");
+      const vnpTransactionDate = searchParams.get("vnp_PayDate");
 
-      // Kiểm tra chữ ký từ VNPay
+      console.log("VNPay Return Params:", Object.fromEntries(searchParams));
+
       const res = await apiClient.get(VNPAY_RETURN_ROUTE, {
         params: Object.fromEntries(searchParams),
       });
 
+      console.log("VNPay Return Response:", res.data);
+
       if (res.data.code === "00") {
         try {
-          // Lấy orderMongoId từ vnp_TxnRef
-          // const orderRes = await apiClient.get(GET_ORDER_BY_VNP_TXN_REF, {
-          //   params: { vnpTxnRef },
-          // });
+          const orderRes = await apiClient.get(GET_ORDER_BY_VNP_TXN_REF, {
+            params: { vnpTxnRef },
+          });
+          const orderMongoId = orderRes.data.data.order.id;
 
-          // const orderMongoId = orderRes.data.data.order.id;
+          const updateRes = await apiClient.put(
+            `${UPDATE_STATUS_ORDER_ROUTE}/${orderMongoId}`,
+            {
+              status: import.meta.env.VITE_STATUS_ORDER_PENDING,
+              vnpTransactionDate,
+            }
+          );
 
-          // const updateRes = await apiClient.put(
-          //   `${UPDATE_STATUS_ORDER_ROUTE}/${orderMongoId}`,
-          //   { status: import.meta.env.VITE_STATUS_ORDER_PROCESSING }
-          // );
-
-          // if (updateRes.status === 200 && updateRes.data.status === 200) {
-          toast.success("Thanh toán VNPay thành công!");
-          await delay(750);
-          window.location.href = "/";
-          // navigate("/");
-          // }
+          if (updateRes.status === 200 && updateRes.data.status === 200) {
+            toast.success("Thanh toán VNPay thành công!");
+            await delay(500);
+            window.location.href = "/";
+          } else {
+            throw new Error("Cập nhật đơn hàng thất bại");
+          }
         } catch (error) {
           toast.error("Lỗi khi cập nhật đơn hàng");
           console.error(error);
+          await delay(500);
+          window.location.href = "/checkout";
         }
       } else {
         toast.error(`Thanh toán VNPay thất bại (Code: ${res.data.code})`);
-        await delay(750);
+        await delay(500);
         window.location.href = "/checkout";
-        // navigate("/checkout");
       }
     };
 

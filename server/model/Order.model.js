@@ -86,6 +86,7 @@ const OrderSchema = new mongoose.Schema({
     default: null,
   },
   vnpTxnRef: String,
+  vnpTransactionDate: String,
 });
 
 const Order = mongoose.model("Order", OrderSchema);

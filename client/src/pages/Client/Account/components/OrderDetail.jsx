@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client.js";
 import {
   GET_ORDER_DETAIL_ROUTE,
+  REFUND_ROUTE,
   UPDATE_STATUS_ORDER_ROUTE,
 } from "@/API/index.api.js";
 import { convertVND } from "@/utils/ConvertVND.js";
@@ -105,15 +106,83 @@ const OrderDetail = () => {
     }
   };
 
+  const refundVNPayPayment = async (vnpTxnRef, vnpTransactionDate, amount) => {
+    try {
+      setIsLoading(true);
+
+      // Kiểm tra và log dữ liệu đầu vào
+      if (!vnpTxnRef || !vnpTransactionDate || !amount) {
+        throw new Error(
+          "Thiếu thông tin cần thiết: vnpTxnRef, vnpTransaction [vnpTxnRef: " +
+            vnpTxnRef +
+            ", vnpTransactionDate: " +
+            vnpTransactionDate +
+            ", amount: " +
+            amount +
+            "]"
+        );
+      }
+
+      console.log("Refund VNPay Data:", {
+        vnpTxnRef,
+        vnpTransactionDate,
+        amount,
+      });
+
+      const refundData = {
+        orderId: vnpTxnRef,
+        transDate: vnpTransactionDate,
+        amount: amount,
+        transType: "02",
+        user: "admin",
+      };
+
+      const res = await apiClient.post(REFUND_ROUTE, refundData);
+      
+
+      if (res.status === 200 && res.data.vnp_ResponseCode === "00") {
+        // toast.success("Hoàn tiền qua VNPay thành công!");
+        return res.data;
+      } else {
+        // console.error("Refund VNPay Response:", res.data);
+        throw new Error(
+          `Hoàn tiền thất bại (Code: ${res.data.data.vnp_ResponseCode})`
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi hoàn tiền qua VNPay:", error);
+      throw new Error("Không thể hoàn tiền qua VNPay");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCancelOrder = async () => {
     try {
-      if (
-        orderDetail?.orderId?.paymentMethod === "PAYPAL" &&
-        orderDetail?.orderId?.paypalCaptureId
-      ) {
-        // Thực hiện refund trước khi hủy đơn
+      setIsLoading(true);
+      const paymentMethod = orderDetail?.orderId?.paymentMethod;
+
+      console.log("Order Detail for Refund:", {
+        paymentMethod,
+        paypalCaptureId: orderDetail?.orderId?.paypalCaptureId,
+        vnpTxnRef: orderDetail?.orderId?.vnpTxnRef,
+        vnpTransactionDate: orderDetail?.orderId?.vnpTransactionDate,
+        total: orderDetail?.orderId?.total,
+      });
+
+      if (paymentMethod === "PAYPAL" && orderDetail?.orderId?.paypalCaptureId) {
         await refundPayPalPayment(
           orderDetail.orderId.paypalCaptureId,
+          orderDetail.orderId.total
+        );
+      } else if (
+        paymentMethod === "VNPAY" &&
+        orderDetail?.orderId?.vnpTxnRef &&
+        orderDetail?.orderId?.vnpTransactionDate
+      ) {
+        await refundVNPayPayment(
+          orderDetail.orderId.vnpTxnRef,
+          orderDetail.orderId.vnpTransactionDate,
           orderDetail.orderId.total
         );
       }
@@ -122,20 +191,21 @@ const OrderDetail = () => {
         `${UPDATE_STATUS_ORDER_ROUTE}/${orderId}`,
         { status: import.meta.env.VITE_STATUS_ORDER_CANCELED }
       );
-      // if (res.status === 200 && res.data.status === 200) {
-      //   console.log(res);
-      //   navigate("/account/orders");
-      // } else {
-      //   console.log("Lỗi khi hủy đơn hàng");
-      // }
 
-      console.log(res);
-      navigate("/account/history");
+      if (res.status === 200 && res.data.status === 200) {
+        toast.success("Đơn hàng đã được hủy thành công!");
+        navigate("/account/history");
+      } else {
+        toast.error("Lỗi khi cập nhật trạng thái đơn hàng");
+      }
     } catch (error) {
-      console.log("Lỗi khi hủy đơn hàng:", error);
+      toast.error(error.message || "Lỗi khi hủy đơn hàng");
+      console.error("Lỗi khi hủy đơn hàng:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  
   return (
     <>
       {isLoading && <Loading />}
@@ -182,13 +252,17 @@ const OrderDetail = () => {
                     (status) => status.value === orderDetail?.orderId.status
                   )?.vi}
               </p>
-              {orderDetail?.orderId?.status === "pending" && (
+              {/* Hiển thị nút hủy/refund dựa trên trạng thái và phương thức thanh toán */}
+              {(orderDetail?.orderId?.status === "pending" ||
+                orderDetail?.orderId?.status === "processing" ||
+                orderDetail?.orderId?.status === "completed") && (
                 <div className="flex justify-end">
                   <Button
                     className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                     onClick={handleCancelOrder}
+                    disabled={isLoading}
                   >
-                    Hủy đơn hàng
+                    {isLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
                   </Button>
                 </div>
               )}
@@ -217,7 +291,6 @@ const OrderDetail = () => {
                         <div className="text-sm text-gray-500">{item.unit}</div>
                       </div>
                     </div>
-
                     <div className="flex-1 flex justify-between">
                       <div>{item.quantity}x</div>
                       <div>

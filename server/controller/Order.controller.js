@@ -274,7 +274,7 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
 export const getOrderByVnpTxnRef = asyncHandler(async (req, res) => {
   const { vnpTxnRef } = req.query;
   console.log(vnpTxnRef);
-  
+
   const order = await Order.findOne({ vnpTxnRef });
   if (!order) {
     return res.json(
@@ -313,6 +313,8 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
         jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy đơn hàng")
       );
     }
+
+    const { status, vnpTransactionDate } = req.body;
 
     // Nếu đơn hàng bị hủy (cancelled)
     if (req.body.status === "cancelled") {
@@ -388,7 +390,10 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
         orderId: order._id,
       });
       if (existingPointHistory) {
-        await Order.findByIdAndUpdate(order._id, { status: req.body.status });
+        await Order.findByIdAndUpdate(order._id, {
+          status: req.body.status,
+          ...(vnpTransactionDate && { vnpTransactionDate }),
+        });
         return res.json(
           jsonGenerate(
             StatusCode.CONTINUE,
@@ -417,7 +422,10 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
         }
       }
 
-      await Order.findByIdAndUpdate(order._id, { status: req.body.status });
+      await Order.findByIdAndUpdate(order._id, {
+        status: req.body.status,
+        ...(vnpTransactionDate && { vnpTransactionDate }),
+      });
       await LoyaltyProgram.findOneAndUpdate(
         { AccountId },
         {
@@ -439,7 +447,10 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
       }
     } else {
       // Các trạng thái khác chỉ cần cập nhật
-      await Order.findByIdAndUpdate(order._id, { status: req.body.status });
+      await Order.findByIdAndUpdate(order._id, {
+        status: req.body.status,
+        ...(vnpTransactionDate && { vnpTransactionDate }),
+      });
     }
 
     return res.json(
