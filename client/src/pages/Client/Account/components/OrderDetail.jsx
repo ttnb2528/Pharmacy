@@ -253,9 +253,7 @@ const OrderDetail = () => {
                   )?.vi}
               </p>
               {/* Hiển thị nút hủy/refund dựa trên trạng thái và phương thức thanh toán */}
-              {(orderDetail?.orderId?.status === "pending" ||
-                orderDetail?.orderId?.status === "processing" ||
-                orderDetail?.orderId?.status === "completed") && (
+              {(orderDetail?.orderId?.status === "pending") && (
                 <div className="flex justify-end">
                   <Button
                     className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
