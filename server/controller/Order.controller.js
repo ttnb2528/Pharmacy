@@ -111,9 +111,9 @@ export const createOrder = asyncHandler(async (req, res) => {
           lastUsedDate: new Date(),
         });
 
-        console.log("Update coupon usage");
+        // console.log("Update coupon usage");
       } else {
-        console.log("Create coupon usage");
+        // console.log("Create coupon usage");
 
         await CouponUsage.create({
           couponId: coupon._id,
@@ -273,7 +273,7 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
 
 export const getOrderByVnpTxnRef = asyncHandler(async (req, res) => {
   const { vnpTxnRef } = req.query;
-  console.log(vnpTxnRef);
+  // console.log(vnpTxnRef);
 
   const order = await Order.findOne({ vnpTxnRef });
   if (!order) {
@@ -470,7 +470,7 @@ export const checkPurchase = asyncHandler(async (req, res) => {
       status: "completed",
     });
 
-    console.log(orders);
+    // console.log(orders);
 
     for (const order of orders) {
       const orderDetail = await OrderDetail.findOne({ orderId: order._id });

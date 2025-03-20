@@ -239,9 +239,9 @@ export const updateCoupon = asyncHandler(async (req, res) => {
     const endDateOnly = new Date(endDateInput.setHours(0, 0, 0, 0)); // end_date, 00:00:00
 
     // Debug: Ghi log để kiểm tra giá trị
-    console.log("Today:", today);
-    console.log("End Date:", endDateOnly);
-    console.log("Is endDateOnly < today?", endDateOnly < today);
+    // console.log("Today:", today);
+    // console.log("End Date:", endDateOnly);
+    // console.log("Is endDateOnly < today?", endDateOnly < today);
 
     // Cập nhật trạng thái: chỉ "expired" nếu end_date nhỏ hơn ngày hôm nay
     const updatedStatus = endDateOnly < today ? "expired" : "active";

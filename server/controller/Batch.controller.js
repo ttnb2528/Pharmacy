@@ -254,7 +254,7 @@ export const bulkImportBatches = asyncHandler(async (req, res) => {
 
         supplier = new Supplier({ id, name: mappedBatch.supplierName });
         await supplier.save();
-        console.log(`Đã tạo mới nhà cung cấp: ${mappedBatch.supplierName}`);
+        // console.log(`Đã tạo mới nhà cung cấp: ${mappedBatch.supplierName}`);
       }
       supplierId = supplier._id;
     } else {
@@ -277,7 +277,7 @@ export const bulkImportBatches = asyncHandler(async (req, res) => {
           country: mappedBatch.country
         });
         await manufacture.save();
-        console.log(`Đã tạo mới nơi sản xuất: ${mappedBatch.manufactureName}`);
+        // console.log(`Đã tạo mới nơi sản xuất: ${mappedBatch.manufactureName}`);
       }
       manufactureId = manufacture._id;
     } else {

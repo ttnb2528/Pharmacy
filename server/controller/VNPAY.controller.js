@@ -69,10 +69,10 @@ export const createPaymentUrl = (req, res, next) => {
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
   vnp_Params["vnp_SecureHash"] = signed;
 
-  console.log("VNPay Payment Params:", vnp_Params);
-  console.log("Sign Data:", signData);
-  console.log("Secret Key (masked):", secretKey.slice(0, 4) + "***");
-  console.log("Secret Key (masked):", secretKey);
+  // console.log("VNPay Payment Params:", vnp_Params);
+  // console.log("Sign Data:", signData);
+  // console.log("Secret Key (masked):", secretKey.slice(0, 4) + "***");
+  // console.log("Secret Key (masked):", secretKey);
 
   const paymentUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, {
     encode: false,
@@ -196,7 +196,7 @@ export const refund = async (req, res, next) => {
       },
     });
 
-    console.log(response.data);
+    // console.log(response.data);
     res.json(response.data); // Trả về response cho client
   } catch (error) {
     console.error(error);

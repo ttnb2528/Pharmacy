@@ -135,7 +135,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
 });
 
 export const addProfileImage = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { avatar } = req.body;
 
   try {
@@ -181,11 +181,11 @@ export const removeProfileImage = async (req, res, next) => {
     let folder = parts[parts.length - 2];
 
     let public_id = folder + "/" + fileName;
-    console.log(public_id);
+    // console.log(public_id);
 
     const response = await cloudinary.uploader.destroy(public_id);
 
-    console.log("Delete result:", response);
+    // console.log("Delete result:", response);
 
     user.avatar = null;
     await user.save();

@@ -143,7 +143,7 @@ export const deleteBrand = asyncHandler(async (req, res) => {
 
     const medicineExits = await Medicine.findOne({ brandId: req.params.id });
 
-    console.log(medicineExits);
+    // console.log(medicineExits);
 
     if (medicineExits) {
       return res.json(

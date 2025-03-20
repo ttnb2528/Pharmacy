@@ -8,7 +8,7 @@ export const removeImage = async (req, res, next) => {
 
     const response = await cloudinary.uploader.destroy(publicId);
 
-    console.log("Delete result:", response);
+    // console.log("Delete result:", response);
 
     return res.json(jsonGenerate(StatusCode.OK, "Xoá ảnh thành công"));
   } catch (error) {

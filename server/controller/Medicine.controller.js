@@ -97,13 +97,13 @@ export const getMedicinesByCategory = asyncHandler(async (req, res) => {
 export const getMedicinesByCategoryName = asyncHandler(async (req, res) => {
   const { categoryName } = req.params;
 
-  console.log(categoryName);
+  // console.log(categoryName);
 
   try {
     // Find the category by name
     const category = await Category.findOne({ name: categoryName });
 
-    console.log(category);
+    // console.log(category);
 
     // If the category exists, find all medicines associated with it
     if (category) {
@@ -454,7 +454,7 @@ export const updateImagesMedicine = asyncHandler(async (req, res) => {
 
 export const bulkAddMedicines = async (req, res) => {
   const zipFile = req.file;
-  console.log("Received zipFile:", zipFile ? zipFile.originalname : "No file");
+  // console.log("Received zipFile:", zipFile ? zipFile.originalname : "No file");
 
   if (!zipFile) {
     return res.json(
@@ -463,38 +463,38 @@ export const bulkAddMedicines = async (req, res) => {
   }
 
   try {
-    console.log("Starting zip processing...");
+    // console.log("Starting zip processing...");
     const zipStream = Readable.from(zipFile.buffer);
     const zip = zipStream.pipe(unzipper.Parse({ forceStream: true }));
 
     let excelData = null;
     const imageBuffers = new Map();
 
-    console.log("Parsing zip entries...");
+    // console.log("Parsing zip entries...");
     for await (const entry of zip) {
       const fileName = entry.path;
-      console.log("Processing entry:", fileName);
+      // console.log("Processing entry:", fileName);
 
       const fileBuffer = await entry.buffer();
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
-        console.log("Reading Excel file:", fileName);
+        // console.log("Reading Excel file:", fileName);
         const workbook = XLSX.read(fileBuffer, { type: "buffer" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         excelData = XLSX.utils.sheet_to_json(worksheet);
-        console.log("Excel data extracted:", excelData.length, "rows");
+        // console.log("Excel data extracted:", excelData.length, "rows");
       } else if (fileName.startsWith("images/")) {
         const imageName = fileName.split("/")[1];
-        console.log("Storing image buffer:", imageName);
+        // console.log("Storing image buffer:", imageName);
         imageBuffers.set(imageName, fileBuffer);
       } else {
-        console.log("Skipping unknown file:", fileName);
+        // console.log("Skipping unknown file:", fileName);
         entry.autodrain();
       }
     }
 
     if (!excelData) {
-      console.log("No Excel data found in zip");
+      // console.log("No Excel data found in zip");
       return res.json(
         jsonGenerate(
           StatusCode.BAD_REQUEST,
@@ -503,7 +503,7 @@ export const bulkAddMedicines = async (req, res) => {
       );
     }
 
-    console.log("Processing medicines...");
+    // console.log("Processing medicines...");
     const uploadedMedicines = [];
 
     for (const medicineData of excelData) {
@@ -513,28 +513,28 @@ export const bulkAddMedicines = async (req, res) => {
         const imageFileNames = medicineData["Hình ảnh"]
           .split(",")
           .map((name) => name.trim());
-        console.log(
-          "Image file names for",
-          medicineData["Tên thuốc"],
-          ":",
-          imageFileNames
-        );
+        // console.log(
+        //   "Image file names for",
+        //   medicineData["Tên thuốc"],
+        //   ":",
+        //   imageFileNames
+        // );
 
         for (const imageFileName of imageFileNames) {
           const imageBuffer = imageBuffers.get(imageFileName);
-          console.log(
-            "Image buffer for",
-            imageFileName,
-            ":",
-            imageBuffer ? "Found" : "Not found"
-          );
+          // console.log(
+          //   "Image buffer for",
+          //   imageFileName,
+          //   ":",
+          //   imageBuffer ? "Found" : "Not found"
+          // );
 
           if (imageBuffer) {
             try {
-              console.log("Uploading", imageFileName, "to Cloudinary...");
+              // console.log("Uploading", imageFileName, "to Cloudinary...");
               const url = await uploadToCloudinary(imageBuffer, imageFileName);
               imageUrls.push(url);
-              console.log("Uploaded", imageFileName, ":", url);
+              // console.log("Uploaded", imageFileName, ":", url);
             } catch (uploadError) {
               console.error(
                 "Failed to upload",
@@ -549,7 +549,7 @@ export const bulkAddMedicines = async (req, res) => {
         }
       }
 
-      console.log("Creating medicine:", medicineData["Tên thuốc"]);
+      // console.log("Creating medicine:", medicineData["Tên thuốc"]);
       const categoryId = await findOrCreateCategory(
         medicineData["Tên danh mục"]
       );
@@ -586,10 +586,10 @@ export const bulkAddMedicines = async (req, res) => {
 
       const savedMedicine = await newMedicine.save();
       uploadedMedicines.push(savedMedicine);
-      console.log("Saved medicine:", savedMedicine.name);
+      // console.log("Saved medicine:", savedMedicine.name);
     }
 
-    console.log("Processing complete, sending response...");
+    // console.log("Processing complete, sending response...");
     return res.json(
       jsonGenerate(
         StatusCode.CREATED,
