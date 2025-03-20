@@ -1,5 +1,5 @@
 import Loading from "@/pages/component/Loading.jsx";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Component UI
@@ -12,11 +12,12 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client.js";
 import { UPDATE_PASSWORD_ROUTE } from "@/API/index.api.js";
-import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { isDisableAll } from "@/utils/isDisableAll.jsx";
+import { useAppStore } from "@/store/index.js";
 
 const UpdatePassword = () => {
-  const { userData } = useContext(PharmacyContext);
+  // const { userData } = useContext(PharmacyContext);
+  const { userInfo } = useAppStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -56,7 +57,7 @@ const UpdatePassword = () => {
       }
 
       const res = await apiClient.put(
-        `${UPDATE_PASSWORD_ROUTE}/${userData.accountId._id}`,
+        `${UPDATE_PASSWORD_ROUTE}/${userInfo.accountId._id}`,
         {
           password: newPassword,
         }

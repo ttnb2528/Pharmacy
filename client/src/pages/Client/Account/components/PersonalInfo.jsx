@@ -369,6 +369,7 @@ const PersonalInfo = () => {
                     <div className="space-y-2">
                       <Label htmlFor="phone">Số điện thoại</Label>
                       <Input
+                        disabled
                         id="phone"
                         placeholder="Số điện thoại"
                         value={phone}
