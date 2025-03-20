@@ -207,6 +207,10 @@ const PersonalInfo = () => {
     }
   };
 
+  const hidePhone = (phone) => {
+    return phone.replace(/(\d{4})(\d{3})(\d{3})/, "**** *** $3");
+  };
+
   return (
     <div>
       {isLoading && <Loading />}
@@ -366,7 +370,16 @@ const PersonalInfo = () => {
                       </div>
                     </div> */}
 
-                    <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
+                        <p className="">Số điện thoại</p>
+                        <p className="font-medium text-neutral-400 break-all">
+                          {hidePhone(phone)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* <div className="space-y-2">
                       <Label htmlFor="phone">Số điện thoại</Label>
                       <Input
                         disabled
@@ -375,7 +388,7 @@ const PersonalInfo = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
-                    </div>
+                    </div> */}
 
                     <div className="flex justify-between">
                       <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
