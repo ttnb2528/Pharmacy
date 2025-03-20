@@ -4,12 +4,13 @@ import bcryptjs from "bcryptjs";
 const AccountSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, "Please provide a email"],
+    // required: [true, "Please provide a email"],
     unique: true,
+    sparse: true,
   },
   password: {
     type: String,
-    required: [true, "Please provide a password"],
+    // required: [true, "Please provide a password"],
     minlength: 6,
   },
   cartData: {
@@ -26,6 +27,9 @@ const AccountSchema = new mongoose.Schema({
 });
 
 AccountSchema.pre("save", async function (next) {
+  if (!this.password) {
+    return next(); // Bỏ qua nếu không có password
+  }
   const salt = await bcryptjs.genSalt(10);
   this.password = await bcryptjs.hash(this.password, salt);
   next();

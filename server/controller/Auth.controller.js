@@ -9,20 +9,84 @@ import Staff from "../model/Staff.model.js";
 import LoyaltyProgram from "../model/LoyaltyProgram.model.js";
 import { generateID } from "../utils/generateID.js";
 
+const formatPhoneNumber = async (phoneNumber) => {
+  const cleaned = phoneNumber.replace(/\D/g, "");
+  if (cleaned.startsWith("84")) {
+    return `0${cleaned.slice(2)}`;
+  }
+  if (cleaned.startsWith("0")) {
+    return cleaned;
+  }
+  return `0${cleaned}`;
+};
+
+// export const signup = asyncHandler(async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.json(
+//         jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập đầy đủ thông tin")
+//       );
+//     }
+
+//     const existingUser = await Account.findOne({ email });
+
+//     if (existingUser) {
+//       return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Email đã tồn tại"));
+//     }
+
+//     let cart = {};
+//     for (let i = 1; i <= 300; i++) {
+//       cart[i] = 0;
+//     }
+
+//     const user = await Account.create({ email, password, cartData: cart });
+
+//     let idCus = await generateID(Customer);
+//     await Customer.create({ accountId: user._id, id: idCus });
+
+//     const loyaltyProgram = await LoyaltyProgram.create({ AccountId: user._id });
+
+//     await Account.findByIdAndUpdate(user._id, {
+//       loyaltyProgramId: loyaltyProgram._id,
+//     });
+
+//     const populatedUser = await Customer.findOne({
+//       accountId: user._id,
+//     }).populate({
+//       path: "accountId",
+//       populate: { path: "loyaltyProgramId" },
+//     });
+
+//     generateToken(res, user._id, false);
+
+//     return res.json(
+//       jsonGenerate(StatusCode.CREATED, "Đăng ký thành công", populatedUser)
+//     );
+//   } catch (error) {
+//     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+//   }
+// });
+
 export const signup = asyncHandler(async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone } = req.body;
 
-    if (!email || !password) {
+    let formatPhone = await formatPhoneNumber(phone);
+    console.log("signup: ", formatPhone);
+
+    if (!formatPhone) {
       return res.json(
-        jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập đầy đủ thông tin")
+        jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập số điện thoại")
       );
     }
 
-    const existingUser = await Account.findOne({ email });
-
-    if (existingUser) {
-      return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Email đã tồn tại"));
+    const existingCustomer = await Customer.findOne({ phone: formatPhone });
+    if (existingCustomer) {
+      return res.json(
+        jsonGenerate(StatusCode.BAD_REQUEST, "Số điện thoại đã tồn tại")
+      );
     }
 
     let cart = {};
@@ -30,12 +94,22 @@ export const signup = asyncHandler(async (req, res) => {
       cart[i] = 0;
     }
 
-    const user = await Account.create({ email, password, cartData: cart });
+    const user = await Account.create({ cartData: cart }); // Không cần email/password
+    console.log("create account: ", user);
 
     let idCus = await generateID(Customer);
-    await Customer.create({ accountId: user._id, id: idCus });
+    console.log("idCus: ", idCus);
+
+    const customer = await Customer.create({
+      accountId: user._id,
+      id: idCus,
+      phone: formatPhone,
+    });
+
+    console.log("create customer: ", customer);
 
     const loyaltyProgram = await LoyaltyProgram.create({ AccountId: user._id });
+    console.log("create loyaltyProgram: ", loyaltyProgram);
 
     await Account.findByIdAndUpdate(user._id, {
       loyaltyProgramId: loyaltyProgram._id,
@@ -58,50 +132,98 @@ export const signup = asyncHandler(async (req, res) => {
   }
 });
 
+// export const login = asyncHandler(async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.json(
+//         jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập đầy đủ thông tin")
+//       );
+//     }
+
+//     const userExist = await Account.findOne({ email });
+
+//     if (!userExist) {
+//       return res.json(
+//         jsonGenerate(StatusCode.BAD_REQUEST, "Email không tồn tại")
+//       );
+//     }
+
+//     const isPasswordCorrect = await bcryptjs.compare(
+//       password,
+//       userExist.password
+//     );
+
+//     if (isPasswordCorrect) {
+//       const populatedUser = await Customer.findOne({
+//         accountId: userExist._id,
+//       }).populate({
+//         path: "accountId",
+//         populate: { path: "loyaltyProgramId" },
+//       });
+
+//       const user = populatedUser.toObject();
+//       delete user.accountId.password;
+
+//       const token = generateToken(res, userExist._id, false);
+
+//       res.json(
+//         jsonGenerate(StatusCode.OK, "Đăng nhập thành công", { user, token })
+//       );
+
+//       return;
+//     } else {
+//       res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Mật khẩu không đúng"));
+//     }
+//   } catch (error) {
+//     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+//   }
+// });
+
 export const login = asyncHandler(async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
 
-    if (!email || !password) {
+    let formatPhone = await formatPhoneNumber(phone);
+    console.log(formatPhone);
+
+    if (!formatPhone) {
       return res.json(
-        jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập đầy đủ thông tin")
+        jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng nhập số điện thoại")
       );
     }
 
-    const userExist = await Account.findOne({ email });
+    const customer = await Customer.findOne({ phone: formatPhone }).populate({
+      path: "accountId",
+      populate: { path: "loyaltyProgramId" },
+    });
 
-    if (!userExist) {
+    if (!customer || !customer.accountId) {
       return res.json(
-        jsonGenerate(StatusCode.BAD_REQUEST, "Email không tồn tại")
+        jsonGenerate(StatusCode.BAD_REQUEST, "Số điện thoại không tồn tại")
       );
     }
 
-    const isPasswordCorrect = await bcryptjs.compare(
-      password,
-      userExist.password
+    if (password) {
+      // Kiểm tra mật khẩu nếu có
+      const isPasswordCorrect = await bcryptjs.compare(
+        password,
+        customer.accountId.password || ""
+      );
+      if (!isPasswordCorrect) {
+        return res.json(
+          jsonGenerate(StatusCode.BAD_REQUEST, "Mật khẩu không đúng")
+        );
+      }
+    }
+
+    const user = customer.toObject();
+    const token = generateToken(res, customer.accountId._id, false);
+
+    res.json(
+      jsonGenerate(StatusCode.OK, "Đăng nhập thành công", { user, token })
     );
-
-    if (isPasswordCorrect) {
-      const populatedUser = await Customer.findOne({
-        accountId: userExist._id,
-      }).populate({
-        path: "accountId",
-        populate: { path: "loyaltyProgramId" },
-      });
-
-      const user = populatedUser.toObject();
-      delete user.accountId.password;
-
-      const token = generateToken(res, userExist._id, false);
-
-      res.json(
-        jsonGenerate(StatusCode.OK, "Đăng nhập thành công", { user, token })
-      );
-
-      return;
-    } else {
-      res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Mật khẩu không đúng"));
-    }
   } catch (error) {
     return res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
