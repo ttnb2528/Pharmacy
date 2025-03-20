@@ -28,6 +28,7 @@ import { apiClient } from "./lib/api-client.js";
 import { GET_USER_INFO } from "./API/index.api.js";
 import { useAppStore } from "./store/index.js";
 import PaymentReturn from "./pages/Client/Payment/PaymentReturn.jsx";
+import UpdateEmail from "./pages/Client/Account/components/UpdateEmail.jsx";
 
 const App = () => {
   const { userInfo, setUserInfo } = useAppStore();
@@ -160,6 +161,10 @@ const App = () => {
           {
             path: "info/update-password",
             element: <UpdatePassword />,
+          },
+          {
+            path: "info/update-email",
+            element: <UpdateEmail />,
           },
         ],
       },
