@@ -86,6 +86,10 @@ const BillSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        image: {
+          type: String,
+          required: true,
+        },
         unit: {
           type: String,
           required: true,

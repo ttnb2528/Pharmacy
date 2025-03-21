@@ -20,10 +20,12 @@ const OrderCard = ({ order, onViewDetails }) => (
     <CardContent className="pt-6">
       <div className="flex justify-between items-center mb-2">
         <span className="text-sm text-gray-500">
-          {new Date(order.date).toLocaleString("vi-VN")}
+          {order.date
+            ? new Date(order.date).toLocaleString("vi-VN")
+            : new Date(order.createdAt).toLocaleString("vi-VN")}
         </span>
         <span className="text-sm font-medium">
-          {order.type === "online" ? "Mua online" : "Mua tại nhà thuốc"}
+          {order.type === "store" ? "Mua online" : "Mua tại nhà thuốc"}
         </span>
       </div>
       <div className="font-semibold">Mã đơn: {order.id}</div>
@@ -32,7 +34,9 @@ const OrderCard = ({ order, onViewDetails }) => (
       </div>
     </CardContent>
     <CardFooter>
-      <Button onClick={() => onViewDetails(order.id)}>Xem chi tiết</Button>
+      <Button onClick={() => onViewDetails(order.id, order.type || "store")}>
+        Xem chi tiết
+      </Button>
     </CardFooter>
   </Card>
 );
@@ -66,8 +70,8 @@ const OrderHistory = () => {
       ? orders
       : orders.filter((order) => order.status === activeTab);
 
-  const handleViewDetails = (orderId) => {
-    navigate(`/account/history/${orderId}`);
+  const handleViewDetails = (orderId, type) => {
+    navigate(`/account/history/${type}/${orderId}`);
   };
 
   return (

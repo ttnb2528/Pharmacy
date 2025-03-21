@@ -139,7 +139,7 @@ const App = () => {
             element: <OrderHistory />,
           },
           {
-            path: "history/:orderId",
+            path: "history/:type/:orderId",
             element: <OrderDetail />,
           },
           {

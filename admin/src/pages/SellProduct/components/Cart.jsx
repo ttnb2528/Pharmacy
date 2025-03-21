@@ -78,6 +78,7 @@ const Cart = ({
           medicineId: medicine._id,
           isRx: medicine.isRx,
           name: medicine.name,
+          image: medicine.images[0],
           unit: medicine.unit,
           quantity: medicine.quantity,
           price:

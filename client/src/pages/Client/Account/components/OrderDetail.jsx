@@ -24,7 +24,7 @@ const orderStatuses = [
 ];
 
 const OrderDetail = () => {
-  const { orderId } = useParams();
+  const { type = "store", orderId } = useParams();
   const [orderDetail, setOrderDetail] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +32,14 @@ const OrderDetail = () => {
   useEffect(() => {
     const resOrderDetail = async () => {
       try {
-        const res = await apiClient.get(`${GET_ORDER_DETAIL_ROUTE}/${orderId}`);
+        const res = await apiClient.get(
+          `${GET_ORDER_DETAIL_ROUTE}/${type}/${orderId}`,
+          {
+            type: "order",
+          }
+        );
+        console.log(res);
+
         if (res.status === 200 && res.data.status === 200) {
           setOrderDetail(res.data.data);
         } else {
@@ -138,7 +145,6 @@ const OrderDetail = () => {
       };
 
       const res = await apiClient.post(REFUND_ROUTE, refundData);
-      
 
       if (res.status === 200 && res.data.vnp_ResponseCode === "00") {
         // toast.success("Hoàn tiền qua VNPay thành công!");
@@ -205,7 +211,7 @@ const OrderDetail = () => {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <>
       {isLoading && <Loading />}
@@ -219,67 +225,106 @@ const OrderDetail = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <Card>
-            <CardHeader>
+            <CardHeader className={`${type === "store" ? "" : "pb-3"}`}>
               <CardTitle>Thông tin người nhận</CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                <strong>Tên:</strong> {orderDetail?.orderId.nameCustomer}
+                <strong>Tên:</strong>{" "}
+                {type === "store"
+                  ? orderDetail?.orderId.nameCustomer
+                  : orderDetail?.customer.name}
               </p>
-              {orderDetail?.orderId.address && (
+              {/* {orderDetail?.orderId.address && (
+                <p>
+                  <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
+                </p>
+              )} */}
+              {type === "store" && (
                 <p>
                   <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
                 </p>
               )}
             </CardContent>
           </Card>
+
           <Card>
-            <CardHeader>
+            <CardHeader className={`${type === "store" ? "" : "pb-2"}`}>
               <CardTitle>Thông tin đơn hàng</CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                <strong>Mã đơn hàng:</strong> {orderDetail?.orderId.id}
+                <strong>Mã đơn hàng:</strong>{" "}
+                {type === "store" ? orderDetail?.orderId.id : orderDetail?.id}
               </p>
               <p>
                 <strong>Ngày đặt:</strong>{" "}
-                {new Date(orderDetail?.orderId.date).toLocaleString("vi-VN")}
+                {type === "store"
+                  ? new Date(orderDetail?.orderId.date).toLocaleString("vi-VN")
+                  : new Date(orderDetail?.createdAt).toLocaleString("vi-VN")}
               </p>
-              <p>
+              {type === "store" && (
+                <p>
+                  <strong>Trạng thái:</strong>{" "}
+                  {orderDetail?.orderId.status &&
+                    orderStatuses.find(
+                      (status) => status.value === orderDetail?.orderId.status
+                    )?.vi}
+                </p>
+              )}
+              {/* <p>
                 <strong>Trạng thái:</strong>{" "}
                 {orderDetail?.orderId.status &&
                   orderStatuses.find(
                     (status) => status.value === orderDetail?.orderId.status
                   )?.vi}
-              </p>
+              </p> */}
               {/* Hiển thị nút hủy/refund dựa trên trạng thái và phương thức thanh toán */}
-              {(orderDetail?.orderId?.status === "pending") && (
-                <div className="flex justify-end">
-                  <Button
-                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    onClick={handleCancelOrder}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
-                  </Button>
-                </div>
-              )}
+              {type === "store" &&
+                orderDetail?.orderId?.status === "pending" && (
+                  <div className="flex justify-end">
+                    <Button
+                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                      onClick={handleCancelOrder}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
+                    </Button>
+                  </div>
+                )}
             </CardContent>
           </Card>
         </div>
+        {type !== "store" && (
+          <Card className="mb-6">
+            <CardHeader className="pb-2">
+              <CardTitle>Địa chỉ nhà thuốc</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Ký túc xá A, Đại học Cần Thơ</p>
+            </CardContent>
+          </Card>
+        )}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Sản phẩm</CardTitle>
           </CardHeader>
           <CardContent>
             <div>
-              {orderDetail?.items.map((item, index) => (
+              {(type === "store"
+                ? orderDetail?.items
+                : orderDetail?.medicines
+              )?.map((item, index) => (
                 <div key={index}>
                   <div className="grid grid-cols-[1fr_calc(26rem/2)] gap-10 py-2">
                     <div className="flex items-center">
                       <div>
                         <img
-                          src={item?.productId?.images[0]}
+                          src={
+                            type === "store"
+                              ? item?.productId?.images[0]
+                              : item?.image
+                          }
                           alt=""
                           className="w-10 h-10 object-cover border mr-4"
                         />
@@ -311,9 +356,12 @@ const OrderDetail = () => {
                       </div>
                     </div>
                   </div>
-                  {index < orderDetail.items.length - 1 && (
-                    <div className="border-b my-2"></div>
-                  )}
+                  {index <
+                    (type === "store"
+                      ? orderDetail?.items
+                      : orderDetail?.medicines
+                    )?.length -
+                      1 && <div className="border-b my-2"></div>}
                 </div>
               ))}
             </div>
@@ -326,13 +374,21 @@ const OrderDetail = () => {
           <CardContent>
             <div className="flex justify-between mb-2">
               <span>Tiền hàng</span>
-              <span>{convertVND(orderDetail?.orderId?.totalTemp)}</span>
+              <span>
+                {type === "store"
+                  ? convertVND(orderDetail?.orderId?.totalTemp)
+                  : convertVND(orderDetail.total)}
+              </span>
             </div>
             <div className="flex justify-between mb-2">
               <span>Phí vận chuyển</span>
-              <span>{convertVND(orderDetail?.orderId?.shippingFee)}</span>
+              <span>
+                {type === "store"
+                  ? convertVND(orderDetail?.orderId?.shippingFee)
+                  : convertVND(0)}
+              </span>
             </div>
-            {orderDetail?.orderId?.discountValue > 0 && (
+            {type === "store" && orderDetail?.orderId?.discountValue > 0 && (
               <div className="flex justify-between mb-2">
                 <span>Giảm giá ưu đãi</span>
                 <span>
@@ -343,28 +399,34 @@ const OrderDetail = () => {
                 </span>
               </div>
             )}
-            <div className="flex justify-between mb-2">
-              <span>Giảm giá sản phẩm</span>
-              <span>-{convertVND(orderDetail?.orderId?.discountProduct)}</span>
-            </div>
+            {type === "store" && (
+              <div className="flex justify-between mb-2">
+                <span>Giảm giá sản phẩm</span>
+                <span>
+                  -{convertVND(orderDetail?.orderId?.discountProduct)}
+                </span>
+              </div>
+            )}
             <div className="border-t mt-2 pt-2">
               <div className="flex justify-between font-bold text-lg">
                 <span>
                   Tổng tiền (
-                  {orderDetail?.items.reduce(
-                    (sum, item) => sum + item.quantity,
-                    0
-                  )}{" "}
+                  {(type === "store"
+                    ? orderDetail?.items
+                    : orderDetail?.medicines
+                  )?.reduce((sum, item) => sum + item.quantity, 0)}{" "}
                   sản phẩm)
                 </span>
                 <span className="text-red-600">
-                  {convertVND(orderDetail?.orderId?.total)}
+                  {type === "store"
+                    ? convertVND(orderDetail?.orderId?.total)
+                    : convertVND(orderDetail.total)}
                 </span>
               </div>
             </div>
             <div className="mt-4">
               <strong>Phương thức thanh toán:</strong>{" "}
-              {orderDetail?.orderId?.paymentMethod}
+              {type == "store" ? orderDetail?.orderId?.paymentMethod : "COD"}
             </div>
           </CardContent>
         </Card>

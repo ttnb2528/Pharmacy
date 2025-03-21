@@ -1,4 +1,5 @@
 import Order from "../model/Order.model.js";
+import Bill from "../model/Bill.model.js";
 import OrderDetail from "../model/OrderDetail.model.js";
 import Medicine from "../model/Medicine.model.js";
 import Batch from "../model/Batch.model.js";
@@ -213,8 +214,34 @@ export const getCurrentUserOrders = asyncHandler(async (req, res) => {
       AccountId: req.user._id,
     }).populate("AccountId");
 
+    const bills = await Bill.find({
+      "customer.customerId": req.user._id,
+    });
+
+    // Transform orders and bills to have a consistent format with a type identifier
+    const formattedOrders = orders.map((order) => ({
+      ...order._doc,
+      createdAt: order.date,
+      type: "store",
+    }));
+
+    const formattedBills = bills.map((bill) => ({
+      ...bill._doc,
+      type: "bill",
+    }));
+
+    // Merge both arrays
+    const mergedOrders = [...formattedOrders, ...formattedBills];
+
+    // Sort by created date (newest first)
+    mergedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     res.json(
-      jsonGenerate(StatusCode.OK, "Lấy danh sách đơn hàng thành công", orders)
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách đơn hàng thành công",
+        mergedOrders
+      )
     );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
@@ -239,32 +266,49 @@ export const getOrderById = asyncHandler(async (req, res) => {
 
 export const getOrderDetail = asyncHandler(async (req, res) => {
   try {
-    const orderExist = await Order.findOne({ id: req.params.orderId });
+    const { type, orderId } = req.params;
+    let result;
 
-    if (!orderExist) {
+    if (type === "store") {
+      const orderExist = await Order.findOne({ id: orderId });
+
+      if (!orderExist) {
+        return res.json(
+          jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy đơn hàng")
+        );
+      }
+
+      const orderDetail = await OrderDetail.findOne({
+        orderId: orderExist._id,
+      })
+        .populate("items.productId")
+        .populate("orderId");
+
+      if (!orderDetail) {
+        return res.json(
+          jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng")
+        );
+      }
+
+      result = { ...orderDetail._doc, type: "store" };
+    } else if (type === "bill") {
+      const billDetail = await Bill.findOne({ id: orderId });
+
+      if (!billDetail) {
+        return res.json(
+          jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy hóa đơn")
+        );
+      }
+
+      result = { ...billDetail._doc, type: "bill" };
+    } else {
       return res.json(
-        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy đơn hàng")
-      );
-    }
-
-    const orderDetail = await OrderDetail.findOne({
-      orderId: orderExist._id,
-    })
-      .populate("items.productId")
-      .populate("orderId");
-
-    if (!orderDetail) {
-      return res.json(
-        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng")
+        jsonGenerate(StatusCode.BAD_REQUEST, "Loại đơn hàng không hợp lệ")
       );
     }
 
     res.json(
-      jsonGenerate(
-        StatusCode.OK,
-        "Lấy chi tiết đơn hàng thành công",
-        orderDetail
-      )
+      jsonGenerate(StatusCode.OK, "Lấy chi tiết đơn hàng thành công", result)
     );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
