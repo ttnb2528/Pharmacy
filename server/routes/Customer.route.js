@@ -13,6 +13,7 @@ import {
   removeProfileImage,
   updateCart,
   updateCustomer,
+  updateEmail,
   updatePassword,
 } from "../controller/User.controller.js";
 import {
@@ -35,6 +36,7 @@ router.get("/getUserInfo", authenticate, getUserInfo);
 router.get("/getCustomers", getCustomers);
 router.get("/:id", authenticate, getCustomerById);
 router.put("/profile/:id", authenticate, updateCustomer);
+router.put("/update-email/:id", authenticate, updateEmail);
 router.put("/update-password/:id", authenticate, updatePassword);
 
 // ROLE: Admin and Staff

@@ -13,6 +13,7 @@ export const REMOVE_PRODUCT_FROM_CART_ROUTE = `${CUSTOMER_ROUTES}/removeProductF
 export const UPDATE_CART_ROUTE = `${CUSTOMER_ROUTES}/updateCart`;
 export const CLEAR_CART_ROUTE = `${CUSTOMER_ROUTES}/clearCart`;
 export const UPDATE_USER_ROUTE = `${CUSTOMER_ROUTES}/profile`;
+export const UPDATE_EMAIL_ROUTE = `${CUSTOMER_ROUTES}/update-email`;
 export const UPDATE_PASSWORD_ROUTE = `${CUSTOMER_ROUTES}/update-password`;
 export const ADD_PROFILE_IMAGE_ROUTE = `${CUSTOMER_ROUTES}/add-profile-image`;
 export const REMOVE_PROFILE_IMAGE_ROUTE = `${CUSTOMER_ROUTES}/remove-profile-image`;

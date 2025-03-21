@@ -112,6 +112,34 @@ export const updateCustomer = asyncHandler(async (req, res) => {
   }
 });
 
+export const updateEmail = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.body;
+
+    const account = await Account.findById(id);
+
+    if (!account) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy tài khoản")
+      );
+    }
+
+    const emailExits = await Account.findOne({ email: email });
+
+    if (emailExits) {
+      return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Email đã sử dụng"));
+    }
+
+    account.email = email;
+    await account.save();
+
+    res.json(jsonGenerate(StatusCode.OK, "Cập nhật email thành công"));
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const updatePassword = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
