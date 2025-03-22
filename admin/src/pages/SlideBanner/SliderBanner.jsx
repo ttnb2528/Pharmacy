@@ -1,0 +1,244 @@
+import { useContext, useState } from "react";
+import Header from "../component/Header.jsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button.jsx";
+import { Edit, Plus, Trash } from "lucide-react";
+import AdminSliderBannerForm from "./Component/AdminAddSliderBannerForm.jsx";
+import { SliderBannerContext } from "@/context/SliderBannerContext.jsx";
+import EditSliderDialog from "./Component/EditSliderDialog.jsx";
+import ConfirmForm from "../component/ConfirmForm.jsx";
+import { apiClient } from "@/lib/api-admin.js";
+import { toast } from "sonner";
+import { DELETE_SLIDER_BANNER_ROUTE } from "@/API/index.api.js";
+import Loading from "../component/Loading.jsx";
+
+const SliderBanner = () => {
+  const { sliders, setSliders } = useContext(SliderBannerContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [selectedSlider, setSelectedSlider] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Lọc các slider chưa bị xóa
+  const activeSliders = sliders.filter((slider) => !slider.deleted);
+
+  const handleEdit = (slider) => {
+    setSelectedSlider(slider);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setSelectedSlider(null);
+    setIsEditing(false);
+  };
+
+  const totalPages = Math.ceil(activeSliders.length / itemsPerPage);
+  const paginatedSliders = activeSliders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleCancel = () => {
+    setIsAdding(false);
+  };
+
+  const handleOpenConfirm = (slider) => {
+    setSelectedSlider(slider);
+    setConfirmDelete(true);
+  };
+
+  const handleDeleteSlider = async (slider) => {
+    try {
+      setIsLoading(true);
+      const res = await apiClient.delete(
+        `${DELETE_SLIDER_BANNER_ROUTE}/${slider._id}`
+      );
+
+      if (res.status === 200 && res.data.status === 200) {
+        toast.success(res.data.message);
+        setSelectedSlider(null);
+        setConfirmDelete(false);
+        setSliders((prevSliders) =>
+          prevSliders.map((item) =>
+            item._id === slider._id ? { ...item, deleted: true } : item
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Có lỗi xảy ra khi xóa slider");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {isLoading && <Loading />}
+      <Header title={"Danh sách Slider ảnh"} />
+      <main className="p-6">
+        <div className="flex justify-end items-center mb-4">
+          <Dialog open={isAdding} onOpenChange={setIsAdding}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Thêm Slider ảnh
+              </Button>
+            </DialogTrigger>
+            <DialogContent
+              className="max-w-2xl"
+              onPointerDownOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <DialogHeader>
+                <DialogTitle>Thêm Slider ảnh</DialogTitle>
+              </DialogHeader>
+              <DialogDescription></DialogDescription>
+              <AdminSliderBannerForm handleCancel={handleCancel} />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>STT</TableHead>
+              <TableHead>Ảnh</TableHead>
+              <TableHead>Vị trí</TableHead>
+              <TableHead>Mô tả</TableHead>
+              <TableHead>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedSliders.length > 0 ? (
+              paginatedSliders.map((slider, index) => (
+                <TableRow key={slider._id}>
+                  <TableCell>
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </TableCell>
+                  <TableCell>
+                    <img
+                      src={slider.image}
+                      alt={`Slider ${index + 1}`}
+                      className="w-auto h-24 object-cover rounded-md"
+                    />
+                  </TableCell>
+                  <TableCell>{slider.position}</TableCell>
+                  <TableCell>{slider.description}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEdit(slider)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleOpenConfirm(slider)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Không có slider nào
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
+      </main>
+      {confirmDelete && (
+        <ConfirmForm
+          info={selectedSlider}
+          open={confirmDelete}
+          onClose={() => {
+            setConfirmDelete(false);
+            setSelectedSlider(null);
+          }}
+          handleConfirm={() => handleDeleteSlider(selectedSlider)}
+          type="slider"
+        />
+      )}
+
+      {isEditing && (
+        <EditSliderDialog
+          slider={selectedSlider}
+          isOpen={isEditing}
+          onClose={handleCancelEdit}
+        />
+      )}
+    </div>
+  );
+};
+
+export default SliderBanner;

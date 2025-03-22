@@ -38,6 +38,8 @@ import { useEffect, useState } from "react";
 import { apiClient } from "./lib/api-admin.js";
 import { GET_CURRENT_STAFF } from "./API/index.api.js";
 import Loading from "./pages/component/Loading.jsx";
+import SliderBanner from "./pages/SlideBanner/SliderBanner.jsx";
+import SliderBannerContextProvider from "./context/SliderBannerContext.jsx";
 
 const App = () => {
   const { userInfo, setUserInfo } = useAppStore();
@@ -80,6 +82,16 @@ const App = () => {
           element: (
             <PrivateRoute2>
               <Overview />
+            </PrivateRoute2>
+          ),
+        },
+        {
+          path: "slider",
+          element: (
+            <PrivateRoute2>
+              <SliderBannerContextProvider>
+                <SliderBanner />
+              </SliderBannerContextProvider>
             </PrivateRoute2>
           ),
         },

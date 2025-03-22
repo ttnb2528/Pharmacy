@@ -49,6 +49,8 @@ const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
         return `Bạn có chắc chắn muốn xóa ca làm việc <span class="font-semibold text-green-500">${
           info?.name || "này"
         }</span> không?`;
+      case "slider":
+        return `Bạn có chắc chắn muốn xóa slider  này không?`;
       default:
         return "Bạn có chắc chắn muốn thực hiện hành động này không?"; // Default text
     }
@@ -78,6 +80,8 @@ const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
         return "Xóa nhân viên";
       case "shift":
         return "Xóa ca làm việc";
+      case "slider":
+        return "Xóa slider";
       default:
         return "Xác nhận hành động"; // Default title
     }

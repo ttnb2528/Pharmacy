@@ -415,6 +415,7 @@ export default function Products() {
                           <MedicineDetails medicine={selectedMedicine} />
                         </DialogContent>
                       </Dialog>
+                      
                       <Button
                         variant="outline"
                         size="icon"

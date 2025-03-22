@@ -13,6 +13,7 @@ import {
   LogOut,
   CreditCard,
   User,
+  SlidersIcon
 } from "lucide-react";
 
 import {
@@ -52,6 +53,12 @@ const sidebarItems = [
     label: "Quản lý thuốc",
     to: "/products",
     roles: ["admin", "employee"],
+  },
+  {
+    icon: SlidersIcon,
+    label: "Quản lý Slider Ảnh",
+    to: "/slider",
+    roles: ["admin"],
   },
   {
     icon: CreditCard,
