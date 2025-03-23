@@ -39,9 +39,49 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [note, setNote] = useState("");
+  const [coinUsed, setCoinUsed] = useState(0);
+  const [tempCoinInput, setTempCoinInput] = useState("");
 
   const { showNotification, ModalNotificationComponent } =
     useModalNotification();
+
+  const handleApplyCoin = () => {
+    const coinValue = parseInt(tempCoinInput) || 0;
+    const totalPrice = CalculateTotalPrice();
+    const maxCoinAllowed = Math.floor(totalPrice * 0.5); // Giới hạn 50% giá trị đơn hàng
+    const availableCoins = userInfo?.accountId?.loyaltyProgramId?.points || 0;
+
+    if (coinValue % 1000 !== 0) {
+      showNotification({
+        title: "Số Xu không hợp lệ",
+        message: "Số Xu sử dụng phải là bội số của 1000",
+        type: "error",
+      });
+      return;
+    }
+
+    if (coinValue > maxCoinAllowed) {
+      showNotification({
+        title: "Số Xu vượt quá giới hạn",
+        message: "Bạn chỉ có thể sử dụng tối đa 50% giá trị đơn hàng",
+        type: "error",
+      });
+      return;
+    }
+
+    if (coinValue > availableCoins) {
+      showNotification({
+        title: "Không đủ Xu",
+        message: "Bạn không có đủ Xu để sử dụng",
+        type: "error",
+      });
+      return;
+    }
+
+    setCoinUsed(coinValue); // Chỉ cập nhật khi nhấn "Áp dụng"
+    setTempCoinInput(""); // Reset input sau khi áp dụng
+    setIsOpenCoinGold(false); // Đóng dialog
+  };
 
   const {
     cart,
@@ -84,7 +124,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
-        total: CalculateTotalPrice(),
+        total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
           ? `${selectedAddress.otherDetails}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
@@ -97,6 +137,7 @@ const Checkout = () => {
         discountProduct: CalculatePriceWithSale(cart),
         note: note,
         cart: cart,
+        coinUsed: coinUsed,
       });
 
       if (res.status === 200 && res.data.status === 201) {
@@ -150,7 +191,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
-        total: CalculateTotalPrice(),
+        total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
           ? `${selectedAddress.otherDetails}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
@@ -196,7 +237,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
-        total: CalculateTotalPrice(),
+        total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
           ? `${selectedAddress.otherDetails}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
@@ -226,6 +267,10 @@ const Checkout = () => {
       toast.error("Lỗi khi tạo thanh toán VNPay");
       console.error(error);
     }
+  };
+
+  const formatNumber = (number) => {
+    return number.toLocaleString("vi-VN");
   };
 
   return (
@@ -303,13 +348,18 @@ const Checkout = () => {
                           id="pxu"
                           type="number"
                           className="col-span-3"
-                          placeholder="Nhập số lượng P-Xu Vàng"
+                          placeholder="Nhập số lượng Xu Vàng"
+                          value={tempCoinInput}
+                          onChange={(e) => setTempCoinInput(e.target.value)} // Chỉ cập nhật giá trị tạm thời
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Có sẵn</Label>
                         <span className="col-span-3 font-semibold">
-                          1000 Xu
+                          {formatNumber(
+                            userInfo?.accountId?.loyaltyProgramId?.points
+                          )}{" "}
+                          Xu
                         </span>
                       </div>
                       <Separator />
@@ -317,12 +367,14 @@ const Checkout = () => {
                         Số Xu sử dụng phải là bội số của 1000 và không vượt quá
                         50% giá trị đơn hàng
                       </p>
+                      {coinUsed > 0 && (
+                        <p className="text-sm text-green-600">
+                          Đã áp dụng: {formatNumber(coinUsed)} Xu
+                        </p>
+                      )}
                     </div>
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={() => setIsOpenCoinGold(false)}
-                      >
+                      <Button type="button" onClick={handleApplyCoin}>
                         Áp dụng
                       </Button>
                     </DialogFooter>
@@ -333,8 +385,19 @@ const Checkout = () => {
 
             <div className="hidden w-full grid-flow-col items-center justify-between md:grid">
               <p className="text-sm text-neutral-900">Xu Vàng hiện có</p>
-              <p className="text-sm text-neutral-900">10.000</p>
+              <p className="text-sm text-neutral-900">
+                {formatNumber(userInfo?.accountId?.loyaltyProgramId?.points)} xu
+              </p>
             </div>
+
+            {coinUsed > 0 && (
+              <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                <p className="text-sm text-neutral-900">Số Xu sử dụng</p>
+                <p className="text-sm text-neutral-900">
+                  {formatNumber(coinUsed)} xu
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -405,7 +468,7 @@ const Checkout = () => {
                     </p>
                   </div>
                   <p className="text-base font-semibold leading-5 text-red-500 no-underline md:text-2xl md:font-bold md:leading-8">
-                    {convertVND(CalculateTotalPrice())}
+                    {convertVND(CalculateTotalPrice() - coinUsed)}
                   </p>
                 </div>
               </div>

@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle2, Gift, CreditCard, Diamond } from "lucide-react";
 import silverBackground from "@/assets/silver-background.jpg";
+import goldBackground from "@/assets/gold-card.png";
+import diamondBackground from "@/assets/diamond-card.png";
 import silverIcon from "@/assets/silver-rank.png";
 import goldIcon from "@/assets/gold-rank.png";
 import diamondIcon from "@/assets/diamond-rank.png";
@@ -18,6 +20,7 @@ import {
 } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useAppStore } from "@/store/index.js";
+import { GoldRank, SilverRank } from "@/utils/variableExport.js";
 
 const TierContent = ({ upgradeCriteria, benefits }) => (
   <Card className="rounded-none border-t-0">
@@ -47,6 +50,7 @@ const TierContent = ({ upgradeCriteria, benefits }) => (
 
 const PointsPolicy = () => {
   const { userInfo } = useAppStore();
+  const rank = userInfo?.accountId?.loyaltyProgramId?.rank;
   const tiers = [
     {
       id: "bac",
@@ -83,14 +87,22 @@ const PointsPolicy = () => {
                 <div
                   className="bg-center h-20 rounded-md bg-cover px-6"
                   style={{
-                    backgroundImage: `url("${silverBackground}")`,
+                    backgroundImage: `url("${
+                      rank === SilverRank
+                        ? silverBackground
+                        : rank === GoldRank
+                        ? goldBackground
+                        : diamondBackground
+                    }")`,
                   }}
                 >
-                  <p className="flex items-center gap-2 pt-4 text-base font-semibold ">
+                  <p
+                    className={`flex items-center gap-2 pt-4 text-base font-semibold ${
+                      rank === SilverRank ? "" : "text-white"
+                    }`}
+                  >
                     Hạng thành viên{" "}
-                    <span className="text-2xl font-bold uppercase">
-                      {userInfo?.accountId?.loyaltyProgramId?.rank}
-                    </span>
+                    <span className="text-2xl font-bold uppercase">{rank}</span>
                   </p>
                 </div>
 

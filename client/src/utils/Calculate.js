@@ -14,8 +14,18 @@ export const handleRenderPriceWithCoupon = (coupon) => {
   }
 };
 
-export const CalculatePointEarned = (price, sale) => {
-  return CalculateProductWithSale(price, sale) / 100;
+export const CalculatePointEarned = (rank, price, sale) => {
+  const priceAfterSale = CalculateProductWithSale(price, sale);
+  switch (rank) {
+    case "Bạc":
+      return Math.floor(priceAfterSale * 0.01); // 1% giá sau giảm
+    case "Vàng":
+      return Math.floor(priceAfterSale * 0.015); // 1.5% giá sau giảm
+    case "Kim cương":
+      return Math.floor(priceAfterSale * 0.02); // 2% giá sau giảm
+    default:
+      return 0;
+  }
 };
 
 export const CalculateRemainingAccumulated = (rank, totalSpending) => {
@@ -53,7 +63,7 @@ export const CalculatePercentProgressSilver = (rank, totalSpending) => {
     if (totalSpending > 4000000) return 100;
     return (totalSpending / 4000000) * 100;
   }
-  return;
+  return 100;
 };
 
 export const CalculatePercentProgressGold = (rank, totalSpending) => {
@@ -61,5 +71,5 @@ export const CalculatePercentProgressGold = (rank, totalSpending) => {
     if (totalSpending > 8000000) return 100;
     return (totalSpending / 8000000) * 100;
   }
-  return;
+  return 100;
 };

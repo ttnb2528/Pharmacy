@@ -21,6 +21,10 @@ const LoyaltyProgramSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  lastResetDate: {
+    type: Date,
+    default: () => new Date(new Date().getFullYear(), 0, 1), // Mặc định là đầu năm hiện tại
+  },
 });
 
 const LoyaltyProgram = mongoose.model("LoyaltyProgram", LoyaltyProgramSchema);

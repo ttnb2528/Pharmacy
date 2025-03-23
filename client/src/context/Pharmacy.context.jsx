@@ -216,7 +216,7 @@ const PharmacyContextProvider = (props) => {
     return totalPrice;
   };
 
-  const CalculateTotalPrice = () => {
+  const CalculateTotalPrice = (coinUsed = 0) => {
     let totalPrice = 0;
 
     if (selectedCoupon) {
@@ -232,6 +232,8 @@ const PharmacyContextProvider = (props) => {
       totalPrice = CalculatePriceAfterSale(cart);
     }
 
+    // Trừ số Xu sử dụng
+    totalPrice = Math.max(totalPrice - coinUsed, 0); // Đảm bảo không âm
     return totalPrice;
   };
 

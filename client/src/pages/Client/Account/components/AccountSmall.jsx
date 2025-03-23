@@ -4,6 +4,9 @@ import CoinSvg from "@/pages/component/CoinSvg.jsx";
 import silverCard from "@/assets/silver-background.jpg";
 import silverRankIcon from "@/assets/silver-rank.png";
 import goldRankIcon from "@/assets/gold-rank.png";
+import goldCard from "@/assets/gold-card.png";
+import diamondRankIcon from "@/assets/diamond-rank.png";
+import diamondCard from "@/assets/diamond-card.png";
 
 import { Separator } from "@/components/ui/separator.jsx";
 import { Progress } from "@/components/ui/progress";
@@ -21,10 +24,11 @@ import {
 } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useAppStore } from "@/store/index.js";
+import { GoldRank, SilverRank } from "@/utils/variableExport.js";
 
 const AccountSmall = () => {
   const { userInfo } = useAppStore();
-
+  const rank = userInfo?.accountId?.loyaltyProgramId?.rank;
   return (
     <div>
       <div className="grid w-[288px] gap-4 rounded-md bg-white">
@@ -63,17 +67,41 @@ const AccountSmall = () => {
 
             <div
               className="rounded-xl bg-cover px-2 py-4"
-              style={{ backgroundImage: `url(${silverCard})` }}
+              style={{
+                backgroundImage: `url(${
+                  rank === SilverRank
+                    ? silverCard
+                    : rank === GoldRank
+                    ? goldCard
+                    : diamondCard
+                })`,
+              }}
+              // style={{ backgroundImage: `url(${goldCard})` }}
+              // style={{ backgroundImage: `url(${diamondCard})` }}
             >
               <div className="mb-9 flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
                   <img
-                    src={silverRankIcon}
+                    src={
+                      rank === SilverRank
+                        ? silverRankIcon
+                        : rank === GoldRank
+                        ? goldRankIcon
+                        : diamondRankIcon
+                    }
+                    // src={goldRankIcon}
+                    // src={diamondRankIcon}
                     alt="silver rank"
                     className=" rounded-full border-2"
                   />
                 </div>
-                <span className="text-xl font-bold uppercase ">Bạc</span>
+                <span
+                  className={`text-xl font-bold uppercase ${
+                    rank === SilverRank ? "" : "text-white"
+                  }`}
+                >
+                  {rank}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -88,7 +116,8 @@ const AccountSmall = () => {
                 </div>
                 <div className="flex w-4 items-center justify-center rounded-full bg-white">
                   <img
-                    src={goldRankIcon}
+                    src={rank === SilverRank ? goldRankIcon : diamondRankIcon}
+                    // src={diamondRankIcon}
                     alt="gold rank"
                     className="border rounded-full"
                   />
@@ -96,7 +125,11 @@ const AccountSmall = () => {
               </div>
 
               <div className="mt-2 flex items-center ">
-                <span className="text-xs font-normal ">
+                <span
+                  className={`text-xs font-normal ${
+                    rank === SilverRank ? "" : "text-white"
+                  }`}
+                >
                   Chi tiêu thêm{" "}
                   {convertVND(
                     CalculateRemainingAccumulated(
@@ -104,7 +137,7 @@ const AccountSmall = () => {
                       userInfo?.accountId?.loyaltyProgramId?.totalSpending
                     )
                   )}{" "}
-                  để thăng hạng vàng
+                  để thăng hạng {rank === SilverRank ? "Vàng" : "Kim cương"}
                 </span>
               </div>
             </div>

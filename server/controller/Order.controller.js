@@ -15,7 +15,7 @@ import CouponUsage from "../model/CouponUsage.model.js";
 
 export const createOrder = asyncHandler(async (req, res) => {
   try {
-    const { cart, ...data } = req.body;
+    const { cart, coinUsed = 0, ...data } = req.body;
     // console.log(data);
 
     const { error } = validate(data);
@@ -130,6 +130,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     const newOrder = new Order({
       id: id,
       ...data,
+      coinUsed,
     });
 
     const order = await newOrder.save();
@@ -416,7 +417,7 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
           { AccountId: order.AccountId },
           {
             $inc: {
-              points: -pointHistory.change,
+              points: -pointHistory.pointsEarned + pointHistory.pointsSpent,
               totalSpending: -order.total,
             },
           }
@@ -433,11 +434,13 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
       const existingPointHistory = await PointHistory.findOne({
         orderId: order._id,
       });
+
       if (existingPointHistory) {
         await Order.findByIdAndUpdate(order._id, {
           status: req.body.status,
           ...(vnpTransactionDate && { vnpTransactionDate }),
         });
+
         return res.json(
           jsonGenerate(
             StatusCode.CONTINUE,
@@ -446,49 +449,100 @@ export const updateStatusOrder = asyncHandler(async (req, res) => {
         );
       }
 
-      const { total, AccountId } = order;
+      const { total, AccountId, coinUsed = 0 } = order;
       const loyaltyProgram = await LoyaltyProgram.findOne({ AccountId });
 
-      let points = 0;
+      let pointsEarned = 0;
       if (loyaltyProgram) {
         switch (loyaltyProgram.rank) {
           case "Bạc":
-            points = total * 0.01;
+            pointsEarned = Math.floor(total * 0.01); // 1%
             break;
           case "Vàng":
-            points = total * 0.015;
+            pointsEarned = Math.floor(total * 0.015); // 1.5%
             break;
           case "Kim cương":
-            points = total * 0.02;
-            break;
-          default:
+            pointsEarned = Math.floor(total * 0.02); // 2%
             break;
         }
+      }
+
+      const pointsSpent = coinUsed; // Số Xu đã dùng
+
+      // Cập nhật LoyaltyProgram: cộng điểm kiếm được, trừ điểm tiêu
+      const updatedLoyaltyProgram = await LoyaltyProgram.findOneAndUpdate(
+        { AccountId },
+        {
+          $inc: {
+            points: pointsEarned - pointsSpent, // Tổng thay đổi điểm
+            totalSpending: total,
+          },
+        },
+        { new: true } // Trả về document đã cập nhật
+      );
+
+      // // Cập nhật points và totalSpending
+      // const updatedLoyaltyProgram = await LoyaltyProgram.findOneAndUpdate(
+      //   { AccountId },
+      //   {
+      //     $inc: {
+      //       points,
+      //       totalSpending: total,
+      //     },
+      //   },
+      //   { new: true } // Trả về document đã cập nhật
+      // );
+
+      // if (points > 0) {
+      //   await PointHistory.create({
+      //     AccountId: order.AccountId,
+      //     orderId: order._id,
+      //     change: points,
+      //     createdAt: new Date(),
+      //     description: `Tích điểm từ đơn hàng ${order.id}`,
+      //   });
+      // }
+
+      // Lưu lịch sử tích điểm
+      if (pointsEarned > 0 || pointsSpent > 0) {
+        await PointHistory.create({
+          AccountId: order.AccountId,
+          orderId: order._id,
+          pointsEarned,
+          pointsSpent,
+          createdAt: new Date(),
+          description: `Đơn hàng ${order.id}: Tích ${pointsEarned} điểm, tiêu ${pointsSpent} Xu`,
+        });
+      }
+
+      // Logic nâng hạng
+      let newRank = loyaltyProgram.rank;
+      if (updatedLoyaltyProgram.totalSpending >= 8000000) {
+        newRank = "Kim cương";
+      } else if (updatedLoyaltyProgram.totalSpending >= 4000000) {
+        newRank = "Vàng";
+      } else {
+        newRank = "Bạc";
+      }
+
+      // Nếu rank thay đổi, cập nhật lại
+      if (newRank !== loyaltyProgram.rank) {
+        await LoyaltyProgram.findOneAndUpdate({ AccountId }, { rank: newRank });
       }
 
       await Order.findByIdAndUpdate(order._id, {
         status: req.body.status,
         ...(vnpTransactionDate && { vnpTransactionDate }),
       });
-      await LoyaltyProgram.findOneAndUpdate(
-        { AccountId },
-        {
-          $inc: {
-            points,
-            totalSpending: total,
-          },
-        }
-      );
-
-      if (points > 0) {
-        await PointHistory.create({
-          AccountId: order.AccountId,
-          orderId: order._id,
-          change: points,
-          createdAt: new Date(),
-          description: `Tích điểm từ đơn hàng ${order.id}`,
-        });
-      }
+      // await LoyaltyProgram.findOneAndUpdate(
+      //   { AccountId },
+      //   {
+      //     $inc: {
+      //       points,
+      //       totalSpending: total,
+      //     },
+      //   }
+      // );
     } else {
       // Các trạng thái khác chỉ cần cập nhật
       await Order.findByIdAndUpdate(order._id, {

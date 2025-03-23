@@ -34,15 +34,23 @@ const PointsHistory = () => {
         <Card key={entry._id} className="mb-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {entry.change > 0 ? "Tích điểm" : "Sử dụng điểm"}
+              {entry.pointsEarned - entry.pointsSpent > 0
+                ? "Tích điểm"
+                : "Sử dụng điểm"}
             </CardTitle>
-            <Badge variant={entry.change > 0 ? "success" : "destructive"}>
-              {entry.change > 0 ? (
+            <Badge
+              variant={
+                entry.pointsEarned - entry.pointsSpent > 0
+                  ? "success"
+                  : "destructive"
+              }
+            >
+              {entry.pointsEarned - entry.pointsSpent > 0 ? (
                 <ArrowUpCircle className="mr-1 h-4 w-4" />
               ) : (
                 <ArrowDownCircle className="mr-1 h-4 w-4" />
               )}
-              {Math.abs(entry.change)} điểm
+              {Math.abs(entry.pointsEarned - entry.pointsSpent)} điểm
             </Badge>
           </CardHeader>
           <CardContent>

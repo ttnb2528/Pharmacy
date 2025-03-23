@@ -23,6 +23,8 @@ const ProductDetailInfo = ({ product }) => {
   const [qty, setQty] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
+  const rank = userInfo?.accountId?.loyaltyProgramId?.rank;
+
   const handleDecrease = () => {
     if (qty > 1) {
       setQty(qty - 1);
@@ -137,6 +139,7 @@ const ProductDetailInfo = ({ product }) => {
               <span className="text-xs font-semibold text-gold-500 md:text-sm">
                 Tích lũy{" "}
                 {CalculatePointEarned(
+                  rank,
                   product?.batches[0]?.price,
                   product?.discountPercentage
                 )}{" "}
