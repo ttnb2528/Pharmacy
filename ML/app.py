@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from flask_cors import CORS  # Thêm import này
 
 # Đường dẫn tới mô hình đã huấn luyện
-model_dir = "D:/web/Luận văn/code/phobert-toxic-model"  # Đường dẫn bạn lưu thư mục
+model_dir = "D:/web/Luận văn/code/phobert-toxic-model2"  # Đường dẫn bạn lưu thư mục
 
 # Tải tokenizer và mô hình
 tokenizer = AutoTokenizer.from_pretrained(model_dir)

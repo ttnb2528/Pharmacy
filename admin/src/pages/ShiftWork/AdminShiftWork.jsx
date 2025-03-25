@@ -160,40 +160,48 @@ const AdminShiftWork = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredShifts.map((shift) => (
-              <TableRow key={shift.id}>
-                <TableCell className="font-medium">{shift.name}</TableCell>
-                <TableCell>
-                  {shift.timeSlots.map((slot, index) => (
-                    <Badge key={index} variant="secondary" className="mr-2">
-                      {slot.startTime} - {slot.endTime}
-                    </Badge>
-                  ))}
-                </TableCell>
-                <TableCell>{shift.overtimeThreshold} giờ</TableCell>
-                <TableCell>{shift.overtimeRate}x</TableCell>
-                <TableCell>{shift.capacity} người</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditShift(shift)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+            {filteredShifts.length > 0 ? (
+              filteredShifts.map((shift) => (
+                <TableRow key={shift.id}>
+                  <TableCell className="font-medium">{shift.name}</TableCell>
+                  <TableCell>
+                    {shift.timeSlots.map((slot, index) => (
+                      <Badge key={index} variant="secondary" className="mr-2">
+                        {slot.startTime} - {slot.endTime}
+                      </Badge>
+                    ))}
+                  </TableCell>
+                  <TableCell>{shift.overtimeThreshold} giờ</TableCell>
+                  <TableCell>{shift.overtimeRate}x</TableCell>
+                  <TableCell>{shift.capacity} người</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditShift(shift)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(shift)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(shift)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không tìm thấy ca làm việc
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
 

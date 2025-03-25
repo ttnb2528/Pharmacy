@@ -201,87 +201,103 @@ const AdminCustomer = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow key={customer._id}>
-                <TableCell>{customer.id}</TableCell>
-                <TableCell>{customer.name || "..."}</TableCell>
-                <TableCell>{customer.phone || "..."}</TableCell>
-                <TableCell>{customer.gender || "..."}</TableCell>
-                <TableCell>
-                  {customer.date ? formatDate(customer.date) : "..."}
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewCustomer(customer)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
+            {filteredCustomers.length > 0 ? (
+              filteredCustomers.map((customer) => (
+                <TableRow key={customer._id}>
+                  <TableCell>{customer.id}</TableCell>
+                  <TableCell>{customer.name || "..."}</TableCell>
+                  <TableCell>{customer.phone || "..."}</TableCell>
+                  <TableCell>{customer.gender || "..."}</TableCell>
+                  <TableCell>
+                    {customer.date ? formatDate(customer.date) : "..."}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewCustomer(customer)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
 
-                      {/* Nội dung Dialog */}
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Thông tin khách hàng</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription></DialogDescription>
-                        <CustomerDetails customer={selectedCustomer} />
-                      </DialogContent>
-                    </Dialog>
+                        {/* Nội dung Dialog */}
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Thông tin khách hàng</DialogTitle>
+                          </DialogHeader>
+                          <DialogDescription></DialogDescription>
+                          <CustomerDetails customer={selectedCustomer} />
+                        </DialogContent>
+                      </Dialog>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditCustomer(customer)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditCustomer(customer)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenConfirm(customer)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenConfirm(customer)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không tìm thấy khách hàng nào
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-        <Pagination className="mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+              )}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 1 && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
       </main>
 
       {confirmDelete && (
