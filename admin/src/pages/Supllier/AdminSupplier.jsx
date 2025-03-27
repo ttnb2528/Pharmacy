@@ -181,12 +181,12 @@ const AdminSupplier = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Địa chỉ</TableHead>
-              <TableHead>Số điện thoại</TableHead>
+              <TableHead className="whitespace-nowrap">ID</TableHead>
+              <TableHead className="whitespace-nowrap">Tên</TableHead>
+              <TableHead className="whitespace-nowrap">Địa chỉ</TableHead>
+              <TableHead className="whitespace-nowrap">Số điện thoại</TableHead>
               {/* <TableHead>Trạng thái</TableHead> */}
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -194,9 +194,15 @@ const AdminSupplier = () => {
               paginatedSuppliers.map((supplier) => (
                 <TableRow key={supplier.id}>
                   <TableCell>{supplier.id}</TableCell>
-                  <TableCell>{supplier.name}</TableCell>
-                  <TableCell>{supplier.address || "..."}</TableCell>
-                  <TableCell>{supplier.phone || "..."}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {supplier.name}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {supplier.address || "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {supplier.phone || "..."}
+                  </TableCell>
                   {/* <TableCell>
                     <Badge
                       variant={supplier.isDeleted ? "destructive" : "success"}

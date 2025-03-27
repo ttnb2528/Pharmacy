@@ -24,10 +24,12 @@ import {
   YAxis,
 } from "recharts";
 import { formatDate } from "@/utils/formatDate.js";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const Overview = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +63,15 @@ const Overview = () => {
     }
 
     return null;
+  };
+
+  const formatXAxis = (value) => {
+    if (isMobile) {
+      // On mobile, show shorter date format
+      const date = new Date(value);
+      return `${date.getDate()}/${date.getMonth() + 1}`;
+    }
+    return formatDate(value);
   };
 
   if (isLoading) {
@@ -144,35 +155,53 @@ const Overview = () => {
                 Biểu đồ doanh số bán hàng trong 30 ngày qua
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[400px]">
-                {/* Biểu đồ */}
-                {data.dailyRevenue.length > 0 ? (
-                  <ResponsiveContainer
-                    width="100%"
-                    height={400}
-                    className={"mt-5"}
-                  >
-                    <LineChart data={data.dailyRevenue}>
-                      <XAxis dataKey="date" tick={{ fontSize: 14 }} />
+            <CardContent className="px-2 sm:px-6">
+              <div className="h-[250px] sm:h-[300px] md:h-[400px]">
+                {data.dailyRevenue && data.dailyRevenue.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={data.dailyRevenue}
+                      margin={{
+                        top: 5,
+                        right: isMobile ? 10 : 30,
+                        left: isMobile ? 0 : 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: isMobile ? 10 : 14 }}
+                        tickFormatter={formatXAxis}
+                        interval={isMobile ? "preserveStartEnd" : 0}
+                        angle={isMobile ? -45 : 0}
+                        textAnchor={isMobile ? "end" : "middle"}
+                        height={isMobile ? 50 : 30}
+                      />
                       <YAxis
-                        tickFormatter={(value) => convertVND(value)}
-                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) =>
+                          isMobile
+                            ? `${(value / 1000000).toFixed(2)}M`
+                            : convertVND(value)
+                        }
+                        tick={{ fontSize: isMobile ? 10 : 12 }}
+                        width={isMobile ? 40 : 80}
                       />
                       <CartesianGrid strokeDasharray="3 3" />
                       <Tooltip content={CustomTooltip} />
-                      {/* <Tooltip /> */}
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 14 }} />
                       <Line
                         type="monotone"
                         name="Doanh số"
                         dataKey="totalRevenue"
                         stroke="#8884d8"
+                        strokeWidth={isMobile ? 1.5 : 2}
+                        dot={{ r: isMobile ? 2 : 4 }}
+                        activeDot={{ r: isMobile ? 4 : 6 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="mt-5 text-center text-lg text-muted-foreground">
+                  <div className="flex h-full items-center justify-center text-center text-lg text-muted-foreground">
                     Không có dữ liệu
                   </div>
                 )}

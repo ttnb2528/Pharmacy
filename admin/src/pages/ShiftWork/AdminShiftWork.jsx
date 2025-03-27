@@ -150,30 +150,42 @@ const AdminShiftWork = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Tên ca</TableHead>
-              <TableHead>Thời gian</TableHead>
-              <TableHead>Ngưỡng làm thêm giờ</TableHead>
-              <TableHead>Hệ số làm thêm giờ</TableHead>
-              <TableHead>Sức chứa</TableHead>
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">Tên ca</TableHead>
+              <TableHead className="whitespace-nowrap">Thời gian</TableHead>
+              <TableHead className="whitespace-nowrap">
+                Ngưỡng làm thêm giờ
+              </TableHead>
+              <TableHead className="whitespace-nowrap">
+                Hệ số làm thêm giờ
+              </TableHead>
+              <TableHead className="whitespace-nowrap">Sức chứa</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredShifts.length > 0 ? (
               filteredShifts.map((shift) => (
                 <TableRow key={shift.id}>
-                  <TableCell className="font-medium">{shift.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium whitespace-nowrap">
+                    {shift.name}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {shift.timeSlots.map((slot, index) => (
                       <Badge key={index} variant="secondary" className="mr-2">
                         {slot.startTime} - {slot.endTime}
                       </Badge>
                     ))}
                   </TableCell>
-                  <TableCell>{shift.overtimeThreshold} giờ</TableCell>
-                  <TableCell>{shift.overtimeRate}x</TableCell>
-                  <TableCell>{shift.capacity} người</TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {shift.overtimeThreshold} giờ
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {shift.overtimeRate}x
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {shift.capacity} người
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <div className="flex space-x-2">
                       <Button
                         variant="outline"

@@ -34,6 +34,7 @@ import { apiClient } from "@/lib/api-admin.js";
 import { toast } from "sonner";
 import { DELETE_SLIDER_BANNER_ROUTE } from "@/API/index.api.js";
 import Loading from "../component/Loading.jsx";
+import ImagePreview from "../Product/components/ImageReview.jsx";
 
 const SliderBanner = () => {
   const { sliders, setSliders } = useContext(SliderBannerContext);
@@ -46,6 +47,9 @@ const SliderBanner = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Lọc các slider chưa bị xóa
   const activeSliders = sliders.filter((slider) => !slider.deleted);
@@ -100,6 +104,18 @@ const SliderBanner = () => {
     }
   };
 
+  const handleImageClick = (image) => {
+    setPreviewImage(image);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setTimeout(() => {
+      setPreviewImage(null);
+    }, 200); // Đợi animation đóng dialog kết thúc
+  };
+
   return (
     <div>
       {isLoading && <Loading />}
@@ -109,7 +125,8 @@ const SliderBanner = () => {
           <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm Slider ảnh
+                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm Slider
+                ảnh
               </Button>
             </DialogTrigger>
             <DialogContent
@@ -130,21 +147,11 @@ const SliderBanner = () => {
           <Table className="min-w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[60px] whitespace-nowrap">
-                  STT
-                </TableHead>
-                <TableHead className="w-[180px] whitespace-nowrap">
-                  Ảnh
-                </TableHead>
-                <TableHead className="w-[120px] whitespace-nowrap">
-                  Vị trí
-                </TableHead>
-                <TableHead className="w-[250px] whitespace-nowrap">
-                  Mô tả
-                </TableHead>
-                <TableHead className="w-[120px] whitespace-nowrap">
-                  Thao tác
-                </TableHead>
+                <TableHead className="whitespace-nowrap">STT</TableHead>
+                <TableHead className="whitespace-nowrap">Ảnh</TableHead>
+                <TableHead className="whitespace-nowrap">Vị trí</TableHead>
+                <TableHead className="whitespace-nowrap">Mô tả</TableHead>
+                <TableHead className="whitespace-nowrap">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -157,6 +164,7 @@ const SliderBanner = () => {
                     <TableCell>
                       <div className="w-[160px] h-[90px] overflow-hidden rounded-md">
                         <img
+                          onClick={() => handleImageClick(slider.image)}
                           src={slider.image || "/placeholder.svg"}
                           alt={`Slider ${index + 1}`}
                           className="w-full h-full object-contain bg-gray-100"
@@ -167,7 +175,7 @@ const SliderBanner = () => {
                       {slider.position}
                     </TableCell>
                     <TableCell>
-                      <div className="max-w-[230px] overflow-hidden text-ellipsis">
+                      <div className="max-w-[230px] whitespace-nowrap overflow-hidden text-ellipsis">
                         {slider.description}
                       </div>
                     </TableCell>
@@ -259,6 +267,12 @@ const SliderBanner = () => {
           onClose={handleCancelEdit}
         />
       )}
+
+      <ImagePreview
+        imageUrl={previewImage}
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 };

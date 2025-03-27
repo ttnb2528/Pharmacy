@@ -192,12 +192,12 @@ const AdminCustomer = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Mã KH</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Số điện thoại</TableHead>
-              <TableHead>Giới tính</TableHead>
-              <TableHead>Ngày sinh</TableHead>
-              <TableHead>Thao tác</TableHead>
+              <TableHead className="whitespace-nowrap">Mã KH</TableHead>
+              <TableHead className="whitespace-nowrap">Tên</TableHead>
+              <TableHead className="whitespace-nowrap">Số điện thoại</TableHead>
+              <TableHead className="whitespace-nowrap">Giới tính</TableHead>
+              <TableHead className="whitespace-nowrap">Ngày sinh</TableHead>
+              <TableHead className="whitespace-nowrap">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -205,10 +205,16 @@ const AdminCustomer = () => {
               filteredCustomers.map((customer) => (
                 <TableRow key={customer._id}>
                   <TableCell>{customer.id}</TableCell>
-                  <TableCell>{customer.name || "..."}</TableCell>
-                  <TableCell>{customer.phone || "..."}</TableCell>
-                  <TableCell>{customer.gender || "..."}</TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {customer.name || "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {customer.phone || "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {customer.gender || "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {customer.date ? formatDate(customer.date) : "..."}
                   </TableCell>
                   <TableCell>

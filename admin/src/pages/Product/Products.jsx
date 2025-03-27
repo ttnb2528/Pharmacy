@@ -383,12 +383,12 @@ export default function Products() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Mã</TableHead>
-              <TableHead>Tên thuốc</TableHead>
-              <TableHead>Kê đơn</TableHead>
-              <TableHead>Loại thuốc</TableHead>
-              <TableHead>Số lượng</TableHead>
-              <TableHead>Thao tác</TableHead>
+              <TableHead className="whitespace-nowrap">Mã</TableHead>
+              <TableHead className="whitespace-nowrap">Tên thuốc</TableHead>
+              <TableHead className="whitespace-nowrap">Kê đơn</TableHead>
+              <TableHead className="whitespace-nowrap">Loại thuốc</TableHead>
+              <TableHead className="whitespace-nowrap">Số lượng</TableHead>
+              <TableHead className="whitespace-nowrap">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -396,9 +396,9 @@ export default function Products() {
               paginatedMedicines.map((medicine) => (
                 <TableRow key={medicine._id}>
                   <TableCell>{medicine.id}</TableCell>
-                  <TableCell>{medicine.name}</TableCell>
+                  <TableCell className="whitespace-nowrap line-clamp-1 leading-10">{medicine.name}</TableCell>
                   <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
-                  <TableCell>{medicine.categoryId.name}</TableCell>
+                  <TableCell className="whitespace-nowrap">{medicine.categoryId.name}</TableCell>
                   <TableCell>{medicine.quantityStock}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">

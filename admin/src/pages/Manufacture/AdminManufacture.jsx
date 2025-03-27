@@ -163,7 +163,8 @@ const AdminManufacture = () => {
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
-                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm nhà sản xuất
+                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm nhà sản
+                xuất
               </Button>
             </DialogTrigger>
             <DialogContent
@@ -186,10 +187,10 @@ const AdminManufacture = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Nước</TableHead>
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">ID</TableHead>
+              <TableHead className="whitespace-nowrap">Tên</TableHead>
+              <TableHead className="whitespace-nowrap">Nước</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -197,8 +198,8 @@ const AdminManufacture = () => {
               paginatedManufactures.map((manufacture) => (
                 <TableRow key={manufacture.id}>
                   <TableCell>{manufacture.id}</TableCell>
-                  <TableCell>{manufacture.name}</TableCell>
-                  <TableCell>{manufacture.country}</TableCell>
+                  <TableCell className="whitespace-nowrap">{manufacture.name}</TableCell>
+                  <TableCell className="whitespace-nowrap">{manufacture.country}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Dialog>

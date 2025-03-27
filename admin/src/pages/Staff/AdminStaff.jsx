@@ -180,26 +180,34 @@ const AdminStaff = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Họ tên</TableHead>
-              <TableHead>Giới tính</TableHead>
-              <TableHead>Ngày sinh</TableHead>
-              <TableHead>Số điện thoại</TableHead>
-              <TableHead>Tên đăng nhập</TableHead>
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">Họ tên</TableHead>
+              <TableHead className="whitespace-nowrap">Giới tính</TableHead>
+              <TableHead className="whitespace-nowrap">Ngày sinh</TableHead>
+              <TableHead className="whitespace-nowrap">Số điện thoại</TableHead>
+              <TableHead className="whitespace-nowrap">Tên đăng nhập</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedStaffs.length > 0 ? (
               paginatedStaffs.map((s) => (
                 <TableRow key={s._id}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">
                     {s?.name ?? "..."}
                   </TableCell>
-                  <TableCell>{s?.gender ?? "..."}</TableCell>
-                  <TableCell>{s?.date ? formatDate(s?.date) : "..."}</TableCell>
-                  <TableCell>{s?.phone ?? "..."}</TableCell>
-                  <TableCell>{s?.username ?? "..."}</TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {s?.gender ?? "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {s?.date ? formatDate(s?.date) : "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {s?.phone ?? "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {s?.username ?? "..."}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <div className="flex space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>

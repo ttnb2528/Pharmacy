@@ -182,23 +182,23 @@ const AdminCoupon = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Mã giảm giá</TableHead>
-              <TableHead>Loại</TableHead>
-              <TableHead>Giá trị</TableHead>
-              <TableHead>Ngày bắt đầu</TableHead>
-              <TableHead>Ngày kết thúc</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">Mã giảm giá</TableHead>
+              <TableHead className="whitespace-nowrap">Loại</TableHead>
+              <TableHead className="whitespace-nowrap">Giá trị</TableHead>
+              <TableHead className="whitespace-nowrap">Ngày bắt đầu</TableHead>
+              <TableHead className="whitespace-nowrap">Ngày kết thúc</TableHead>
+              <TableHead className="whitespace-nowrap">Trạng thái</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedCoupons.length > 0 ? (
               paginatedCoupons.map((coupon) => (
                 <TableRow key={coupon.id}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">
                     {coupon.coupon_code}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {coupon.discount_type === "percentage"
                       ? "Phần trăm"
                       : "Số tiền cố định"}

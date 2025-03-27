@@ -9,7 +9,6 @@ export const authenticate = asyncHandler(async (req, res, next) => {
   // Read JWT from the 'jwt' cookie
   const role = req.headers["x-role"]; // Header tùy chỉnh
   let token = role === "admin" ? req.cookies.jwt_admin : req.cookies.jwt_client;
-
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

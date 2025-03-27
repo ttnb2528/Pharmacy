@@ -18,7 +18,13 @@ const databaseURL = process.env.DATABASE_URL;
 
 app.use(
   cors({
-    origin: [process.env.CLIENT, process.env.ADMIN, process.env.CLOUDINARY],
+    origin: [
+      process.env.CLIENT,
+      process.env.ADMIN,
+      process.env.CLOUDINARY,
+      // test phone
+      "http://10.2.9.28:5174",
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -33,8 +39,8 @@ app.use("/api/v1", router);
 
 // Cron job để reset LoyaltyProgram vào 0h ngày 1/1 hàng năm
 cron.schedule("0 0 1 1 *", async () => {
-// Test 30s
-// cron.schedule("*/30 * * * * *", async () => {
+  // Test 30s
+  // cron.schedule("*/30 * * * * *", async () => {
   try {
     console.log("Starting Loyalty Program reset for new year...");
     const programs = await LoyaltyProgram.find();

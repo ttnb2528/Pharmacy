@@ -183,10 +183,12 @@ const AdminBrand = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>STT</TableHead>
-              <TableHead>Tên thương hiệu</TableHead>
-              <TableHead>Mô tả</TableHead>
-              <TableHead>Thao tác</TableHead>
+              <TableHead className="whitespace-nowrap">STT</TableHead>
+              <TableHead className="whitespace-nowrap">
+                Tên thương hiệu
+              </TableHead>
+              <TableHead className="whitespace-nowrap">Mô tả</TableHead>
+              <TableHead className="whitespace-nowrap">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -195,7 +197,7 @@ const AdminBrand = () => {
                 <TableRow key={brand._id}>
                   <TableCell>{brand.id || "..."}</TableCell>
                   <TableCell>{brand.name || "..."}</TableCell>
-                  <TableCell>{brand.description || "..."}</TableCell>
+                  <TableCell className="line-clamp-2 max-h-12">{brand.description || "..."}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Dialog>

@@ -179,10 +179,10 @@ const AdminCategory = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Mô tả</TableHead>
-              <TableHead>Hành động</TableHead>
+              <TableHead className="whitespace-nowrap">ID</TableHead>
+              <TableHead className="whitespace-nowrap">Tên</TableHead>
+              <TableHead className="whitespace-nowrap">Mô tả</TableHead>
+              <TableHead className="whitespace-nowrap">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -190,8 +190,8 @@ const AdminCategory = () => {
               paginatedCategories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell>{category.id}</TableCell>
-                  <TableCell>{category.name}</TableCell>
-                  <TableCell>{category.description}</TableCell>
+                  <TableCell className="whitespace-nowrap">{category.name}</TableCell>
+                  <TableCell className="line-clamp-2 max-h-12">{category.description}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Dialog>

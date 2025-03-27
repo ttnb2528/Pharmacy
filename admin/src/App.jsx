@@ -49,6 +49,8 @@ const App = () => {
     const getUserData = async () => {
       try {
         const res = await apiClient.get(GET_CURRENT_STAFF);
+        console.log(res);
+        
         if (res.status === 200 && res.data.status === 200) {
           setUserInfo(res.data.data);
         } else {

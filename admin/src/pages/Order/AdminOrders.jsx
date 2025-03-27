@@ -161,8 +161,9 @@ export default function AdminOrders() {
     if (isDetailsDialogOpen && selectedOrder) {
       const fetchOrderDetails = async (orderId) => {
         try {
+          const type = "store";
           const res = await apiClient.get(
-            `${GET_ORDER_DETAIL_ROUTE}/${orderId}`
+            `${GET_ORDER_DETAIL_ROUTE}/${type}/${orderId}`
           );
 
           if (res.status === 200 && res.data.status === 200) {
@@ -311,122 +312,138 @@ export default function AdminOrders() {
           open={isDetailsDialogOpen}
           onOpenChange={setIsDetailsDialogOpen}
         >
-          <DialogContent className="sm:max-w-3xl">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-xl w-[calc(100vw-32px)]">
+            <DialogHeader className="pb-2">
               <DialogTitle>Chi tiết đơn hàng</DialogTitle>
-              <DialogDescription></DialogDescription>
             </DialogHeader>
+
             {selectedOrder && (
-              <div className="grid gap-6">
-                <div className="grid grid-cols-2 gap-20">
-                  <div>
-                    <Label className="font-bold">Thông tin khách hàng</Label>
-                    <div className="mt-2 space-y-1">
-                      <div>
-                        <span className="font-medium">Tên:</span>{" "}
-                        {selectedOrder.nameCustomer}
-                      </div>
-                      <div>
-                        <span className="font-medium">Số điện thoại:</span>{" "}
-                        {selectedOrder.phone}
-                      </div>
-                      <div>
-                        <span className="font-medium">Địa chỉ:</span>{" "}
-                        {selectedOrder.address}
-                      </div>
+              <div className="space-y-3 overflow-y-auto max-h-[calc(80vh-120px)]">
+                {/* Customer and Order Info - More compact layout */}
+                <div className="grid grid-cols-1 gap-2 text-sm">
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    <div className="col-span-2 font-bold border-b pb-1">
+                      Thông tin khách hàng
                     </div>
+                    <div className="font-medium">Tên:</div>
+                    <div>{selectedOrder.nameCustomer}</div>
+                    <div className="font-medium">Số điện thoại:</div>
+                    <div>{selectedOrder.phone}</div>
+                    <div className="font-medium">Địa chỉ:</div>
+                    <div className="break-words">{selectedOrder.address}</div>
                   </div>
-                  <div>
-                    <Label className="font-bold">Thông tin đơn hàng</Label>
-                    <div className="mt-2 space-y-1">
-                      <div>
-                        <span className="font-medium">Mã đơn hàng:</span>{" "}
-                        {selectedOrder.id}
-                      </div>
-                      <div>
-                        <span className="font-medium">Ngày đặt:</span>{" "}
-                        {formatDate(selectedOrder.date)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Trạng thái:</span>{" "}
-                        <Badge
-                          variant={getStatusBadgeVariant(selectedOrder.status)}
-                        >
-                          {selectedOrder.status}
-                        </Badge>
-                      </div>
+
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+                    <div className="col-span-2 font-bold border-b pb-1">
+                      Thông tin đơn hàng
+                    </div>
+                    <div className="font-medium">Mã đơn hàng:</div>
+                    <div>{selectedOrder.id}</div>
+                    <div className="font-medium">Ngày đặt:</div>
+                    <div className="whitespace-nowrap">
+                      {formatDate(selectedOrder.date)}
+                    </div>
+                    <div className="font-medium">Trạng thái:</div>
+                    <div>
+                      <Badge
+                        variant={getStatusBadgeVariant(selectedOrder.status)}
+                        className="font-normal"
+                      >
+                        {selectedOrder.status}
+                      </Badge>
                     </div>
                   </div>
                 </div>
+
+                {/* Product Details - Compact table */}
                 <div>
-                  <Label className="font-bold">Chi tiết sản phẩm</Label>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Mã thuốc</TableHead>
-                        <TableHead>Tên</TableHead>
-                        <TableHead>Đơn vị tính</TableHead>
-                        <TableHead>Số lượng</TableHead>
-                        <TableHead>Đơn giá</TableHead>
-                        <TableHead>Thành tiền</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {selectedOrderDetail?.items.map((item) => (
-                        <TableRow key={item._id}>
-                          <TableCell>{item?.productId?.id || "1"}</TableCell>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.unit}</TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{convertVND(item.price)}</TableCell>
-                          <TableCell>
-                            {convertVND(
-                              item.price * item.quantity - item.discount
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Ghi chú</Label>
-                    <div className="font-medium">
-                      {selectedOrder.note || "Không có ghi chú"}
-                    </div>
+                  <div className="font-bold border-b pb-1 mb-1">
+                    Chi tiết sản phẩm
                   </div>
-                  <div className="text-right space-y-1">
-                    <div className="grid grid-cols-2">
-                      <span className="font-medium text-left">Tiền hàng:</span>{" "}
-                      <span>- {convertVND(selectedOrder.totalTemp)}</span>
+                  <div className="overflow-x-auto -mx-4 px-4">
+                    <Table className="min-w-[500px] text-xs sm:text-sm">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="py-1.5">Mã</TableHead>
+                          <TableHead className="py-1.5">Tên</TableHead>
+                          <TableHead className="py-1.5">ĐVT</TableHead>
+                          <TableHead className="py-1.5">SL</TableHead>
+                          <TableHead className="py-1.5">Đơn giá</TableHead>
+                          <TableHead className="py-1.5">Thành tiền</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedOrderDetail?.items.map((item) => (
+                          <TableRow key={item._id}>
+                            <TableCell className="py-1.5">
+                              {item?.productId?.id || "1"}
+                            </TableCell>
+                            <TableCell className="py-1.5 max-w-[120px] line-clamp-1">
+                              {item.name}
+                            </TableCell>
+                            <TableCell className="py-1.5">
+                              {item.unit}
+                            </TableCell>
+                            <TableCell className="py-1.5">
+                              {item.quantity}
+                            </TableCell>
+                            <TableCell className="py-1.5">
+                              {convertVND(item.price)}
+                            </TableCell>
+                            <TableCell className="py-1.5">
+                              {convertVND(
+                                item.price - (item.price * item.discount) / 100
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+
+                {/* Notes and Summary - Compact layout */}
+                <div className="grid grid-cols-1 gap-2 text-sm">
+                  <div className="grid grid-cols-1 gap-1">
+                    <div className="font-bold border-b pb-1">Ghi chú</div>
+                    <div>{selectedOrder.note || "Không có ghi chú"}</div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1 mt-1">
+                    <div className="font-bold border-b pb-1">
+                      Tổng kết đơn hàng
                     </div>
-                    <div className="grid grid-cols-2">
-                      <span className="font-medium text-left">
-                        Phí vận chuyển:
-                      </span>{" "}
-                      <span>- {convertVND(selectedOrder.shippingFee)}</span>
+                    <div className="grid grid-cols-2 text-sm">
+                      <span className="font-medium">Tiền hàng:</span>
+                      <span className="text-right">
+                        {convertVND(selectedOrder.totalTemp)}
+                      </span>
                     </div>
-                    <div className="grid grid-cols-2">
-                      <span className="font-medium text-left">
-                        Giảm giá ưu đãi:
-                      </span>{" "}
-                      <span>
-                        -{" "}
+                    <div className="grid grid-cols-2 text-sm">
+                      <span className="font-medium">Phí vận chuyển:</span>
+                      <span className="text-right">
+                        {convertVND(selectedOrder.shippingFee)}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 text-sm">
+                      <span className="font-medium">Giảm giá ưu đãi:</span>
+                      <span className="text-right">
                         {selectedOrder.discountValue <= 100
                           ? selectedOrder.discountValue + "%"
                           : convertVND(selectedOrder.discountValue)}
                       </span>
                     </div>
-                    <div className="grid grid-cols-2">
-                      <span className="font-medium text-left">
-                        Giảm giá sản phẩm:
-                      </span>{" "}
-                      <span>- {convertVND(selectedOrder.discountProduct)}</span>
+                    <div className="grid grid-cols-2 text-sm">
+                      <span className="font-medium">Giảm giá sản phẩm:</span>
+                      <span className="text-right">
+                        {convertVND(selectedOrder.discountProduct)}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="text-lg font-bold text-right">
+
+                {/* Total */}
+                <div className="text-base font-bold text-right pt-2 border-t">
                   Tổng cộng:{" "}
                   <span className="text-red-500">
                     {convertVND(selectedOrder.total)}
@@ -434,8 +451,13 @@ export default function AdminOrders() {
                 </div>
               </div>
             )}
-            <DialogFooter>
-              <Button onClick={() => setIsDetailsDialogOpen(false)}>
+
+            <DialogFooter className="mt-2">
+              <Button
+                onClick={() => setIsDetailsDialogOpen(false)}
+                className="w-full"
+                size="sm"
+              >
                 Đóng
               </Button>
             </DialogFooter>

@@ -129,13 +129,13 @@ const Cart = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Mã</TableHead>
-              <TableHead>Tên thuốc</TableHead>
-              <TableHead>Thuốc kê đơn?</TableHead>
-              <TableHead>Đơn vị tính</TableHead>
-              <TableHead>Số lượng</TableHead>
-              <TableHead>Đơn giá</TableHead>
-              <TableHead>Thành tiền</TableHead>
+              <TableHead className="whitespace-nowrap">Mã</TableHead>
+              <TableHead className="whitespace-nowrap">Tên thuốc</TableHead>
+              <TableHead className="whitespace-nowrap">Thuốc kê đơn?</TableHead>
+              <TableHead className="whitespace-nowrap">Đơn vị tính</TableHead>
+              <TableHead className="whitespace-nowrap">Số lượng</TableHead>
+              <TableHead className="whitespace-nowrap">Đơn giá</TableHead>
+              <TableHead className="whitespace-nowrap">Thành tiền</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
