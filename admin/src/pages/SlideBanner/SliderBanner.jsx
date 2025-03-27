@@ -103,13 +103,13 @@ const SliderBanner = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <Header title={"Danh sách Slider ảnh"} />
+      <Header title={"Slider ảnh"} />
       <main className="p-6">
         <div className="flex justify-end items-center mb-4">
           <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm Slider ảnh
+                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm Slider ảnh
               </Button>
             </DialogTrigger>
             <DialogContent
@@ -126,59 +126,81 @@ const SliderBanner = () => {
             </DialogContent>
           </Dialog>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>STT</TableHead>
-              <TableHead>Ảnh</TableHead>
-              <TableHead>Vị trí</TableHead>
-              <TableHead>Mô tả</TableHead>
-              <TableHead>Thao tác</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedSliders.length > 0 ? (
-              paginatedSliders.map((slider, index) => (
-                <TableRow key={slider._id}>
-                  <TableCell>
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </TableCell>
-                  <TableCell>
-                    <img
-                      src={slider.image}
-                      alt={`Slider ${index + 1}`}
-                      className="w-auto h-24 object-cover rounded-md"
-                    />
-                  </TableCell>
-                  <TableCell>{slider.position}</TableCell>
-                  <TableCell>{slider.description}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleEdit(slider)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleOpenConfirm(slider)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+        <div className="w-full overflow-x-auto">
+          <Table className="min-w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[60px] whitespace-nowrap">
+                  STT
+                </TableHead>
+                <TableHead className="w-[180px] whitespace-nowrap">
+                  Ảnh
+                </TableHead>
+                <TableHead className="w-[120px] whitespace-nowrap">
+                  Vị trí
+                </TableHead>
+                <TableHead className="w-[250px] whitespace-nowrap">
+                  Mô tả
+                </TableHead>
+                <TableHead className="w-[120px] whitespace-nowrap">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedSliders.length > 0 ? (
+                paginatedSliders.map((slider, index) => (
+                  <TableRow key={slider._id}>
+                    <TableCell className="text-center whitespace-nowrap">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+                    <TableCell>
+                      <div className="w-[160px] h-[90px] overflow-hidden rounded-md">
+                        <img
+                          src={slider.image || "/placeholder.svg"}
+                          alt={`Slider ${index + 1}`}
+                          className="w-full h-full object-contain bg-gray-100"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {slider.position}
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[230px] overflow-hidden text-ellipsis">
+                        {slider.description}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2 whitespace-nowrap">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEdit(slider)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleOpenConfirm(slider)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    Không có slider nào
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  Không có slider nào
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
         {totalPages > 1 && (
           <Pagination className="mt-4">

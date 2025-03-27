@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -144,21 +144,20 @@ const AdminCategory = () => {
       {isLoading && <Loading />}
       <Header title={"Danh sách danh mục"} />
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:space-x-3 mb-4">
+          <div className="flex items-center space-x-2">
+            {/* <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
             <Input
-              type="text"
               placeholder="Tìm kiếm danh mục..."
-              className="pl-8"
+              className="w-full sm:w-auto sm:flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm danh mục
+              <Button className="w-full sm:w-auto">
+                <Plus className="hidden sm:block h-4 w-4" /> Thêm danh mục
               </Button>
             </DialogTrigger>
             <DialogContent

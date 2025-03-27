@@ -150,11 +150,11 @@ const AdminBrand = () => {
       {isLoading && <Loading />}
       <Header title={"Danh sách thương hiệu"} />
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:space-x-3 mb-4">
           <div className="flex items-center space-x-2">
             <Input
               placeholder="Tìm kiếm thương hiệu..."
-              className="w-64"
+              className="w-full sm:w-auto sm:flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -162,8 +162,8 @@ const AdminBrand = () => {
 
           <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm thương hiệu
+              <Button className="w-full sm:w-auto">
+                <Plus className="hidden sm:block h-4 w-4" /> Thêm thương hiệu
               </Button>
             </DialogTrigger>
             <DialogContent

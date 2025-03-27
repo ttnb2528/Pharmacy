@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -149,13 +149,12 @@ const AdminManufacture = () => {
       {isLoading && <Loading />}
       <Header title={"Danh sách nhà sản xuất"} />
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:space-x-3 mb-4">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            {/* <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
             <Input
-              type="text"
               placeholder="Tìm kiếm nhà sản xuất..."
-              className="pl-8"
+              className="w-full sm:w-auto sm:flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -163,8 +162,8 @@ const AdminManufacture = () => {
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm nhà sản xuất
+              <Button className="w-full sm:w-auto">
+                <Plus className="hidden sm:block mr-2 h-4 w-4" /> Thêm nhà sản xuất
               </Button>
             </DialogTrigger>
             <DialogContent

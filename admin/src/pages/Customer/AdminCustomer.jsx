@@ -157,19 +157,19 @@ const AdminCustomer = () => {
       {isLoading && <Loading />}
       <Header title={"Danh sách khách hàng"} />
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center space-x-2">
+        <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-4">
+          <div>
             <Input
               placeholder="Tìm kiếm khách hàng..."
-              className="w-64"
+              className="w-full sm:w-auto"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Dialog open={isAdding} onOpenChange={setIsAdding}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm khách hàng
+              <Button className="w-full sm:w-auto">
+                <Plus className="hidden sm:block h-4 w-4" /> Thêm khách hàng
               </Button>
             </DialogTrigger>
             <DialogContent

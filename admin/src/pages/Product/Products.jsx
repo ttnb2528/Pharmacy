@@ -280,16 +280,16 @@ export default function Products() {
       {isLoading && <Loading />}
       <Header title={"Danh sách thuốc"} />
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center space-x-2">
+        <div className="grid lg:grid-cols-2 gap-6 mb-4">
+          <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:space-x-3">
             <Input
               placeholder="Tìm kiếm thuốc..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-64"
+              className="w-full sm:w-auto sm:flex-1"
             />
             <Select value={selectedCategory} onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-[180px] text-gray-500">
+              <SelectTrigger className="w-full sm:w-[180px] text-gray-500 mt-2 sm:mt-0">
                 <SelectValue placeholder="Chọn danh mục" />
               </SelectTrigger>
               <SelectContent>
@@ -301,11 +301,11 @@ export default function Products() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex space-x-2">
+          <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:space-x-3">
             <Dialog open={isAdding} onOpenChange={setIsAdding}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Thêm thuốc
+                <Button className="w-full sm:w-auto">
+                  <Plus className="hidden sm:block h-4 w-4 mr-2" /> Thêm thuốc
                 </Button>
               </DialogTrigger>
               <DialogContent
@@ -321,22 +321,45 @@ export default function Products() {
                 <AddMedicineForm handleCancel={handleCancel} />
               </DialogContent>
             </Dialog>
-            <Label
-              htmlFor="zip-upload"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 
-               shadow-sm text-sm font-medium rounded-md text-gray-700 
-               bg-white hover:bg-gray-50 cursor-pointer"
-            >
-              <Upload className="mr-2 h-4 w-4" /> Nhập thuốc (zip)
-            </Label>
-            <Input
-              id="zip-upload"
-              type="file"
-              accept=".zip"
-              onChange={handleExcelUpload}
-              className="hidden"
-              ref={inputMedicineRef}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full sm:flex-1">
+              <div>
+                <Label
+                  htmlFor="zip-upload"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 
+                shadow-sm text-sm font-medium rounded-md text-gray-700 
+                bg-white hover:bg-gray-50 cursor-pointer"
+                >
+                  <Upload className="hidden sm:block mr-2 h-4 w-4" /> Nhập
+                  thuốc (zip)
+                </Label>
+                <Input
+                  id="zip-upload"
+                  type="file"
+                  accept=".zip"
+                  onChange={handleExcelUpload}
+                  className="hidden"
+                  ref={inputMedicineRef}
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="excel-import-upload"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 
+                shadow-sm text-sm font-medium rounded-md text-gray-700 
+                bg-white hover:bg-gray-50 cursor-pointer"
+                >
+                  <Upload className="hidden sm:block mr-2 h-4 w-4" /> Nhập kho
+                </Label>
+                <Input
+                  id="excel-import-upload"
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleExcelImport}
+                  className="hidden"
+                  ref={inputBatchRef}
+                />
+              </div>
+            </div>
             {/* <Label
               htmlFor="excel-upload"
               className="inline-flex items-center px-4 py-2 border border-gray-300 
@@ -354,23 +377,6 @@ export default function Products() {
               className="hidden"
               ref={inputMedicineRef}
             /> */}
-
-            <Label
-              htmlFor="excel-import-upload"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 
-             shadow-sm text-sm font-medium rounded-md text-gray-700 
-             bg-white hover:bg-gray-50 cursor-pointer"
-            >
-              <Upload className="mr-2 h-4 w-4" /> Nhập kho
-            </Label>
-            <Input
-              id="excel-import-upload"
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleExcelImport}
-              className="hidden"
-              ref={inputBatchRef}
-            />
           </div>
         </div>
 
@@ -415,7 +421,7 @@ export default function Products() {
                           <MedicineDetails medicine={selectedMedicine} />
                         </DialogContent>
                       </Dialog>
-                      
+
                       <Button
                         variant="outline"
                         size="icon"

@@ -1,26 +1,35 @@
 import { X } from "lucide-react";
-import { createPortal } from "react-dom";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-const ImagePreview = ({ imageUrl, onClose }) => {
-  if (!imageUrl) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative max-w-[90vw] max-h-[90vh]">
-        <img
-          src={imageUrl}
-          alt="Preview"
-          className="max-w-full max-h-[90vh] object-contain"
-        />
-        <button
-          className="absolute top-4 right-4 bg-black/20 p-3 rounded-full hover:bg-black/50 transition-all duration-300 text-white"
-          onClick={onClose}
-        >
-          <X />
-        </button>
-      </div>
-    </div>,
-    document.body
+const ImagePreview = ({ imageUrl, onClose, isOpen }) => {
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+        }}
+        className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent shadow-none"
+      >
+        <div className="relative grid place-items-center">
+          <img
+            src={imageUrl}
+            alt="Preview"
+            className="max-w-full max-h-[80vh] object-contain"
+          />
+          <button
+            className="absolute -top-14 bg-black/20 p-3 border border-white rounded-full hover:bg-black/50 transition-all duration-300 text-white md:block hidden"
+            onClick={onClose}
+          >
+            <X />
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

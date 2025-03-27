@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -114,21 +114,20 @@ const AdminShiftWork = () => {
       {isLoading && <Loading />}
       <Header title={"Danh sách ca làm việc"} />
       <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="w-full space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:space-x-3 mb-4">
+          <div>
+            {/* <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
             <Input
-              type="text"
               placeholder="Tìm kiếm ca làm việc..."
-              className="pl-8"
+              className="w-full sm:w-auto"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Thêm ca làm việc
+              <Button className="w-full sm:w-auto">
+                <Plus className="hidden sm:block h-4 w-4" /> Thêm ca làm việc
               </Button>
             </DialogTrigger>
             <DialogContent

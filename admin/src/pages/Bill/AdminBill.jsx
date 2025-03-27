@@ -80,13 +80,17 @@ const AdminBill = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Mã hóa đơn</TableHead>
-              <TableHead>Tên khách hàng</TableHead>
-              <TableHead>Ngày tạo</TableHead>
-              <TableHead>Mã phiếu khám</TableHead>
-              <TableHead>Nơi khám</TableHead>
-              <TableHead>Hóa đơn kê đơn</TableHead>
-              <TableHead>Chi tiết</TableHead>
+              <TableHead className="whitespace-nowrap">Mã hóa đơn</TableHead>
+              <TableHead className="whitespace-nowrap">
+                Tên khách hàng
+              </TableHead>
+              <TableHead className="whitespace-nowrap">Ngày tạo</TableHead>
+              <TableHead className="whitespace-nowrap">Mã phiếu khám</TableHead>
+              <TableHead className="whitespace-nowrap">Nơi khám</TableHead>
+              <TableHead className="whitespace-nowrap">
+                Hóa đơn kê đơn
+              </TableHead>
+              <TableHead className="whitespace-nowrap">Chi tiết</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,7 +98,7 @@ const AdminBill = () => {
               paginatedBrands.map((bill) => (
                 <TableRow key={bill.id}>
                   <TableCell>{bill.id}</TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {bill.customer.name ?? "Khách vãng lai"}
                   </TableCell>
                   <TableCell>

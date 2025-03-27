@@ -20,6 +20,7 @@ const MedicineDetails = ({ medicine }) => {
   const [activeTab, setActiveTab] = useState("info");
   const [batches, setBatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
     const renderBatchesHistory = async (medicine) => {
@@ -48,8 +49,17 @@ const MedicineDetails = ({ medicine }) => {
     </div>
   );
 
-  console.log(medicine);
-  
+  const handleImageClick = (image) => {
+    setPreviewImage(image);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setTimeout(() => {
+      setPreviewImage(null);
+    }, 200); // Đợi animation đóng dialog kết thúc
+  };
 
   return (
     <>
@@ -109,21 +119,24 @@ const MedicineDetails = ({ medicine }) => {
               )
             )}
             {medicine.isDiscount &&
-              renderField("Phần trăm giảm giá", `${medicine.discountPercentage}%`)}
+              renderField(
+                "Phần trăm giảm giá",
+                `${medicine.discountPercentage}%`
+              )}
             {renderField("Thương hiệu", medicine.brandId.name)}
-            <div className="grid grid-cols-[200px_1fr] items-start gap-4 py-2">
+            <div className="grid md:grid-cols-[200px_1fr] items-start gap-4 py-2">
               <Label className="font-medium text-gray-700">Hình ảnh:</Label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-10 md:gap-2">
                 {medicine.images.map((image, index) => (
                   <div
                     key={index}
                     className="cursor-pointer"
-                    onClick={() => setPreviewImage(image)}
+                    onClick={() => handleImageClick(image)}
                   >
                     <img
                       src={image}
                       alt={"Hình ảnh thuốc"}
-                      className="w-24 h-24 object-cover rounded-md border border-gray-200"
+                      className="md:w-24 md:h-24 object-cover rounded-md border border-gray-200"
                     />
                   </div>
                 ))}
@@ -172,12 +185,11 @@ const MedicineDetails = ({ medicine }) => {
         </TabsContent>
       </Tabs>
 
-      {previewImage && (
-        <ImagePreview
-          imageUrl={previewImage}
-          onClose={() => setPreviewImage(null)}
-        />
-      )}
+      <ImagePreview
+        imageUrl={previewImage}
+        isOpen={isPreviewOpen}
+        onClose={handleClosePreview}
+      />
     </>
   );
 };

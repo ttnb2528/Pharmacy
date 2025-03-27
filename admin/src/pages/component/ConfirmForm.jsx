@@ -89,30 +89,37 @@ const ConfirmForm = ({ open, onClose, handleConfirm, type, info }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] p-0">
-        <DialogHeader className="px-4 py-2.5">
-          <DialogTitle className="text-2xl font-bold">
-            {getTitleText()}
-          </DialogTitle>
-          <DialogDescription></DialogDescription>
-        </DialogHeader>
-        <p
-          className="px-4"
-          dangerouslySetInnerHTML={{ __html: getConfirmationText() }}
-        />{" "}
-        {/* Use dangerouslySetInnerHTML for HTML in text */}
-        <DialogFooter className="px-4 py-2.5">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Quay lại
-          </Button>
+      <DialogContent className="sm:max-w-[425px] p-0 rounded-lg">
+        <div className="px-6 py-4">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-2xl font-bold">
+              {getTitleText()}
+            </DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
 
-          <Button
-            className="border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border"
-            onClick={handleConfirm}
-          >
-            Đồng ý
-          </Button>
-        </DialogFooter>
+          <div className="my-4">
+            <p dangerouslySetInnerHTML={{ __html: getConfirmationText() }} />
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-6 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
+              Quay lại
+            </Button>
+
+            <Button
+              className="w-full sm:w-auto border-green-400 shadow-none text-white hover:bg-green-600 bg-green-500 border order-1 sm:order-2"
+              onClick={handleConfirm}
+            >
+              Đồng ý
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

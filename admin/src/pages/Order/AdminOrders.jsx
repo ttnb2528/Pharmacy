@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Eye, Search, RefreshCw } from "lucide-react";
+import { Eye, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -190,79 +190,84 @@ export default function AdminOrders() {
       <Header title={"Danh sách mã giảm giá"} />
 
       <main className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="mb-4">
+          <div>
+            {/* <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
             <Input
-              type="text"
               placeholder="Tìm kiếm đơn hàng..."
-              className="pl-8"
+              className="w-full sm:w-auto"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Mã đơn hàng</TableHead>
-              <TableHead>Khách hàng</TableHead>
-              <TableHead>Ngày đặt</TableHead>
-              <TableHead>Tổng tiền</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead>Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedOrders.length > 0 ? (
-              paginatedOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{order.nameCustomer}</TableCell>
-                  <TableCell>{formatDate(order.date)}</TableCell>
-                  <TableCell>{convertVND(order.total)}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadgeVariant(order.status)}>
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setIsDetailsDialogOpen(true);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={order.status === "cancelled"}
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setIsStatusUpdateDialogOpen(true);
-                        }}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </div>
+        <div className="w-full overflow-x-auto">
+          <Table className="min-w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">Mã đơn hàng</TableHead>
+                <TableHead className="whitespace-nowrap">Khách hàng</TableHead>
+                <TableHead className="whitespace-nowrap">Ngày đặt</TableHead>
+                <TableHead className="whitespace-nowrap">Tổng tiền</TableHead>
+                <TableHead className="whitespace-nowrap">Trạng thái</TableHead>
+                <TableHead className="whitespace-nowrap">Hành động</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedOrders.length > 0 ? (
+                paginatedOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{order.id}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {order.nameCustomer}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {formatDate(order.date)}
+                    </TableCell>
+                    <TableCell>{convertVND(order.total)}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsDetailsDialogOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={order.status === "cancelled"}
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsStatusUpdateDialogOpen(true);
+                          }}
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    Không tìm thấy đơn hàng
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  Không tìm thấy đơn hàng
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
         {totalPages > 1 && (
           <Pagination className="mt-4">

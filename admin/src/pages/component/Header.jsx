@@ -24,7 +24,7 @@ const Header = ({ title }) => {
   return (
     <header className="flex items-center justify-between p-4 border-b">
       <SidebarTrigger />
-      <h1 className="text-2xl font-bold">{title}</h1>
+      <h1 className="md:text-2xl font-bold">{title}</h1>
       <Button onClick={handleLogout}>Đăng xuất</Button>
     </header>
   );
