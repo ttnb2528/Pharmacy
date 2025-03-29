@@ -19,7 +19,7 @@ const SupplierSchema = new mongoose.Schema({
     // required: true,
     default: "",
   },
-  isDeleted: {
+  deleted: {
     type: Boolean,
     default: false,
   },

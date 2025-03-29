@@ -13,7 +13,7 @@ const ManufactureSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  isDeleted: {
+  deleted: {
     type: Boolean,
     default: false,
   },
