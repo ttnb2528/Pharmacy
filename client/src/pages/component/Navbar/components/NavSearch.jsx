@@ -299,7 +299,7 @@ const NavSearch = () => {
                               <span className="ml-1 text-[#f48120]">
                                 {convertVND(
                                   CalculateProductWithSale(
-                                    product.batches[0].price,
+                                    product.batches[0].retailPrice,
                                     product.discountPercentage
                                   )
                                 )}

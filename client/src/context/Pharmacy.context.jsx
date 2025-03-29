@@ -172,8 +172,8 @@ const PharmacyContextProvider = (props) => {
       if (carts[item] > 0) {
         // Tìm sản phẩm có id tương ứng
         const product = allProducts.find((p) => p.id === parseInt(item));
-        if (product?.batches?.[0]?.price) {
-          totalPrice += carts[item] * product.batches[0].price;
+        if (product?.batches?.[0]?.retailPrice) {
+          totalPrice += carts[item] * product.batches[0].retailPrice;
         }
       }
     }
@@ -187,10 +187,10 @@ const PharmacyContextProvider = (props) => {
     for (const item in carts) {
       if (carts[item] > 0) {
         const product = allProducts.find((p) => p.id === parseInt(item));
-        if (product?.batches?.[0]?.price) {
+        if (product?.batches?.[0]?.retailPrice) {
           totalPrice +=
             carts[item] *
-            ((product.discountPercentage / 100) * product.batches[0].price);
+            ((product.discountPercentage / 100) * product.batches[0].retailPrice);
         }
       }
     }
@@ -204,11 +204,11 @@ const PharmacyContextProvider = (props) => {
     for (const item in carts) {
       if (carts[item] > 0) {
         const product = allProducts.find((p) => p.id === parseInt(item));
-        if (product?.batches?.[0]?.price) {
+        if (product?.batches?.[0]?.retailPrice) {
           totalPrice +=
             carts[item] *
-            (product.batches[0].price -
-              (product.discountPercentage / 100) * product.batches[0].price);
+            (product.batches[0].retailPrice -
+              (product.discountPercentage / 100) * product.batches[0].retailPrice);
         }
       }
     }

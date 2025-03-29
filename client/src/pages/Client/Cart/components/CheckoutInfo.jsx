@@ -244,18 +244,18 @@ const CheckoutInfo = ({
                         <div className="flex flex-col justify-center md:w-[calc(160rem/16)] md:flex-row md:items-center md:justify-end md:space-x-1">
                           {product?.isDiscount && (
                             <p className="text-base text-neutral-700 line-through md:text-sm">
-                              {convertVND(product?.batches[0]?.price)}
+                              {convertVND(product?.batches[0]?.retailPrice)}
                             </p>
                           )}
                           <p className="text-base font-semibold text-neutral-900 md:text-sm">
                             {product?.isDiscount
                               ? convertVND(
                                   CalculateProductWithSale(
-                                    product?.batches[0].price,
+                                    product?.batches[0].retailPrice,
                                     product?.discountPercentage
                                   )
                                 )
-                              : convertVND(product?.batches[0]?.price)}
+                              : convertVND(product?.batches[0]?.retailPrice)}
                           </p>
                         </div>
                       </div>

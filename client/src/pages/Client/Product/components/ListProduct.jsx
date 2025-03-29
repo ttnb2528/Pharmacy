@@ -26,7 +26,7 @@ const ProductList = ({ products }) => {
     if (priceRange) {
       const [minPrice, maxPrice] = priceRange.split("-").map(Number);
       updatedProducts = updatedProducts.filter((product) => {
-        const price = product.batches[0].price;
+        const price = product.batches[0].retailPrice;
         return maxPrice
           ? price >= minPrice && price <= maxPrice
           : price >= minPrice;

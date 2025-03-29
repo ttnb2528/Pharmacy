@@ -144,7 +144,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       return {
         productId: medicine._id, // Sử dụng _id của medicine
         quantity: item.quantity,
-        price: medicine.batches[0].price,
+        price: medicine.batches[0].retailPrice,
         name: medicine.name,
         unit: medicine.unit,
         discount: medicine.isDiscount ? medicine.discountPercentage : 0,

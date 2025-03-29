@@ -356,13 +356,13 @@ const CartItemBox = () => {
                               <div className="flex flex-col justify-center md:w-[calc(160rem/16)] md:flex-row md:space-x-1">
                                 {product.isDiscount && (
                                   <p className="text-base line-through md:text-sm text-neutral-700">
-                                    {convertVND(product.batches[0].price)}
+                                    {convertVND(product.batches[0].retailPrice)}
                                   </p>
                                 )}
                                 <p className="text-base font-semibold md:text-sm text-neutral-900">
                                   {convertVND(
                                     CalculateProductWithSale(
-                                      product.batches[0].price,
+                                      product.batches[0].retailPrice,
                                       product.discountPercentage
                                     )
                                   )}
@@ -429,7 +429,7 @@ const CartItemBox = () => {
                                 <p className="text-sm font-semibold text-neutral-900">
                                   {convertVND(
                                     CalculateTotalPrice(
-                                      product.batches[0].price,
+                                      product.batches[0].retailPrice,
                                       product.discountPercentage,
                                       cart[product.id]
                                     )

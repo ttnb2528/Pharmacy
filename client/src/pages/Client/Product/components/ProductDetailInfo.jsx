@@ -102,9 +102,9 @@ const ProductDetailInfo = ({ product }) => {
               <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
                 Giảm {product?.discountPercentage}%
               </span>
-              {product?.batches[0]?.price ? (
+              {product?.batches[0]?.retailPrice ? (
                 <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
-                  {convertVND(product?.batches[0]?.price)}
+                  {convertVND(product?.batches[0]?.retailPrice)}
                 </del>
               ) : (
                 <span className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
@@ -114,11 +114,11 @@ const ProductDetailInfo = ({ product }) => {
             </div>
           )}
 
-          {product?.batches[0]?.price ? (
+          {product?.batches[0]?.retailPrice ? (
             <div className="text-xl font-bold md:mb-2 md:text-[28px]">
               {convertVND(
                 CalculateProductWithSale(
-                  product?.batches[0]?.price,
+                  product?.batches[0]?.retailPrice,
                   product?.discountPercentage
                 )
               )}
@@ -135,12 +135,12 @@ const ProductDetailInfo = ({ product }) => {
           </p>
 
           <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
-            {product?.batches[0]?.price ? (
+            {product?.batches[0]?.retailPrice ? (
               <span className="text-xs font-semibold text-gold-500 md:text-sm">
                 Tích lũy{" "}
                 {CalculatePointEarned(
                   rank,
-                  product?.batches[0]?.price,
+                  product?.batches[0]?.retailPrice,
                   product?.discountPercentage
                 )}{" "}
                 Xu

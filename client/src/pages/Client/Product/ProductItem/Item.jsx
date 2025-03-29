@@ -149,12 +149,12 @@ const Item = ({
                   {product?.isDiscount ? (
                     <>
                       <del className="block h-5 text-sm font-semibold text-neutral-600">
-                        {convertVND(product?.batches[0]?.price)}
+                        {convertVND(product?.batches[0]?.retailPrice)}
                       </del>
                       <span className="mt-1 block h-6 text-base font-bold text-green-600">
                         {convertVND(
                           CalculateProductWithSale(
-                            product?.batches[0]?.price,
+                            product?.batches[0]?.retailPrice,
                             product?.discountPercentage
                           )
                         )}
@@ -164,7 +164,7 @@ const Item = ({
                     <>
                       <div className="h-5"></div>
                       <span className="mt-1 block h-6 text-base font-bold text-green-600">
-                        {convertVND(product?.batches[0]?.price)}
+                        {convertVND(product?.batches[0]?.retailPrice)}
                       </span>
                     </>
                   )}
