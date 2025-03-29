@@ -10,7 +10,7 @@ const getBaseURL = () => {
     return HOST; // Ví dụ: http://localhost:8888
   }
   // Nếu chạy trên điện thoại (hoặc mạng nội bộ), dùng IP
-  return "http://10.2.9.28:8888"; // Thay bằng IP của máy tính chạy backend
+  return "http://10.2.9.205:8888"; // Thay bằng IP của máy tính chạy backend
 };
 
 export const apiClient = axios.create({

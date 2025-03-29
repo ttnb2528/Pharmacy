@@ -592,6 +592,10 @@ const validate = (data) => {
   const schema = Joi.object({
     nameCustomer: Joi.string().required().label("Tên khách hàng"),
     total: Joi.number().required().label("Tổng tiền"),
+    phone: Joi.string()
+      .pattern(/^[0-9]+$/)
+      .required()
+      .label("Số điện thoại"),
     address: Joi.string().required().label("Địa chỉ"),
     paymentMethod: Joi.string().required().label("Phương thức thanh toán"),
   })
