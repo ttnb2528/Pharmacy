@@ -26,14 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import { useContext, useRef, useState } from "react";
 import { MedicineContext } from "@/context/ProductContext.context";
 import MedicineDetails from "./components/MedicineDetails.jsx";
@@ -53,6 +46,7 @@ import ImportMedicineDialog from "./components/ImportMedicineDialog.jsx";
 
 import * as XLSX from "xlsx";
 import { Label } from "@/components/ui/label.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
@@ -329,8 +323,8 @@ export default function Products() {
                 shadow-sm text-sm font-medium rounded-md text-gray-700 
                 bg-white hover:bg-gray-50 cursor-pointer"
                 >
-                  <Upload className="hidden sm:block mr-2 h-4 w-4" /> Nhập
-                  thuốc (zip)
+                  <Upload className="hidden sm:block mr-2 h-4 w-4" /> Nhập thuốc
+                  (zip)
                 </Label>
                 <Input
                   id="zip-upload"
@@ -396,9 +390,13 @@ export default function Products() {
               paginatedMedicines.map((medicine) => (
                 <TableRow key={medicine._id}>
                   <TableCell>{medicine.id}</TableCell>
-                  <TableCell className="whitespace-nowrap line-clamp-1 leading-10">{medicine.name}</TableCell>
+                  <TableCell className="whitespace-nowrap line-clamp-1 leading-10">
+                    {medicine.name}
+                  </TableCell>
                   <TableCell>{medicine.isRx ? "Có" : "Không"}</TableCell>
-                  <TableCell className="whitespace-nowrap">{medicine.categoryId.name}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {medicine.categoryId.name}
+                  </TableCell>
                   <TableCell>{medicine.quantityStock}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
@@ -459,42 +457,11 @@ export default function Products() {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </main>
 
       {isEditing && (

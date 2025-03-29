@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import {
   Table,
   TableBody,
@@ -40,6 +33,7 @@ import AdminBrandDetail from "./Component/AdminBrandDetail.jsx";
 import AdminBrandForm from "./Component/AdminBrandForm.jsx";
 import Header from "../component/Header.jsx";
 import EditBranDialog from "./Component/EditBranDialog.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminBrand = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -197,7 +191,9 @@ const AdminBrand = () => {
                 <TableRow key={brand._id}>
                   <TableCell>{brand.id || "..."}</TableCell>
                   <TableCell>{brand.name || "..."}</TableCell>
-                  <TableCell className="line-clamp-2 max-h-12">{brand.description || "..."}</TableCell>
+                  <TableCell className="line-clamp-2 max-h-12">
+                    {brand.description || "..."}
+                  </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Dialog>
@@ -250,42 +246,11 @@ const AdminBrand = () => {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </main>
       {confirmDelete && (
         <ConfirmForm

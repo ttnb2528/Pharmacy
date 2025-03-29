@@ -19,15 +19,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
 import { apiClient } from "@/lib/api-admin.js";
 import {
   ADD_MANUFACTURE_ROUTE,
@@ -41,6 +32,7 @@ import AdminManufactureForm from "./components/AdminManufactureForm.jsx";
 import AdminManufactureDetail from "./components/AdminManufactureDetail.jsx";
 import EditManufactureDialog from "./components/EditManufactureDialog.jsx";
 import ConfirmForm from "../component/ConfirmForm.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminManufacture = () => {
   const { manufactures, setManufactures } = useContext(ManufactureContext);
@@ -198,8 +190,12 @@ const AdminManufacture = () => {
               paginatedManufactures.map((manufacture) => (
                 <TableRow key={manufacture.id}>
                   <TableCell>{manufacture.id}</TableCell>
-                  <TableCell className="whitespace-nowrap">{manufacture.name}</TableCell>
-                  <TableCell className="whitespace-nowrap">{manufacture.country}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {manufacture.name}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {manufacture.country}
+                  </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Dialog>
@@ -254,42 +250,11 @@ const AdminManufacture = () => {
           </TableBody>
         </Table>
       </main>
-      {totalPages > 1 && (
-        <Pagination className="mt-4">
-          <PaginationContent>
-            {totalPages > 1 && (
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                />
-              </PaginationItem>
-            )}
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            {totalPages > 1 && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
-      )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Delete Dialog */}
       {confirmDelete && (

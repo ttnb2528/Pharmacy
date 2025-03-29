@@ -19,14 +19,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import Loading from "../component/Loading.jsx";
 import { StaffContext } from "@/context/StaffContext.context.jsx";
 import { apiClient } from "@/lib/api-admin.js";
@@ -37,6 +29,7 @@ import ConfirmForm from "../component/ConfirmForm.jsx";
 import AdminStaffDetail from "./components/AdminStaffDetail.jsx";
 import AdminStaffForm from "./components/AdminStaffForm.jsx";
 import EditStaffDialog from "./components/EditStaffDialog.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminStaff = () => {
   const { staffs, setStaffs } = useContext(StaffContext);
@@ -259,42 +252,11 @@ const AdminStaff = () => {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
         {/* Delete Dialog */}
         {confirmDelete && (

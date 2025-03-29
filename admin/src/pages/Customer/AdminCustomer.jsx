@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import {
   Table,
   TableBody,
@@ -41,6 +34,7 @@ import ConfirmForm from "../component/ConfirmForm.jsx";
 import Header from "../component/Header.jsx";
 import EditCustomerDialog from "./Components/EditCustomerDialog.jsx";
 import { formatDate } from "@/utils/formatDate.js";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminCustomer = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -268,42 +262,11 @@ const AdminCustomer = () => {
             )}
           </TableBody>
         </Table>
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </main>
 
       {confirmDelete && (

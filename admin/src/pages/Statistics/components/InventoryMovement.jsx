@@ -7,14 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input.jsx";
 import { formatDate } from "@/utils/formatDate.js";
@@ -28,6 +21,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select.jsx";
 import * as XLSX from "xlsx";
+import CustomPagination from "@/pages/component/Pagination.jsx";
 
 const InventoryMovement = () => {
   const [date, setDate] = useState({
@@ -187,38 +181,11 @@ const InventoryMovement = () => {
             </TableBody>
           </Table>
 
-          {totalPages > 1 && (
-            <Pagination className="mt-4">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                {[...Array(totalPages)].map((_, index) => (
-                  <PaginationItem key={index}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(index + 1)}
-                      isActive={currentPage === index + 1}
-                    >
-                      {index + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          )}
+          <CustomPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </>
       ) : (
         <p className="text-center text-lg text-muted-foreground">

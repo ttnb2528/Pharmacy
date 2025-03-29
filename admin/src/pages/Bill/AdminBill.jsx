@@ -17,19 +17,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Check, Search, X } from "lucide-react";
 import Header from "../component/Header";
 import BillDetails from "./components/BillDetais.jsx";
 import { BillContext } from "@/context/BillContext.context.jsx";
 import { Input } from "@/components/ui/input.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminBill = () => {
   const { bills } = useContext(BillContext);
@@ -143,42 +136,11 @@ const AdminBill = () => {
             )}
           </TableBody>
         </Table>
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </main>
     </div>
   );

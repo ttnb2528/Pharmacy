@@ -39,14 +39,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 import { OrderContext } from "@/context/OrderContext.context.jsx";
 import { convertVND } from "@/utils/convertVND.js";
@@ -58,6 +50,7 @@ import {
 } from "@/API/index.api.js";
 import { toast } from "sonner";
 import Header from "../component/Header.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
@@ -270,42 +263,11 @@ export default function AdminOrders() {
           </Table>
         </div>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-              )}
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={currentPage === index + 1}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {totalPages > 1 && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        )}
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
         {/* Order Details Dialog */}
         <Dialog

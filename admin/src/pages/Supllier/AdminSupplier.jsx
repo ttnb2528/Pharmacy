@@ -19,15 +19,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
 // import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-admin.js";
 import { ADD_SUPPLIER_ROUTE, DELETE_SUPPLIER_ROUTE } from "@/API/index.api.js";
@@ -39,6 +30,7 @@ import AdminSupplierForm from "./components/AdminSupplierForm.jsx";
 import AdminSupplierDetail from "./components/AdminSupplierDetail.jsx";
 import EditSupplierDialog from "./components/EditSupplierDialog.jsx";
 import ConfirmForm from "../component/ConfirmForm.jsx";
+import CustomPagination from "../component/Pagination.jsx";
 
 const AdminSupplier = () => {
   const { suppliers, setSuppliers } = useContext(SupplierContext);
@@ -263,42 +255,11 @@ const AdminSupplier = () => {
         </Table>
       </main>
 
-      {totalPages > 1 && (
-        <Pagination className="mt-4">
-          <PaginationContent>
-            {totalPages > 1 && (
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                />
-              </PaginationItem>
-            )}
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            {totalPages > 1 && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
-      )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Delete Dialog */}
       {confirmDelete && (
