@@ -12,4 +12,8 @@ export default defineConfig({
     },
   },
   base: "/",
+  server: {
+    host: "0.0.0.0", // Cho phép lắng nghe trên tất cả các địa chỉ IP
+    port: 5174, // Cổng mà bạn muốn Vite lắng nghe
+  },
 });

@@ -22,6 +22,7 @@ app.use(
       process.env.CLOUDINARY,
       // test phone
       "http://10.2.9.205:5174",
+      "http://10.2.9.205:5173",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
