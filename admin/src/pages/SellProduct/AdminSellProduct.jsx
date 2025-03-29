@@ -43,7 +43,7 @@ const SellMedicinePage = () => {
                 setInvoiceCreated={setInvoiceCreated}
                 setPrescriptionInfo={setPrescriptionInfo}
               />
-              {customerType === "loyalty" && (
+              {(customerType === "loyalty" || customerType === "walkin") && (
                 <PrescriptionInfo
                   prescriptionInfo={prescriptionInfo}
                   setPrescriptionInfo={setPrescriptionInfo}

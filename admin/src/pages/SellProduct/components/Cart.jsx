@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, Trash2, Printer } from "lucide-react";
+import { Plus, Minus, Trash2, Printer, Trash } from "lucide-react";
 import { convertVND } from "@/utils/convertVND.js";
 import { apiClient } from "@/lib/api-admin.js";
 import { CREATE_BILL_ROUTE } from "@/API/index.api.js";
@@ -44,6 +44,19 @@ const Cart = ({
 
   const removeFromCart = (id) => {
     setCart(cart.filter((item) => item.id !== id));
+  };
+
+  // Thêm hàm xóa tất cả
+  const clearCart = () => {
+    if (cart.length > 0) {
+      if (confirm("Bạn có chắc chắn muốn xóa tất cả thuốc khỏi giỏ hàng?")) {
+        setCart([]);
+        if (invoiceCreated) {
+          setInvoiceCreated(false);
+          setInvoice(null);
+        }
+      }
+    }
   };
 
   const total = cart.reduce((sum, item) => {
@@ -86,7 +99,7 @@ const Cart = ({
               ? medicine?.batches[0]?.price
               : medicine?.batches[0]?.retailPrice,
         })),
-        total,
+        total: total + total * 0.05,
         type: "sell",
       };
 
@@ -125,6 +138,13 @@ const Cart = ({
 
   return (
     <>
+      {cart.length > 0 && (
+        <div className="flex justify-end mb-2">
+          <Button variant="destructive" size="sm" onClick={clearCart}>
+            <Trash className="h-4 w-4 mr-2" /> Xóa tất cả
+          </Button>
+        </div>
+      )}
       <div>
         <Table>
           <TableHeader>
@@ -213,16 +233,22 @@ const Cart = ({
           <span className="font-semibold">Tổng cộng</span>
           {cart && cart.length > 0 && (
             <p className="text-2xl font-bold text-red-500">
-              {total.toLocaleString()} VND
+              {(total + total * 0.05).toLocaleString()} VND
             </p>
           )}
         </div>
         <div className="flex gap-2">
           {cart &&
             cart.length > 0 &&
-            (customerType === "walkin" ||
-              customerType === "business" ||
-              (selectedCustomer &&
+            // Điều kiện cho khách hàng doanh nghiệp
+            (customerType === "business" ||
+              // Điều kiện cho khách hàng thành viên
+              (customerType === "loyalty" &&
+                selectedCustomer &&
+                (activeTab === "otc" ||
+                  (prescriptionInfo.source && prescriptionInfo.number))) ||
+              // Điều kiện cho khách vãng lai - cần thêm điều kiện cho thuốc kê đơn
+              (customerType === "walkin" &&
                 (activeTab === "otc" ||
                   (prescriptionInfo.source && prescriptionInfo.number)))) && (
               <Button onClick={handleCreateInvoice} disabled={invoiceCreated}>

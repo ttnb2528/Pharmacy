@@ -17,11 +17,11 @@ const PrintInvoice = forwardRef(function PrintInvoice(
   ref
 ) {
   const { userInfo } = useAppStore();
-  const calculateTotal = () => {
-    const subtotal = invoice?.total || 0;
-    const vat = subtotal * 0.05; // 5% VAT
-    return subtotal + vat;
-  };
+  // const calculateTotal = () => {
+  //   const subtotal = invoice?.total || 0;
+  //   const vat = subtotal * 0.05; // 5% VAT
+  //   return subtotal + vat;
+  // };
 
   return (
     <Card
@@ -164,13 +164,13 @@ const PrintInvoice = forwardRef(function PrintInvoice(
 
             <div className="mt-6 text-right grid gap-1">
               <p className="font-semibold">
-                Tổng cộng: {convertVND(invoice?.total)}
+                Tổng cộng: {convertVND(invoice?.total / 1.05)}
               </p>
               <p className="font-semibold">
-                VAT (5%): {convertVND(invoice?.total * 0.05)}
+                VAT (5%): {convertVND(invoice?.total - invoice?.total / 1.05)}
               </p>
               <p className="text-lg font-bold mt-2">
-                Tổng thanh toán: {convertVND(calculateTotal())}
+                Tổng thanh toán: {convertVND(invoice?.total)}
               </p>
             </div>
 
