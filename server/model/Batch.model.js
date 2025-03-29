@@ -49,6 +49,10 @@ const BatchSchema = new mongoose.Schema(
       ref: "Medicine",
       required: true,
     },
+    isExpiredHandled: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

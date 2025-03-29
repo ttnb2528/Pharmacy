@@ -4,9 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import router from "./routes/index.js";
-import LoyaltyProgram from "./model/LoyaltyProgram.model.js";
-import PointHistory from "./model/PointHistory.model.js";
-import cron from "node-cron";
+import { setupAllCronJobs } from "./cron/index.js";
 
 dotenv.config();
 
@@ -37,49 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", router);
 
-// Cron job để reset LoyaltyProgram vào 0h ngày 1/1 hàng năm
-cron.schedule("0 0 1 1 *", async () => {
-  // Test 30s
-  // cron.schedule("*/30 * * * * *", async () => {
-  try {
-    console.log("Starting Loyalty Program reset for new year...");
-    const programs = await LoyaltyProgram.find();
-    const lastYear = new Date().getFullYear() - 1;
-
-    for (const program of programs) {
-      // Tính tổng chi tiêu của năm trước
-      const pointHistories = await PointHistory.find({
-        AccountId: program.AccountId,
-        createdAt: {
-          $gte: new Date(lastYear, 0, 1), // 1/1 năm trước
-          $lt: new Date(lastYear + 1, 0, 1), // 1/1 năm hiện tại
-        },
-      }).populate("orderId");
-
-      const totalSpendingLastYear = pointHistories.reduce((sum, history) => {
-        return sum + (history.orderId ? history.orderId.total : 0);
-      }, 0);
-
-      // Quyết định hạng mới dựa trên tổng chi tiêu năm trước
-      let newRank = "Bạc";
-      if (totalSpendingLastYear >= 8000000) newRank = "Kim cương";
-      else if (totalSpendingLastYear >= 4000000) newRank = "Vàng";
-
-      // Reset totalSpending và cập nhật rank, lastResetDate
-      await LoyaltyProgram.updateOne(
-        { _id: program._id },
-        {
-          totalSpending: 0,
-          rank: newRank,
-          lastResetDate: new Date(lastYear + 1, 0, 1),
-        }
-      );
-    }
-    console.log(`Loyalty Programs reset completed for year ${lastYear + 1}`);
-  } catch (error) {
-    console.error("Error resetting Loyalty Programs:", error);
-  }
-});
+setupAllCronJobs();
 
 app.get("/", (req, res) => {
   res.send(`
