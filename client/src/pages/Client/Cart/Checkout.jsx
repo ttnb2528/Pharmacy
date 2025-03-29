@@ -124,6 +124,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
+        phone: userInfo.phone,
         total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
@@ -191,6 +192,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
+        phone: userInfo.phone,
         total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
@@ -237,6 +239,7 @@ const Checkout = () => {
       const res = await apiClient.post(CREATE_ORDER_ROUTE, {
         AccountId: userInfo.accountId._id,
         nameCustomer: selectedAddress?.name,
+        phone: userInfo.phone,
         total: CalculateTotalPrice() - coinUsed,
         type: "online",
         address: selectedAddress
