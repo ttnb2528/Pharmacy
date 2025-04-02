@@ -30,19 +30,23 @@ const HomeSuggest = () => {
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
-          dots: false,
+          dots: true,
           lazyLoad: true,
           slidesToShow: 2,
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          dots: false,
           lazyLoad: true,
           slidesToShow: 1,
+          autoplay: true,
+          autoplaySpeed: 3000,
+          arrows: false,
         },
       },
     ],
@@ -50,10 +54,10 @@ const HomeSuggest = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <div className="product_carousel bg-[#dcefe3] rounded-lg px-3 mb-10">
-        <div className="px-6 pt-6 pb-9 ">
-          <div className="product_carousel-header mb-5">
-            <span className="product_carousel-title text-3xl font-bold">
+      <div className="product_carousel bg-[#dcefe3] rounded-lg px-2 md:px-3 mb-10">
+        <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
+          <div className="product_carousel-header mb-3 md:mb-5">
+            <span className="product_carousel-title text-xl md:text-3xl font-bold">
               Gợi ý hôm nay
             </span>
           </div>

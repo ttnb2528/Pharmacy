@@ -48,7 +48,7 @@ const FloatingActions = ({ zaloLink = "https://zalo.me/84866554764" }) => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 flex flex-col gap-2 md:gap-3 z-50">
       <style>{`
         @keyframes pulse {
           0% {
@@ -79,11 +79,12 @@ const FloatingActions = ({ zaloLink = "https://zalo.me/84866554764" }) => {
         }
       `}</style>
       <TooltipProvider>
+        {/* Zalo support button - hidden on mobile */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               size="icon"
-              className="rounded-full w-16 h-16 bg-[#26773d] hover:bg-[#1e5f31] shadow-lg pulse"
+              className="rounded-full w-16 h-16 bg-[#26773d] hover:bg-[#1e5f31] shadow-lg pulse hidden md:flex"
               onClick={() => window.open(zaloLink, "_blank")}
             >
               <MessageCircle style={{ width: "32px", height: "32px" }} />
@@ -101,14 +102,17 @@ const FloatingActions = ({ zaloLink = "https://zalo.me/84866554764" }) => {
               <Button
                 size="icon"
                 variant="secondary"
-                className="rounded-full w-16 h-16 shadow-lg fade-in"
+                className="rounded-full w-10 h-10 md:w-16 md:h-16 shadow-lg fade-in"
                 onClick={scrollToTop}
               >
-                <ArrowUp style={{ width: "24px", height: "24px" }} />
+                <ArrowUp
+                  style={{ width: "18px", height: "18px" }}
+                  className="md:w-6 md:h-6"
+                />
                 <span className="sr-only">Lên đầu trang</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="left">
+            <TooltipContent side="left" className="hidden md:block">
               <p>Lên đầu trang</p>
             </TooltipContent>
           </Tooltip>

@@ -70,7 +70,6 @@ const Item = ({
       });
 
       console.log(res);
-      
 
       if (res.status === 200 && res.data.status === 200) {
         setCart((prev) => {
@@ -119,20 +118,20 @@ const Item = ({
 
   return (
     <>
-      <div className=" p-2" onMouseDown={handleMouseDown}>
+      <div className="p-2 w-full sm:w-auto" onMouseDown={handleMouseDown}>
         <div className="border border-green-500 rounded-lg hover:border hover:border-red-300 h-full flex flex-col">
           <div className="h-full overflow-hidden rounded-lg border bg-white shadow-sm flex flex-col">
             <div className="product-card-image flex-shrink-0">
-              <div className="relative min-h-48">
+              <div className="relative min-h-36 md:min-h-48">
                 <div onClick={handleClick}>
                   <img
-                    className="w-full h-full object-contain cursor-pointer max-h-48"
-                    src={product?.images[0]}
+                    className="w-full h-full object-contain cursor-pointer max-h-36 md:max-h-48"
+                    src={product?.images[0] || "/placeholder.svg"}
                     alt="product"
                   />
                 </div>
                 {product.isDiscount && (
-                  <span className="absolute top-2 left-2 bg-red-400 py-1 px-3 text-xs font-bold text-white rounded-xl">
+                  <span className="absolute top-2 left-2 bg-red-400 py-1 px-2 md:px-3 text-xs font-bold text-white rounded-xl">
                     {product.discountPercentage}%
                   </span>
                 )}
@@ -140,7 +139,7 @@ const Item = ({
             </div>
             <div className="p-2 pb-1 font-medium flex-grow flex flex-col justify-between">
               <div>
-                <h3 className="line-clamp-2 h-10 text-sm font-semibold">
+                <h3 className="line-clamp-2 h-8 md:h-10 text-xs md:text-sm font-semibold">
                   {product?.name}
                 </h3>
               </div>
@@ -148,10 +147,10 @@ const Item = ({
                 <div className="my-1 items-center whitespace-nowrap">
                   {product?.isDiscount ? (
                     <>
-                      <del className="block h-5 text-sm font-semibold text-neutral-600">
+                      <del className="block h-4 md:h-5 text-xs md:text-sm font-semibold text-neutral-600">
                         {convertVND(product?.batches[0]?.retailPrice)}
                       </del>
-                      <span className="mt-1 block h-6 text-base font-bold text-green-600">
+                      <span className="mt-1 block h-5 md:h-6 text-sm md:text-base font-bold text-green-600">
                         {convertVND(
                           CalculateProductWithSale(
                             product?.batches[0]?.retailPrice,
@@ -162,8 +161,8 @@ const Item = ({
                     </>
                   ) : (
                     <>
-                      <div className="h-5"></div>
-                      <span className="mt-1 block h-6 text-base font-bold text-green-600">
+                      <div className="h-4 md:h-5"></div>
+                      <span className="mt-1 block h-5 md:h-6 text-sm md:text-base font-bold text-green-600">
                         {convertVND(product?.batches[0]?.retailPrice)}
                       </span>
                     </>
@@ -171,17 +170,17 @@ const Item = ({
                 </div>
               ) : (
                 <div className="my-1 items-center whitespace-nowrap">
-                  <div className="h-5"></div>
-                  <span className="mt-1 block h-6 text-base font-bold text-red-600">
+                  <div className="h-4 md:h-5"></div>
+                  <span className="mt-1 block h-5 md:h-6 text-sm md:text-base font-bold text-red-600">
                     Tạm hết hàng
                   </span>
                 </div>
               )}
             </div>
-            <div className="flex justify-center items-center my-3">
+            <div className="flex justify-center items-center my-2 md:my-3">
               {product?.batches.length > 0 && product?.quantityStock > 0 ? (
                 <Button
-                  className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
+                  className="w-5/6 bg-[#26773d] hover:bg-[#0e562e] text-xs md:text-sm py-1 md:py-2"
                   onClick={() =>
                     userInfo ? AddToCart(product.id) : setShowLogin(true)
                   }
@@ -190,7 +189,7 @@ const Item = ({
                 </Button>
               ) : (
                 <Button
-                  className="w-5/6 bg-[#26773d] hover:bg-[#0e562e]"
+                  className="w-5/6 bg-[#26773d] hover:bg-[#0e562e] text-xs md:text-sm py-1 md:py-2"
                   disabled
                 >
                   Tạm hết hàng

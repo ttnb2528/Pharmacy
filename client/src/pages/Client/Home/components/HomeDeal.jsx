@@ -141,7 +141,7 @@ const HomeDeal = () => {
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
@@ -159,7 +159,7 @@ const HomeDeal = () => {
           slidesToShow: 1,
           slidesToScroll: 1,
           lazyLoad: true,
-          arrows: true,
+          arrows: false,
           autoplay: true,
           autoplaySpeed: 2000,
           pauseOnHover: true,
@@ -168,37 +168,27 @@ const HomeDeal = () => {
     ],
   };
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     const now = moment();
-  //     const midnight = moment().endOf("day");
-  //     const diff = moment.duration(midnight.diff(now));
-
-  //     setRemainingTime(diff);
-  //   }, 1000);
-
-  //   return () => clearInterval(intervalId);
-  // }, []);
-
   return (
-    <div className="my-10 rounded-lg overflow-hidden bg-[#fff8f9] px-3">
+    <div className="my-10 rounded-lg overflow-hidden bg-[#fff8f9] px-2 md:px-3">
       {isLoading && <Loading />}
-      <div className="px-6 pt-6 pb-9">
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-[#c31731]">
-            Săn Deal Chớp Nhoáng
+      <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
+        <div className="flex md:justify-between md:items-center gap-4">
+          <h1 className="text-2xl md:text-4xl font-bold text-[#c31731] text-center sm:text-left">
+            Săn Deal <span className="hidden sm:inline-block">Chớp Nhoáng</span>
           </h1>
-          <div className="flex justify-end items-center text-white">
-            <h5 className="font-bold text-black text-2xl">Kết Thúc trong:</h5>
-            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+          <div className="flex items-center text-white">
+            <h5 className="font-bold text-black text-lg md:text-2xl hidden sm:inline-block">
+              Kết Thúc trong:
+            </h5>
+            <h5 className="font-bold mx-1 md:mx-2 bg-red-300 p-1 md:p-2 rounded text-sm md:text-base">
               {remainingTime.hours().toString().padStart(2, "0")}
             </h5>
-            <span className="text-black text-lg">:</span>
-            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+            <span className="text-black text-sm md:text-lg">:</span>
+            <h5 className="font-bold mx-1 md:mx-2 bg-red-300 p-1 md:p-2 rounded text-sm md:text-base">
               {remainingTime.minutes().toString().padStart(2, "0")}
             </h5>
-            <span className="text-black text-lg">:</span>
-            <h5 className="font-bold mx-2 bg-red-300 p-2 rounded">
+            <span className="text-black text-sm md:text-lg">:</span>
+            <h5 className="font-bold mx-1 md:mx-2 bg-red-300 p-1 md:p-2 rounded text-sm md:text-base">
               {remainingTime.seconds().toString().padStart(2, "0")}
             </h5>
           </div>

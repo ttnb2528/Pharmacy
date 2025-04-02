@@ -71,31 +71,39 @@ const FooterHistory = () => {
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
-          dots: false,
+          dots: true,
           lazyLoad: true,
           slidesToShow: 2,
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          dots: false,
+          dots: true,
           lazyLoad: true,
           slidesToShow: 1,
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
     ],
   };
 
+  if (viewedProducts.length === 0) {
+    return null;
+  }
+
   return (
     <div>
       {isLoading && <Loading />}
-      <div className="product_carousel bg-white rounded-lg px-3 mb-10 w-[80vw] mx-auto">
-        <div className="px-6 pt-6 pb-9 ">
-          <div className="product_carousel-header mb-5">
-            <span className="product_carousel-title text-3xl font-bold">
+      <div className="product_carousel bg-white rounded-lg px-2 md:px-3 mb-10 w-[95vw] md:w-[90vw] lg:w-[80vw] mx-auto">
+        <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
+          <div className="product_carousel-header mb-3 md:mb-5">
+            <span className="product_carousel-title text-xl md:text-3xl font-bold">
               Sản phẩm vừa xem
             </span>
           </div>

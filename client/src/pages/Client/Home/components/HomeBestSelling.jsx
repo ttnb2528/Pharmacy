@@ -83,7 +83,7 @@ const HomeBestSelling = () => {
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
@@ -101,7 +101,7 @@ const HomeBestSelling = () => {
           slidesToShow: 1,
           slidesToScroll: 1,
           lazyLoad: true,
-          arrows: true,
+          arrows: false,
           autoplay: true,
           autoplaySpeed: 2000,
           pauseOnHover: true,
@@ -112,10 +112,10 @@ const HomeBestSelling = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <div className="product_carousel bg-white rounded-lg px-3 mb-10">
-        <div className="px-6 pt-6 pb-9 ">
-          <div className="product_carousel-header mb-5">
-            <span className="product_carousel-title text-3xl font-bold">
+      <div className="product_carousel bg-white rounded-lg px-2 md:px-3 mb-10">
+        <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
+          <div className="product_carousel-header mb-3 md:mb-5">
+            <span className="product_carousel-title text-xl md:text-3xl font-bold">
               Sản phẩm bán chạy
             </span>
           </div>

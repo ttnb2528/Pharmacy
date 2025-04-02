@@ -52,23 +52,22 @@ const HomeProductForGroup = () => {
           dots: false,
           lazyLoad: true,
           slidesToShow: 3,
-          rows: 4,
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
           slidesToShow: 2,
           lazyLoad: true,
-          rows: 5,
+
+          dots: true,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 1,
           lazyLoad: true,
-          rows: 5,
         },
       },
     ],
@@ -76,17 +75,17 @@ const HomeProductForGroup = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <div className="product_carousel bg-white rounded-lg px-3 mb-10">
-        <div className="px-6 pt-6 pb-9 ">
-          <div className="product_carousel-header mb-5">
-            <span className="product_carousel-title text-3xl font-bold">
+      <div className="product_carousel bg-white rounded-lg px-2 md:px-3 mb-10">
+        <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
+          <div className="product_carousel-header mb-3 md:mb-5">
+            <span className="product_carousel-title text-xl md:text-3xl font-bold">
               Sản phẩm theo nhóm
             </span>
           </div>
 
-          <div className="flex gap-3 overflow-auto">
+          <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
             <Button
-              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
+              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
                 activeTab === "Sản phẩm tiện lợi"
                   ? "bg-[#0e562e] text-white font-medium"
                   : ""
@@ -96,7 +95,7 @@ const HomeProductForGroup = () => {
               Sản phẩm tiện lợi
             </Button>
             <Button
-              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
+              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
                 activeTab === "Mẹ và Bé"
                   ? "bg-[#0e562e] text-white font-medium"
                   : ""
@@ -106,7 +105,7 @@ const HomeProductForGroup = () => {
               Mẹ và Bé
             </Button>
             <Button
-              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
+              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
                 activeTab === "Chăm sóc cá nhân"
                   ? "bg-[#0e562e] text-white font-medium"
                   : ""
@@ -116,7 +115,7 @@ const HomeProductForGroup = () => {
               Chăm sóc cá nhân
             </Button>
             <Button
-              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium ${
+              className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
                 activeTab === "Thiết bị y tế"
                   ? "bg-[#0e562e] text-white font-medium"
                   : ""
@@ -127,7 +126,7 @@ const HomeProductForGroup = () => {
             </Button>
           </div>
 
-          <div className="slider-container mt-5">
+          <div className="slider-container mt-3 md:mt-5">
             <Slider {...settings}>
               {productForGroups.map((product, i) => {
                 return (
