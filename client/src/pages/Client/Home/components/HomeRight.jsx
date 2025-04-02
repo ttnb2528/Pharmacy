@@ -23,7 +23,7 @@ const HomeRight = () => {
       }
     };
     getBannerRight();
-  });
+  }, []);
   return (
     <div>
       {/* <img src={right1} alt="" className="w-full h-auto rounded mb-4" />
