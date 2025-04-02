@@ -6,6 +6,7 @@ import {
   FaShoppingCart,
   FaUserCircle,
   FaTrash,
+  FaBars,
 } from "react-icons/fa";
 import {
   DropdownMenu,
@@ -37,8 +38,9 @@ import { toast } from "sonner";
 import Loading from "../../Loading.jsx";
 import slugify from "slugify";
 import { useAppStore } from "@/store/index.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 
-const NavSearch = () => {
+const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
   const { userInfo, setUserInfo } = useAppStore();
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
@@ -56,6 +58,8 @@ const NavSearch = () => {
   const [loading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
   const searchContainerRef = useRef(null);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const handleShowLogin = () => {
     setShowLogin(true);
@@ -149,15 +153,36 @@ const NavSearch = () => {
   };
 
   return (
-    <div className="flex flex-wrap justify-between items-center relative gap-10">
+    <div className="flex flex-wrap justify-between items-center relative gap-2 sm:gap-4 md:gap-6 py-2">
       {loading && <Loading />}
-      <div>
+
+      {/* Mobile menu toggle */}
+      {!isDesktop && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <FaBars className="h-5 w-5" />
+        </Button>
+      )}
+
+      {/* Logo */}
+      <div className={isMobile ? "w-24" : ""}>
         <Link to="/">
-          <img src={logo} alt="" className="h-20 w-25 my-2 mr-6" />
+          <img
+            src={logo || "/placeholder.svg"}
+            alt="Pharmacy Logo"
+            className={`${isMobile ? "h-12 w-auto" : "h-20 w-auto"} my-2`}
+          />
         </Link>
       </div>
 
-      <div className="relative flex-1">
+      {/* Search bar */}
+      <div
+        className={`relative ${isMobile ? "order-last w-full mt-2" : "flex-1"}`}
+      >
         <Input
           ref={inputRef}
           className="w-full h-10 rounded border-none bg-white focus-visible:ring-0 p-2 outline-none"
@@ -170,17 +195,15 @@ const NavSearch = () => {
         <FaSearch className="absolute right-3 top-3" />
         {showResults && (
           <div
-            className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md search-suggestions"
+            className="absolute top-12 left-0 w-full bg-white rounded-md shadow-md z-50"
             ref={searchContainerRef}
           >
             <ul>
               {searchResults.map((product) => (
                 <li
                   key={product.id}
-                  // className="py-2 px-4 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
                     setShowResults(false);
-                    // navigate(`/product/${product.id}`);
                   }}
                 >
                   <div
@@ -188,11 +211,11 @@ const NavSearch = () => {
                     className="py-2 px-4 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
                   >
                     <img
-                      src={product.images[0]}
+                      src={product.images[0] || "/placeholder.svg"}
                       alt={product.name}
                       className="w-8 h-8 rounded-md"
                     />
-                    <span>{product.name}</span>
+                    <span className="line-clamp-1">{product.name}</span>
                   </div>
                 </li>
               ))}
@@ -201,7 +224,7 @@ const NavSearch = () => {
               <>
                 <Separator />
                 <div
-                  className="p-4 text-center"
+                  className="p-4 text-center cursor-pointer"
                   onClick={() => {
                     const searchParams = new URLSearchParams();
                     searchParams.set("keyword", searchTerm);
@@ -219,22 +242,24 @@ const NavSearch = () => {
         )}
       </div>
 
-      {/* cart */}
+      {/* Cart dropdown */}
       <DropdownMenu>
-        <DropdownMenuTrigger className="text-[#fff] py-[2px] flex border-none">
-          <div className="bg-[#0e562e] rounded px-[10px] py-[2px] mx-auto flex items-center h-10 w-32 box-border cursor-pointer">
-            <div className="relative mr-3 text-center">
-              <FaShoppingCart className="text-[#fff] text-[20px]" />
-              <span className="absolute top-[-3px] min-w-[15px] bg-white rounded-full text-[9px] left-[14px] font-bold text-[#4cb551]">
-                {CalculateTotalItems(cart)}
-              </span>
-            </div>
-            Giỏ hàng
-          </div>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative bg-[#0e562e] text-white rounded-md h-10 w-10 sm:w-32 flex items-center justify-center hover:bg-[#13482b] hover:text-white transition-all duration-300"
+          >
+            <FaShoppingCart />
+            <span className="absolute -top-1 -right-1 sm:top-1 sm:right-20 bg-white rounded-full text-[#4cb551] text-xs min-w-[18px] h-[18px] flex items-center justify-center">
+              {CalculateTotalItems(cart)}
+            </span>
+            <span className="ml-2 hidden sm:inline">Giỏ hàng</span>
+          </Button>
         </DropdownMenuTrigger>
 
         {cart && CalculateTotalItems(cart) > 0 ? (
-          <DropdownMenuContent className="w-[320px] right-20 relative">
+          <DropdownMenuContent className="w-[320px] right-0 relative">
             <DropdownMenuLabel className="text-right">
               Tổng tiền:
               <span className="text-[#f48120] font-bold ml-1">
@@ -263,7 +288,7 @@ const NavSearch = () => {
                       >
                         <div className="flex gap-2 my-2 w-full">
                           <img
-                            src={product?.images[0]}
+                            src={product?.images[0] || "/placeholder.svg"}
                             alt="product"
                             className="h-10 w-10"
                             onClick={() =>
@@ -307,7 +332,7 @@ const NavSearch = () => {
                             </div>
                           </div>
                           <div
-                            className=" hidden group-hover:block group-hover:text-green-500 mr-2"
+                            className="hidden group-hover:block group-hover:text-green-500 mr-2"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -339,7 +364,7 @@ const NavSearch = () => {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         ) : (
-          <DropdownMenuContent className="w-56 right-10 top-1 relative">
+          <DropdownMenuContent className="w-56 right-0 relative">
             <DropdownMenuGroup>
               <DropdownMenuItem className="text-center justify-center">
                 <span>Giỏ hàng trống</span>
@@ -349,7 +374,7 @@ const NavSearch = () => {
         )}
       </DropdownMenu>
 
-      {/* user */}
+      {/* User dropdown */}
       {userInfo ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
