@@ -15,10 +15,14 @@ export const Layout = () => {
     <>
       {showLogin && <Login close={() => setShowLogin(false)} />}
       <div className="h-full flex flex-col w-full bg-[#e5e5e5] pb-16 md:pb-0">
-        <div className="w-full bg-[#26773d] z-30 ">
+        <div
+          className={`${
+            !isHomePage ? "hidden md:block" : ""
+          } w-full bg-[#26773d] z-30 `}
+        >
           <Navbar />
         </div>
-        <div className="w-[95vw] md:w-[90vw] lg:w-[80vw] mx-auto flex flex-col">
+        <div className="w-full md:w-[90vw] lg:w-[80vw] sm:mx-auto flex flex-col">
           <Outlet />
         </div>
         <div className={`${!isHomePage ? "hidden md:block" : ""}`}>

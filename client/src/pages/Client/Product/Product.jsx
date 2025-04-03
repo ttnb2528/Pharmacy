@@ -3,10 +3,14 @@ import Breadcrumbs from "./components/Breadcumbs.jsx";
 import ListProduct from "./components/ListProduct.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCT_BY_CATEGORY_ROUTE } from "@/API/index.api.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobileProductHeader from "./components/MobileProductHeader.jsx";
 
 const Product = (props) => {
   const { title, categoryId } = props;
   const [products, setProducts] = useState([]);
+  const isMobile = useMediaQuery("(max-width: 640px)");
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -29,7 +33,11 @@ const Product = (props) => {
 
   return (
     <div>
-      <Breadcrumbs category={title} />
+      {isMobile ? (
+        <MobileProductHeader title={title} />
+      ) : (
+        <Breadcrumbs category={title} />
+      )}
       <ListProduct products={products} />
     </div>
   );
