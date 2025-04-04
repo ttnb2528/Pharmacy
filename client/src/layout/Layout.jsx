@@ -14,7 +14,7 @@ export const Layout = () => {
   return (
     <>
       {showLogin && <Login close={() => setShowLogin(false)} />}
-      <div className="h-full flex flex-col w-full bg-[#e5e5e5] pb-16 md:pb-0">
+      <div className="h-[100vh] md:h-full flex flex-col w-full bg-[#e5e5e5] pb-16 md:pb-0">
         <div
           className={`${
             !isHomePage ? "hidden md:block" : ""

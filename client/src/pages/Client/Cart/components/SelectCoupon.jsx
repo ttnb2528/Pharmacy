@@ -9,6 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useContext } from "react";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { CouponCard } from "./CouponCard";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+
 const SelectCoupon = ({
   isOpen,
   setIsOpen,
@@ -16,6 +19,7 @@ const SelectCoupon = ({
   handleApplyCoupon,
 }) => {
   const { couponData } = useContext(PharmacyContext);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -24,28 +28,25 @@ const SelectCoupon = ({
           {selectedCoupon ? "Đổi mã" : "Chọn Mã"}
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent
+        side={isMobile ? "bottom" : "right"}
+        className={isMobile ? "h-[80vh]" : ""}
+      >
         <SheetHeader>
           <SheetTitle>Mã Khuyến Mãi</SheetTitle>
           <SheetDescription>
             Chọn mã khuyến mãi để áp dụng cho đơn hàng của bạn.
           </SheetDescription>
         </SheetHeader>
-        <div className="mt-4 space-y-4">
-          {couponData.length > 0 ? (
-            couponData?.map((coupon) => (
-              <div key={coupon._id} className="rounded-lg border p-3">
-                <h3 className="font-semibold">{coupon.coupon_code}</h3>
-                <p className="text-sm text-gray-500">{coupon.description}</p>
-                <Button
-                  className="mt-2 bg-green-500 hover:bg-green-600"
-                  size="sm"
-                  onClick={() => handleApplyCoupon(coupon)}
-                  disabled={!coupon.canUse}
-                >
-                  {coupon.canUse ? "Áp dụng" : "Đã hết lượt sử dụng"}
-                </Button>
-              </div>
+        <div className="mt-4 space-y-4 overflow-auto max-h-[calc(100%-100px)]">
+          {couponData && couponData.length > 0 ? (
+            couponData.map((coupon) => (
+              <CouponCard
+                key={coupon._id}
+                coupon={coupon}
+                onSelect={handleApplyCoupon}
+                isSelected={selectedCoupon && selectedCoupon._id === coupon._id}
+              />
             ))
           ) : (
             <div className="text-center text-gray-500 font-semibold">

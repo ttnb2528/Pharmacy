@@ -8,12 +8,16 @@ import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { handleRenderPriceWithCoupon } from "@/utils/Calculate.js";
 import { useModalNotification } from "@/pages/component/Notification.jsx";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 
 const CartItemBoxBuy = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { showNotification, ModalNotificationComponent } =
     useModalNotification();
+
+  const isMobile = useMediaQuery("(max-width: 640px)");
+
   const {
     cart,
     allProducts,
@@ -54,7 +58,9 @@ const CartItemBoxBuy = () => {
 
   return (
     <div
-      className="sticky top-[calc(var(--header-position-start-sticky)+12px)] hidden gap-4 md:grid"
+      className={`${
+        isMobile ? "hidden" : ""
+      } sticky top-[calc(var(--header-position-start-sticky)+12px)] hidden gap-4 md:grid`}
       style={{ "--header-position-start-sticky": "0px" }}
     >
       {/* Existing JSX code */}

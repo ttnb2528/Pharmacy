@@ -10,9 +10,15 @@ import { Link, useLocation } from "react-router-dom";
 const MobileNavBar = () => {
   const location = useLocation();
   const path = location.pathname;
+  const isOtherPage =
+    location.pathname !== "/" && location.pathname !== "/account";
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-between items-center px-2 py-2 md:hidden z-50">
+    <div
+      className={`${
+        isOtherPage ? "hidden" : "block"
+      } fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-between items-center px-2 py-2 md:hidden z-50`}
+    >
       <Link to="/" className="flex flex-col items-center justify-center w-1/5">
         <Home
           size={20}

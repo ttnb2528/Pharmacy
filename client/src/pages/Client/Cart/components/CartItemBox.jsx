@@ -24,6 +24,7 @@ import {
 import ConfirmForm from "@/pages/component/ConfirmForm.jsx";
 import { toast } from "sonner";
 import slugify from "slugify";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 
 const CartItemBox = () => {
   const { allProducts, cart, setCart, CalculateTotalItems } =
@@ -33,6 +34,7 @@ const CartItemBox = () => {
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [quantityInput, setQuantityInput] = useState({});
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     const initialQuantities = {};
@@ -292,7 +294,11 @@ const CartItemBox = () => {
         </div>
 
         <div className="grid gap-2 md:gap-6">
-          <div className="grid grid-cols-[24px_1fr] items-center gap-2 rounded-xl bg-green-50 py-4 pe-4 ps-3 md:rounded-sm md:p-2">
+          <div
+            className={`${
+              isMobile ? "hidden" : "block"
+            } grid grid-cols-[24px_1fr] items-center gap-2 rounded-xl bg-green-50 py-4 pe-4 ps-3 md:rounded-sm md:p-2`}
+          >
             <div className="relative h-6 w-6">
               <FaShippingFast className="w-6 h-6" />
             </div>
@@ -302,7 +308,7 @@ const CartItemBox = () => {
           </div>
 
           <div className="grid gap-4">
-            <div className="hidden  grid-cols-[1fr_calc(24rem/16)] items-center gap-4 md:grid">
+            <div className="hidden grid-cols-[1fr_calc(24rem/16)] items-center gap-4 md:grid">
               <div className="flex items-center justify-between space-x-4">
                 <div className="grid flex-1 items-start gap-2">
                   <p className="text-sm leading-4 text-neutral-900">Sản phẩm</p>
@@ -321,12 +327,12 @@ const CartItemBox = () => {
               </div>
               <div className="w-4"></div>
             </div>
-            <Separator />
+            {!isMobile && <Separator />}
             {allProducts.map(
               (product, index) =>
                 cart[product.id] > 0 && (
                   <div key={product._id} className="space-y-4">
-                    <div className="grid items-start justify-start gap-2 py-4 md:gap-4 md:p-0 md:grid-cols-[1fr_calc(24rem/16)] grid-cols-[calc(16rem/16)_1fr]">
+                    <div className="grid items-start justify-start gap-2 py-4 md:gap-4 md:p-0 md:grid-cols-[1fr_calc(24rem/16)] grid-cols-1">
                       <div className="space-y-2">
                         <div className="grid grid-cols-[calc(68rem/16)_1fr] items-start gap-2">
                           <div className="relative h-[calc(68rem/16)] w-[calc(68rem/16)] rounded-sm border border-neutral-100">
@@ -334,7 +340,11 @@ const CartItemBox = () => {
                               onClick={() => handleNavigateToProduct(product)}
                               className="w-full h-full cursor-pointer"
                             >
-                              <img src={product?.images[0]} alt="" className="w-full h-full object-contain"/>
+                              <img
+                                src={product?.images[0]}
+                                alt=""
+                                className="w-full h-full object-contain"
+                              />
                             </div>
                           </div>
 
@@ -347,10 +357,22 @@ const CartItemBox = () => {
                                   {product.name}
                                 </p>
                               </div>
-                              <div className="dropdown text-sm text-neutral-500">
+                              <div
+                                className={`${
+                                  isMobile ? "hidden md:block" : ""
+                                } dropdown text-sm text-neutral-500`}
+                              >
                                 Mã sản phẩm: {product.id}
                               </div>
                             </div>
+
+                            {isMobile && (
+                              <div className="mt-2">
+                                <p className="text-sm font-semibold">
+                                  Phân loại: {product.unit}
+                                </p>
+                              </div>
+                            )}
 
                             <div className="flex h-fit items-center justify-between space-x-4 md:justify-center">
                               <div className="flex flex-col justify-center md:w-[calc(160rem/16)] md:flex-row md:space-x-1">
@@ -390,7 +412,7 @@ const CartItemBox = () => {
                                       />
                                     </Button>
                                     <Input
-                                      className="border-none focus-visible:ring-0 shadow-none w-10 font-semibold text-center"
+                                      className="border-none focus-visible:ring-0 shadow-none w-11 font-semibold text-center"
                                       value={quantityInput[product.id] || ""}
                                       onKeyPress={(e) => {
                                         if (e.key === "Enter") {
@@ -442,13 +464,15 @@ const CartItemBox = () => {
                       </div>
 
                       <Button
-                        className="bg-transparent border-none focus-visible:ring-0 text-black hover:bg-transparent hover:text-green-400 shadow-none"
+                        className={`${
+                          isMobile ? "hidden md:block" : ""
+                        } bg-transparent border-none focus-visible:ring-0 text-black hover:bg-transparent hover:text-green-400 shadow-none`}
                         onClick={() => handleConfirmDeleteOpen(product)}
                       >
                         <FaTrashAlt className="w-4 h-4 mr-2" />
                       </Button>
                     </div>
-                    {index < allProducts.length - 1 && <Separator />}
+                    {index < product.length - 1 && <Separator />}
                   </div>
                 )
             )}
