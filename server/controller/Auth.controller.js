@@ -74,7 +74,7 @@ export const signup = asyncHandler(async (req, res) => {
     const { phone } = req.body;
 
     let formatPhone = await formatPhoneNumber(phone);
-    console.log("signup: ", formatPhone);
+    // console.log("signup: ", formatPhone);
 
     if (!formatPhone) {
       return res.json(
@@ -94,7 +94,9 @@ export const signup = asyncHandler(async (req, res) => {
       cart[i] = 0;
     }
 
-    const user = await Account.create({ cartData: cart }); // Không cần email/password
+    const dummyEmail = `phone_${formatPhone}_${Date.now()}@temp.com`;
+
+    const user = await Account.create({ cartData: cart, email: dummyEmail }); // Tạo tài khoản với email tạm thời
     console.log("create account: ", user);
 
     let idCus = await generateID(Customer);

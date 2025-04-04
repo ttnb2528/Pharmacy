@@ -13,11 +13,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 const MobileProductReview = ({
-  productId,
   userInfo,
-  userComment,
   hasPurchased,
   onSubmitReview,
+  userComment,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [rating, setRating] = useState(0);
@@ -85,10 +84,18 @@ const MobileProductReview = ({
       <SheetTrigger asChild>
         <Button
           variant="outline"
-          className="text-green-600 border-green-600"
+          className={`${
+            userInfo && hasPurchased
+              ? "text-green-600 border-green-600"
+              : "text-gray-400 border-gray-300"
+          }`}
           disabled={!userInfo || !hasPurchased || userComment}
         >
-          Viết đánh giá
+          {!userInfo
+            ? "Đăng nhập để đánh giá"
+            : !hasPurchased
+            ? "Cần mua sản phẩm để đánh giá"
+            : "Viết đánh giá"}
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[90vh]">
