@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 router.post("/createComment", createComment);
-router.get("/getCommentByProductId/:commentId", getCommentByProductId);
+router.get("/getCommentByProductId/:productId", getCommentByProductId);
 router.put("/editComment/:commentId", EditComment);
 
 export default router;

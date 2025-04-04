@@ -124,10 +124,11 @@ export const createComment = asyncHandler(async (req, res) => {
 
 export const getCommentByProductId = asyncHandler(async (req, res) => {
   const { productId } = req.params;
+  console.log(productId);
 
   try {
     const comments = await Comment.find({
-      id: productId,
+      productId,
     }).populate("userId", "name avatar");
 
     return res.json(jsonGenerate(StatusCode.OK, "Thành công", comments));
