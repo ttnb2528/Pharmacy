@@ -13,6 +13,8 @@ import {
 } from "@/API/index.api.js";
 import axios from "axios";
 import { useAppStore } from "@/store/index.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobileProductReview from "./MobileProductReview.jsx";
 
 const ProductComments = ({ productId }) => {
   const { userInfo } = useAppStore();
@@ -27,6 +29,7 @@ const ProductComments = ({ productId }) => {
   const [warning, setWarning] = useState(null);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [userComment, setUserComment] = useState(null);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -34,6 +37,9 @@ const ProductComments = ({ productId }) => {
         const response = await apiClient.get(
           `${GET_COMMENTS_ROUTE}/${productId}`
         );
+        console.log("product id", productId); 
+
+        console.log(response);
 
         if (response.status === 200 && response.data.status === 200) {
           // const commentFilter = response.data.data.filter(
@@ -108,27 +114,32 @@ const ProductComments = ({ productId }) => {
   };
 
   // Hàm xử lý gửi bình luận
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (mobileReviewData) => {
     if (!userInfo) {
       setShowLogin(true);
       return;
     }
 
-    if (!text.trim()) {
+    // Use data from mobile review form if provided
+    const reviewText = mobileReviewData?.text || text;
+    const reviewRating = mobileReviewData?.rating || rating;
+    const reviewImages = mobileReviewData?.images || images;
+
+    if (!reviewText.trim()) {
       toast.error("Vui lòng nhập bình luận!");
       return;
     }
 
-    if (rating < 1 || rating > 5) {
+    if (reviewRating < 1 || reviewRating > 5) {
       toast.error("Vui lòng chọn số sao từ 1 đến 5!");
       return;
     }
 
     setIsLoading(true);
     let imageUrls = [];
-    if (images.length > 0) {
+    if (reviewImages.length > 0) {
       try {
-        imageUrls = await uploadToCloudinary(images);
+        imageUrls = await uploadToCloudinary(reviewImages);
       } catch (error) {
         console.error("Error uploading images:", error);
         toast.error("Không thể upload ảnh, vui lòng thử lại!");
@@ -136,11 +147,12 @@ const ProductComments = ({ productId }) => {
         return;
       }
     }
+
     const payload = {
       productId,
       userId: userData._id,
-      text,
-      rating,
+      text: reviewText,
+      rating: reviewRating,
       images: imageUrls,
     };
 
@@ -166,15 +178,15 @@ const ProductComments = ({ productId }) => {
         setComments((prev) =>
           editCommentId
             ? prev.map((c) => {
-                console.log(c._id, editCommentId);
-                console.log(c._id === editCommentId);
-                console.log(res.data.data);
+                // console.log(c._id, editCommentId);
+                // console.log(c._id === editCommentId);
+                // console.log(res.data.data);
 
                 return c._id === editCommentId ? res.data.data : c;
               })
             : [...prev, res.data.data]
         );
-      } else {
+      } else if (res.data.data.isToxic) {
         // Nếu bình luận toxic sau khi sửa, xóa khỏi danh sách comments
         setComments((prev) => prev.filter((c) => c._id !== editCommentId));
         setWarning(res.data.data.warning);
@@ -195,7 +207,7 @@ const ProductComments = ({ productId }) => {
     } catch (error) {
       console.error("Error submitting comment:", error.response?.data || error);
       toast.error(
-        error.response?.data?.error || "Đã xảy ra lỗi khi gửi bình luận."
+        error.response?.data?.message || "Đã xảy ra lỗi khi gửi bình luận."
       );
     } finally {
       setIsLoading(false);
@@ -228,8 +240,23 @@ const ProductComments = ({ productId }) => {
 
   return (
     <div className="mt-6 bg-white p-5">
-      <h2 className="text-xl font-bold mb-4">Đánh giá sản phẩm</h2>
-      <div className="grid grid-cols-[60%,40%] gap-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold">Đánh giá sản phẩm</h2>
+
+        {isMobile && (
+          <MobileProductReview
+            productId={productId}
+            userComment={userComment}
+            userInfo={userInfo}
+            hasPurchased={hasPurchased}
+            onSubmitReview={handleSubmitComment}
+          />
+        )}
+      </div>
+
+      <div
+        className={`${isMobile ? "block" : "grid grid-cols-[60%,40%]"} gap-6`}
+      >
         {/* Phần hiển thị danh sách đánh giá */}
         <div className="space-y-4">
           {hasVisibleComments ? (
@@ -240,7 +267,7 @@ const ProductComments = ({ productId }) => {
                     <div className="flex items-center gap-2">
                       {cmt.userId?.avatar ? (
                         <img
-                          src={cmt.userId.avatar}
+                          src={cmt.userId.avatar || "/placeholder.svg"}
                           alt="avatar user"
                           className="h-8 w-8 rounded-full object-cover"
                         />
@@ -283,7 +310,7 @@ const ProductComments = ({ productId }) => {
                         {cmt?.images.map((img, idx) => (
                           <img
                             key={idx}
-                            src={img}
+                            src={img || "/placeholder.svg"}
                             alt="Comment"
                             className="w-20 h-20 object-cover rounded-md"
                           />
@@ -301,111 +328,113 @@ const ProductComments = ({ productId }) => {
           )}
         </div>
 
-        {/* Phần viết đánh giá hoặc hiển thị bình luận của user */}
-        <div className="flex flex-col gap-4">
-          {userInfo && hasPurchased ? (
-            userComment && !editCommentId ? (
-              <div
-                className={`border p-4 rounded-lg bg-gray-50 ${
-                  userComment.isToxic ? "opacity-80" : ""
-                }`}
-              >
-                <p className="font-semibold">{userData.name || "Bạn"}</p>
-                <div className="flex gap-1 mb-1">
-                  {renderStars(userComment.rating)}
-                </div>
-                <p className="text-gray-700">{userComment.text}</p>
-                {userComment.images && userComment.images.length > 0 && (
-                  <div className="flex gap-2 mt-2 flex-wrap">
-                    {userComment.images.map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img}
-                        alt="Comment"
-                        className="w-16 h-16 object-cover rounded-md"
-                      />
-                    ))}
+        {/* Phần viết đánh giá hoặc hiển thị bình luận của user - chỉ hiển thị trên desktop */}
+        {!isMobile && (
+          <div className="flex flex-col gap-4">
+            {userInfo && hasPurchased ? (
+              userComment && !editCommentId ? (
+                <div
+                  className={`border p-4 rounded-lg bg-gray-50 ${
+                    userComment.isToxic ? "opacity-80" : ""
+                  }`}
+                >
+                  <p className="font-semibold">{userData.name || "Bạn"}</p>
+                  <div className="flex gap-1 mb-1">
+                    {renderStars(userComment.rating)}
                   </div>
-                )}
-                <span className="text-sm text-gray-500">
-                  {new Date(userComment.createdAt).toLocaleString()}
-                </span>
-                {userComment.editCount < 1 && (
-                  <Button
-                    onClick={() => handleEditComment(userComment)}
-                    className="text-blue-500 hover:underline text-sm mt-2"
-                    variant="link"
-                  >
-                    Sửa
-                  </Button>
-                )}
-                {!userComment.isApproved && userComment.isToxic && (
-                  <p className="text-red-500 italic text-sm">
-                    Đánh giá của bạn chứa nội dung không phù hợp
-                  </p>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="flex gap-1">{renderStars(rating)}</div>
-                <Input
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Viết đánh giá của bạn..."
-                  className="w-full border-gray-300 focus:border-green-500"
-                  disabled={isLoading}
-                />
-                <label className="flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-200 transition">
-                  <span className="text-sm text-gray-600">
-                    Chọn ảnh (tối đa 5)
+                  <p className="text-gray-700">{userComment.text}</p>
+                  {userComment.images && userComment.images.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {userComment.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img || "/placeholder.svg"}
+                          alt="Comment"
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-500">
+                    {new Date(userComment.createdAt).toLocaleString()}
                   </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageChange}
-                    className="hidden"
+                  {userComment.editCount < 1 && (
+                    <Button
+                      onClick={() => handleEditComment(userComment)}
+                      className="text-blue-500 hover:underline text-sm mt-2"
+                      variant="link"
+                    >
+                      Sửa
+                    </Button>
+                  )}
+                  {!userComment.isApproved && userComment.isToxic && (
+                    <p className="text-red-500 italic text-sm">
+                      Đánh giá của bạn chứa nội dung không phù hợp
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-1">{renderStars(rating)}</div>
+                  <Input
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Viết đánh giá của bạn..."
+                    className="w-full border-gray-300 focus:border-green-500"
                     disabled={isLoading}
                   />
-                </label>
-                {images.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {images.map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={URL.createObjectURL(img)}
-                        alt="Preview"
-                        className="w-16 h-16 object-cover rounded-md border"
-                      />
-                    ))}
-                  </div>
-                )}
-                {warning && (
-                  <p className="text-red-500 text-sm">
-                    {warning} (Chỉ được sửa 1 lần)
-                  </p>
-                )}
-                <Button
-                  onClick={handleSubmitComment}
-                  className="bg-green-500 hover:bg-green-600 w-fit self-end"
-                  disabled={isLoading}
-                >
-                  {isLoading
-                    ? "Đang gửi..."
-                    : editCommentId
-                    ? "Cập nhật"
-                    : "Gửi đánh giá"}
-                </Button>
-              </>
-            )
-          ) : userInfo && !hasPurchased ? (
-            <p className="text-gray-500">
-              Bạn cần mua sản phẩm này để có thể đánh giá.
-            </p>
-          ) : (
-            <p className="text-gray-500">Đăng nhập để đánh giá sản phẩm.</p>
-          )}
-        </div>
+                  <label className="flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-200 transition">
+                    <span className="text-sm text-gray-600">
+                      Chọn ảnh (tối đa 5)
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      className="hidden"
+                      disabled={isLoading}
+                    />
+                  </label>
+                  {images.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={URL.createObjectURL(img) || "/placeholder.svg"}
+                          alt="Preview"
+                          className="w-16 h-16 object-cover rounded-md border"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {warning && (
+                    <p className="text-red-500 text-sm">
+                      {warning} (Chỉ được sửa 1 lần)
+                    </p>
+                  )}
+                  <Button
+                    onClick={() => handleSubmitComment()}
+                    className="bg-green-500 hover:bg-green-600 w-fit self-end"
+                    disabled={isLoading}
+                  >
+                    {isLoading
+                      ? "Đang gửi..."
+                      : editCommentId
+                      ? "Cập nhật"
+                      : "Gửi đánh giá"}
+                  </Button>
+                </>
+              )
+            ) : userInfo && !hasPurchased ? (
+              <p className="text-gray-500">
+                Bạn cần mua sản phẩm này để có thể đánh giá.
+              </p>
+            ) : (
+              <p className="text-gray-500">Đăng nhập để đánh giá sản phẩm.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
