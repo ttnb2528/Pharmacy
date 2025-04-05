@@ -28,6 +28,7 @@ import EditAddressForm from "@/pages/component/EditAddressForm.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { FaCcPaypal } from "react-icons/fa";
 import { IoIosCash } from "react-icons/io";
+import { SiVisa } from "react-icons/si";
 
 const CheckoutInfo = ({
   paymentMethod,
@@ -528,7 +529,7 @@ const CheckoutInfo = ({
             <div className="flex items-center space-x-4 space-y-0 mt-2">
               <RadioGroupItem value="VNPAY" id="VNPAY" />
               <Label htmlFor="VNPAY" className="flex items-center space-x-4">
-                <FaCcPaypal className="w-8 h-8 text-blue-600" />
+                <SiVisa className="w-8 h-8 text-blue-600" />
                 <span>VNPay</span>
               </Label>
             </div>

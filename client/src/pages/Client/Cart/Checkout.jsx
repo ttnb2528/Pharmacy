@@ -1,19 +1,19 @@
 import CheckoutInfo from "./components/CheckoutInfo.jsx";
 import { LuTicketPercent, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
 import { useContext, useState } from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useModalNotification } from "@/pages/component/Notification.jsx";
 import SelectCoupon from "./components/SelectCoupon.jsx";
@@ -31,6 +31,17 @@ import { toast } from "sonner";
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import axios from "axios";
 import { useAppStore } from "@/store/index.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobileCheckoutHeader from "./components/MobileCheckoutHeader.jsx";
+import MobileCheckoutAddress from "./components/MobileCheckoutAddress.jsx";
+import MobileCheckoutDelivery from "./components/MobileCheckoutDelivery.jsx";
+import MobileCheckoutProducts from "./components/MobileCheckoutProducts.jsx";
+import MobileCheckoutNote from "./components/MobileCheckoutNote.jsx";
+import MobileCheckoutPayment from "./components/MobileCheckoutPayment.jsx";
+// import MobileCheckoutCoupon from "./components/MobileCheckoutCoupon.jsx";
+import MobileCheckoutCoins from "./components/MobileCheckoutCoins.jsx";
+import MobileCheckoutSummary from "./components/MobileCheckoutSummary.jsx";
+import MobileCheckoutFooter from "./components/MobileCheckoutFooter.jsx";
 
 const Checkout = () => {
   const { userInfo } = useAppStore();
@@ -41,12 +52,15 @@ const Checkout = () => {
   const [note, setNote] = useState("");
   const [coinUsed, setCoinUsed] = useState(0);
   const [tempCoinInput, setTempCoinInput] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const { showNotification, ModalNotificationComponent } =
     useModalNotification();
 
   const handleApplyCoin = () => {
     const coinValue = parseInt(tempCoinInput) || 0;
+    // const coinValue = Number.parseInt(tempCoinInput) || 0
     const totalPrice = CalculateTotalPrice();
     const maxCoinAllowed = Math.floor(totalPrice * 0.5); // Giới hạn 50% giá trị đơn hàng
     const availableCoins = userInfo?.accountId?.loyaltyProgramId?.points || 0;
@@ -153,10 +167,9 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Lỗi khi tạo đơn hàng:", error);
+      toast.error("Có lỗi xảy ra khi tạo đơn hàng");
     }
   };
-
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const paypalOptions = {
     "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
@@ -277,246 +290,271 @@ const Checkout = () => {
   };
 
   return (
-    <div className="relative grid gap-2.5 md:container md:grid-cols-1 md:items-start md:gap-4 md:pt-6 lg:grid-cols-[min(80%,calc(900rem/16)),1fr] md:mb-5">
-      <CheckoutInfo
-        paymentMethod={paymentMethod}
-        setPaymentMethod={setPaymentMethod}
-        selectedAddress={selectedAddress}
-        setSelectedAddress={setSelectedAddress}
-        note={note}
-        setNote={setNote}
-      />
-      <div
-        className="sticky top-[calc(var(--header-position-start-sticky)+12px)] contents content-start gap-4 md:grid"
-        style={{ "--header-position-start-sticky": "0px" }}
-      >
-        <div>
-          <div className="flex flex-col space-y-3 rounded-sm bg-white px-4 md:p-3">
-            <div className="grid w-full grid-flow-col items-center justify-between">
-              <div className="grid grid-cols-[24px_1fr] items-center justify-start gap-1">
-                <LuTicketPercent className="w-6 h-6 text-green-500" />
-                <p className="text-sm font-semibold">Khuyến mãi</p>
-              </div>
-              <SelectCoupon
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
+    <>
+      {isMobile && <MobileCheckoutHeader />}
+
+      <div className="relative grid gap-2.5 md:container md:grid-cols-1 md:items-start md:gap-4 md:pt-6 lg:grid-cols-[min(80%,calc(900rem/16)),1fr] md:mb-5">
+        {isMobile ? (
+          <>
+            <div className={`space-y-4 ${selectedCoupon ? "mb-44" : "mb-32"}`}>
+              <MobileCheckoutAddress
+                selectedAddress={selectedAddress}
+                setSelectedAddress={setSelectedAddress}
+              />
+
+              <MobileCheckoutDelivery />
+
+              <MobileCheckoutProducts />
+
+              <MobileCheckoutNote note={note} setNote={setNote} />
+
+              <MobileCheckoutPayment
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+              />
+
+              {/* <MobileCheckoutCoupon
                 selectedCoupon={selectedCoupon}
+                setSelectedCoupon={setSelectedCoupon}
                 handleApplyCoupon={handleApplyCoupon}
+                handleRemoveCoupon={handleRemoveCoupon}
+              /> */}
+
+              <MobileCheckoutCoins
+                coinUsed={coinUsed}
+                setCoinUsed={setCoinUsed}
+                tempCoinInput={tempCoinInput}
+                setTempCoinInput={setTempCoinInput}
+                handleApplyCoin={handleApplyCoin}
+                isOpenCoinGold={isOpenCoinGold}
+                setIsOpenCoinGold={setIsOpenCoinGold}
+                formatNumber={formatNumber}
+              />
+
+              <MobileCheckoutSummary
+                CalculateTotalItems={CalculateTotalItems}
+                CalculateTotalPriceTemp={CalculateTotalPriceTemp}
+                CalculatePriceWithSale={CalculatePriceWithSale}
+                CalculateTotalPrice={CalculateTotalPrice}
+                cart={cart}
+                selectedCoupon={selectedCoupon}
+                coinUsed={coinUsed}
               />
             </div>
-            {selectedCoupon && (
-              <div className="flex items-center justify-between bg-green-100 p-2 rounded-md">
-                <span className="text-sm text-green-700">
-                  {selectedCoupon?.coupon_code}
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="p-1 h-auto"
-                  onClick={handleRemoveCoupon}
-                >
-                  <LuX className="w-4 h-4 text-green-700" />
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
 
-        <div className="order-6 md:order-3">
-          <div className="flex flex-col space-y-3 rounded-sm bg-white p-4  md:p-3">
-            <div className="grid w-full grid-flow-col items-center justify-between md:text-sm">
-              <div className="grid grid-cols-[24px_1fr] items-center justify-start gap-1">
-                <CoinSvg />
-                <p className="font-semibold text-neutral-900">Dùng Xu</p>
-              </div>
+            <MobileCheckoutFooter
+              CalculateTotalPrice={CalculateTotalPrice}
+              selectedCoupon={selectedCoupon}
+              setSelectedCoupon={setSelectedCoupon}
+              coinUsed={coinUsed}
+              paymentMethod={paymentMethod}
+              handleSubmit={handleSubmit}
+              handleVNPayPayment={handleVNPayPayment}
+              createPayPalOrder={createPayPalOrder}
+              onApprovePayPalPayment={onApprovePayPalPayment}
+              isProcessingPayment={isProcessingPayment}
+              paypalOptions={paypalOptions}
+            />
+          </>
+        ) : (
+          <>
+            <CheckoutInfo
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              selectedAddress={selectedAddress}
+              setSelectedAddress={setSelectedAddress}
+              note={note}
+              setNote={setNote}
+            />
+            <div
+              className="sticky top-[calc(var(--header-position-start-sticky)+12px)] contents content-start gap-4 md:grid"
+              style={{ "--header-position-start-sticky": "0px" }}
+            >
               <div>
-                <Dialog open={isOpenCoinGold} onOpenChange={setIsOpenCoinGold}>
-                  <DialogTrigger asChild>
-                    <Button variant="none">Tùy chọn</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Sử dụng Xu</DialogTitle>
-                      <Separator />
-                      <DialogDescription>
-                        Nhập số lượng Xu bạn muốn sử dụng cho đơn hàng này.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="pxu" className="text-right">
-                          Xu
-                        </Label>
-                        <Input
-                          id="pxu"
-                          type="number"
-                          className="col-span-3"
-                          placeholder="Nhập số lượng Xu Vàng"
-                          value={tempCoinInput}
-                          onChange={(e) => setTempCoinInput(e.target.value)} // Chỉ cập nhật giá trị tạm thời
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label className="text-right">Có sẵn</Label>
-                        <span className="col-span-3 font-semibold">
-                          {formatNumber(
-                            userInfo?.accountId?.loyaltyProgramId?.points
-                          )}{" "}
-                          Xu
-                        </span>
-                      </div>
-                      <Separator />
-                      <p className="text-sm font-medium text-neutral-900">
-                        Số Xu sử dụng phải là bội số của 1000 và không vượt quá
-                        50% giá trị đơn hàng
-                      </p>
-                      {coinUsed > 0 && (
-                        <p className="text-sm text-green-600">
-                          Đã áp dụng: {formatNumber(coinUsed)} Xu
-                        </p>
-                      )}
+                <div className="flex flex-col space-y-3 rounded-sm bg-white px-4 md:p-3">
+                  <div className="grid w-full grid-flow-col items-center justify-between">
+                    <div className="grid grid-cols-[24px_1fr] items-center justify-start gap-1">
+                      <LuTicketPercent className="w-6 h-6 text-green-500" />
+                      <p className="text-sm font-semibold">Khuyến mãi</p>
                     </div>
-                    <DialogFooter>
-                      <Button type="button" onClick={handleApplyCoin}>
-                        Áp dụng
+                    <SelectCoupon
+                      isOpen={isOpen}
+                      setIsOpen={setIsOpen}
+                      selectedCoupon={selectedCoupon}
+                      handleApplyCoupon={handleApplyCoupon}
+                    />
+                  </div>
+                  {selectedCoupon && (
+                    <div className="flex items-center justify-between bg-green-100 p-2 rounded-md">
+                      <span className="text-sm text-green-700">
+                        {selectedCoupon?.coupon_code}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="p-1 h-auto"
+                        onClick={handleRemoveCoupon}
+                      >
+                        <LuX className="w-4 h-4 text-green-700" />
                       </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="hidden w-full grid-flow-col items-center justify-between md:grid">
-              <p className="text-sm text-neutral-900">Xu Vàng hiện có</p>
-              <p className="text-sm text-neutral-900">
-                {formatNumber(userInfo?.accountId?.loyaltyProgramId?.points)} xu
-              </p>
-            </div>
+              <div className="order-6 md:order-3">
+                <div className="flex flex-col space-y-3 rounded-sm bg-white p-4 md:p-3">
+                  <div className="grid w-full grid-flow-col items-center justify-between md:text-sm">
+                    <div className="grid grid-cols-[24px_1fr] items-center justify-start gap-1">
+                      <CoinSvg />
+                      <p className="font-semibold text-neutral-900">Dùng Xu</p>
+                    </div>
+                    <div>
+                      <Button
+                        variant="none"
+                        onClick={() => setIsOpenCoinGold(true)}
+                      >
+                        Tùy chọn
+                      </Button>
+                    </div>
+                  </div>
 
-            {coinUsed > 0 && (
-              <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                <p className="text-sm text-neutral-900">Số Xu sử dụng</p>
-                <p className="text-sm text-neutral-900">
-                  {formatNumber(coinUsed)} xu
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="order-7">
-          <div className="space-y-2">
-            <div className="p-4 pb-0 grid grid-flow-col items-center gap-2 rounded-sm bg-white md:grid-flow-row md:items-start md:gap-8 md:p-4">
-              <div className="grid gap-3 md:gap-4">
-                <p className="grid text-base font-semibold text-neutral-900 md:block">
-                  Chi tiết thanh toán
-                </p>
-                <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                  <p className="text-sm text-neutral-900">
-                    <span>Tạm tính</span>
-                    <span className="ms-1 inline text-sm text-neutral-700 md:hidden">
-                      {CalculateTotalItems(cart)} sản phẩm
-                    </span>
-                  </p>
-                  <p className="text-sm text-neutral-900">
-                    {convertVND(CalculateTotalPriceTemp(cart))}
-                  </p>
-                </div>
-
-                <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                  <p className="text-sm text-neutral-900">Phí vận chuyển</p>
-                  <p className="text-sm text-neutral-900">
-                    {convertVND(30000)}
-                  </p>
-                </div>
-
-                <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                  <p className="text-sm text-neutral-900">
-                    Giảm giá vận chuyển
-                  </p>
-                  <p className="text-sm text-neutral-900">
-                    - {convertVND(30000)}
-                  </p>
-                </div>
-
-                <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                  <p className="text-sm text-neutral-900">Giảm giá ưu đãi</p>
-                  <p className="text-sm text-neutral-900">
-                    {selectedCoupon
-                      ? handleRenderPriceWithCoupon(selectedCoupon)
-                      : "-"}
-                  </p>
-                </div>
-
-                <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
-                  <p className="text-sm text-neutral-900">Giảm giá sản phẩm</p>
-                  <p className="text-sm text-neutral-900">
-                    {" "}
-                    - {convertVND(CalculatePriceWithSale(cart))}
-                  </p>
-                </div>
-
-                <Separator />
-
-                <div className="grid grid-flow-col justify-between items-center justify-items-end gap-0.5 md:grid-flow-col md:justify-between md:gap-2">
-                  <div className=" grid gap-1">
-                    <p className="hidden text-sm text-neutral-900 md:block md:text-base md:font-semibold">
-                      Tổng tiền
-                    </p>
-                    <p className="block text-sm font-bold text-neutral-900 md:hidden">
-                      Tổng thanh toán
-                    </p>
-                    <p className="hidden text-sm text-neutral-900 md:block">
-                      {CalculateTotalItems(cart)} sản phẩm
+                  <div className="hidden w-full grid-flow-col items-center justify-between md:grid">
+                    <p className="text-sm text-neutral-900">Xu Vàng hiện có</p>
+                    <p className="text-sm text-neutral-900">
+                      {formatNumber(
+                        userInfo?.accountId?.loyaltyProgramId?.points
+                      )}{" "}
+                      xu
                     </p>
                   </div>
-                  <p className="text-base font-semibold leading-5 text-red-500 no-underline md:text-2xl md:font-bold md:leading-8">
-                    {convertVND(CalculateTotalPrice() - coinUsed)}
-                  </p>
+
+                  {coinUsed > 0 && (
+                    <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                      <p className="text-sm text-neutral-900">Số Xu sử dụng</p>
+                      <p className="text-sm text-neutral-900">
+                        {formatNumber(coinUsed)} xu
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* <Button
-                className="bg-green-500 text-white hover:bg-green-600"
-                onClick={handleSubmit}
-              >
-                Đặt hàng
-              </Button> */}
+              <div className="order-7">
+                <div className="space-y-2">
+                  <div className="p-4 pb-0 grid grid-flow-col items-center gap-2 rounded-sm bg-white md:grid-flow-row md:items-start md:gap-8 md:p-4">
+                    <div className="grid gap-3 md:gap-4">
+                      <p className="grid text-base font-semibold text-neutral-900 md:block">
+                        Chi tiết thanh toán
+                      </p>
+                      <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                        <p className="text-sm text-neutral-900">
+                          <span>Tạm tính</span>
+                          <span className="ms-1 inline text-sm text-neutral-700 md:hidden">
+                            {CalculateTotalItems(cart)} sản phẩm
+                          </span>
+                        </p>
+                        <p className="text-sm text-neutral-900">
+                          {convertVND(CalculateTotalPriceTemp(cart))}
+                        </p>
+                      </div>
 
-              {paymentMethod === "COD" ? (
-                <Button
-                  className="bg-green-500 text-white hover:bg-green-600"
-                  onClick={handleSubmit}
-                >
-                  Đặt hàng
-                </Button>
-              ) : paymentMethod === "PAYPAL" ? (
-                <PayPalScriptProvider options={paypalOptions}>
-                  <PayPalButtons
-                    style={{ layout: "horizontal" }}
-                    createOrder={createPayPalOrder}
-                    onApprove={onApprovePayPalPayment}
-                    onError={(err) => {
-                      toast.error("Có lỗi xảy ra với PayPal");
-                      console.error(err);
-                    }}
-                    disabled={isProcessingPayment}
-                  />
-                </PayPalScriptProvider>
-              ) : paymentMethod === "VNPAY" ? (
-                <Button
-                  className="bg-blue-500 text-white hover:bg-blue-600"
-                  onClick={handleVNPayPayment}
-                >
-                  Thanh toán qua VNPay
-                </Button>
-              ) : null}
+                      <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                        <p className="text-sm text-neutral-900">
+                          Phí vận chuyển
+                        </p>
+                        <p className="text-sm text-neutral-900">
+                          {convertVND(30000)}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                        <p className="text-sm text-neutral-900">
+                          Giảm giá vận chuyển
+                        </p>
+                        <p className="text-sm text-neutral-900">
+                          - {convertVND(30000)}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                        <p className="text-sm text-neutral-900">
+                          Giảm giá ưu đãi
+                        </p>
+                        <p className="text-sm text-neutral-900">
+                          {selectedCoupon
+                            ? handleRenderPriceWithCoupon(selectedCoupon)
+                            : "-"}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-flow-col items-center justify-between gap-2 md:grid">
+                        <p className="text-sm text-neutral-900">
+                          Giảm giá sản phẩm
+                        </p>
+                        <p className="text-sm text-neutral-900">
+                          {" "}
+                          - {convertVND(CalculatePriceWithSale(cart))}
+                        </p>
+                      </div>
+
+                      <Separator />
+
+                      <div className="grid grid-flow-col justify-between items-center justify-items-end gap-0.5 md:grid-flow-col md:justify-between md:gap-2">
+                        <div className=" grid gap-1">
+                          <p className="hidden text-sm text-neutral-900 md:block md:text-base md:font-semibold">
+                            Tổng tiền
+                          </p>
+                          <p className="block text-sm font-bold text-neutral-900 md:hidden">
+                            Tổng thanh toán
+                          </p>
+                          <p className="hidden text-sm text-neutral-900 md:block">
+                            {CalculateTotalItems(cart)} sản phẩm
+                          </p>
+                        </div>
+                        <p className="text-base font-semibold leading-5 text-red-500 no-underline md:text-2xl md:font-bold md:leading-8">
+                          {convertVND(CalculateTotalPrice() - coinUsed)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {paymentMethod === "COD" ? (
+                      <Button
+                        className="bg-green-500 text-white hover:bg-green-600"
+                        onClick={handleSubmit}
+                      >
+                        Đặt hàng
+                      </Button>
+                    ) : paymentMethod === "PAYPAL" ? (
+                      <PayPalScriptProvider options={paypalOptions}>
+                        <PayPalButtons
+                          style={{ layout: "horizontal" }}
+                          createOrder={createPayPalOrder}
+                          onApprove={onApprovePayPalPayment}
+                          onError={(err) => {
+                            toast.error("Có lỗi xảy ra với PayPal");
+                            console.error(err);
+                          }}
+                          disabled={isProcessingPayment}
+                        />
+                      </PayPalScriptProvider>
+                    ) : paymentMethod === "VNPAY" ? (
+                      <Button
+                        className="bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleVNPayPayment}
+                      >
+                        Thanh toán qua VNPay
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
       {ModalNotificationComponent}
-    </div>
+    </>
   );
 };
 
