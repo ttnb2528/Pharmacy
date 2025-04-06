@@ -5,13 +5,13 @@ import { apiClient } from "@/lib/api-client.js";
 import Loading from "@/pages/component/Loading.jsx";
 
 // UI Components
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -41,10 +41,16 @@ import { normalizeWhitespace } from "@/utils/normalizeWhiteSpace.jsx";
 import { getInitials } from "@/utils/getInitialName.jsx";
 import { useAppStore } from "@/store/index.js";
 
+// Mobile components
+
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobilePersonalInfoHeader from "./MobilePersonalInfoHeader.jsx";
+
 const PersonalInfo = () => {
   const { userInfo, setUserInfo } = useAppStore();
   // const { updateUserData } = useContext(PharmacyContext);
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const navigate = useNavigate();
   const [date, setDate] = useState("");
@@ -214,237 +220,372 @@ const PersonalInfo = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <div>
+
+      {/* Mobile header */}
+      {isMobile && <MobilePersonalInfoHeader />}
+
+      {/* Desktop header */}
+      {!isMobile && (
         <div className="items-center space-x-4 mb-4 hidden md:block">
           <div className="flex-1">
             <h1 className="text-xl font-semibold text-neutral-900">
               Thông tin cá nhân
             </h1>
           </div>
-          <div></div>
         </div>
+      )}
 
-        <div>
-          <div className="rounded-lg bg-white p-6">
-            {/* set image */}
-            <div className="mb-3">
-              <span className="text-sm font-semibold text-neutral-900">
-                Ảnh đại diện
-              </span>
-              <div
-                className="mt-2 flex items-center gap-6 relative "
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-              >
-                {/* logic set image */}
-                <Avatar className="w-20 h-20">
-                  {userInfo?.avatar ? (
-                    <AvatarImage
-                      src={avatar}
-                      alt="User avatar"
-                      className="object-cover w-full h-full bg-black"
-                    />
-                  ) : (
-                    // <AvatarFallback className="border border-green-400 bg-green-400 text-white">
-                    //   <span className="text-xl font-bold">
-                    //     {userInfo?.name ? userInfo.name : "KH"}
-                    //   </span>
-                    // </AvatarFallback>
-
-                    <div className="uppercase h-20 w-20 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
-                      {userInfo?.name ? getInitials(userInfo.name) : "KH"}
-                    </div>
-                  )}
-                </Avatar>
-                {hovered && (
+      <div className={`rounded-lg bg-white ${isMobile ? "p-4" : "p-6"}`}>
+        {/* set image */}
+        <div className="mb-5">
+          <span className="text-sm font-semibold text-neutral-900">
+            Ảnh đại diện
+          </span>
+          <div
+            className={`mt-3 ${
+              isMobile
+                ? "flex flex-col items-center"
+                : "flex items-center gap-6"
+            } relative`}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
+            <div className="relative">
+              {/* logic set image */}
+              <Avatar className={`${isMobile ? "w-24 h-24" : "w-20 h-20"}`}>
+                {userInfo?.avatar ? (
+                  <img
+                    src={avatar || "/placeholder.svg"}
+                    alt="User avatar"
+                    className="object-cover w-full h-full bg-black rounded-full"
+                  />
+                ) : (
                   <div
-                    className="absolute inset-0 top-1 flex items-center w-20 h-20 justify-center bg-black/50 ring-fuchsia-50 rounded-full"
-                    onClick={
-                      userInfo?.avatar
-                        ? handleDeleteImage
-                        : handleFileInputClick
-                    }
+                    className={`uppercase ${
+                      isMobile ? "h-24 w-24" : "h-20 w-20"
+                    } text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full`}
                   >
-                    {userInfo?.avatar ? (
-                      <FaTrash className="text-white text-xl cursor-pointer" />
-                    ) : (
-                      <FaPlus className="text-white text-xl cursor-pointer" />
-                    )}
+                    {userInfo?.name ? getInitials(userInfo.name) : "KH"}
                   </div>
                 )}
+              </Avatar>
+              {hovered && (
+                <div
+                  className={`absolute inset-0 top-1 flex items-center ${
+                    isMobile ? "w-24 h-24" : "w-20 h-20"
+                  } justify-center bg-black/50 ring-fuchsia-50 rounded-full`}
+                  onClick={
+                    userInfo?.avatar ? handleDeleteImage : handleFileInputClick
+                  }
+                >
+                  {userInfo?.avatar ? (
+                    <FaTrash className="text-white text-xl cursor-pointer" />
+                  ) : (
+                    <FaPlus className="text-white text-xl cursor-pointer" />
+                  )}
+                </div>
+              )}
+            </div>
+            {/* logic set image */}
+            {/* <Avatar className="w-20 h-20">
+              {userInfo?.avatar ? (
+                <AvatarImage
+                  src={avatar}
+                  alt="User avatar"
+                  className="object-cover w-full h-full bg-black"
+                />
+              ) : (
+                // <AvatarFallback className="border border-green-400 bg-green-400 text-white">
+                //   <span className="text-xl font-bold">
+                //     {userInfo?.name ? userInfo.name : "KH"}
+                //   </span>
+                // </AvatarFallback>
+
+                <div className="uppercase h-20 w-20 text-xl font-bold border border-green-400 bg-green-400 text-white flex items-center justify-center rounded-full ">
+                  {userInfo?.name ? getInitials(userInfo.name) : "KH"}
+                </div>
+              )}
+            </Avatar> */}
+            {/* {hovered && (
+              <div
+                className="absolute inset-0 top-1 flex items-center w-20 h-20 justify-center bg-black/50 ring-fuchsia-50 rounded-full"
+                onClick={
+                  userInfo?.avatar ? handleDeleteImage : handleFileInputClick
+                }
+              >
+                {userInfo?.avatar ? (
+                  <FaTrash className="text-white text-xl cursor-pointer" />
+                ) : (
+                  <FaPlus className="text-white text-xl cursor-pointer" />
+                )}
+              </div>
+            )} */}
+
+            <div className={isMobile ? "mt-3 text-center" : ""}>
+              <div className={`mb-2 flex ${isMobile ? "justify-center" : ""}`}>
+                <Button
+                  className="bg-neutral-300 text-neutral-900 hover:bg-neutral-200"
+                  onClick={handleFileInputClick}
+                >
+                  <span>Cập nhật ảnh mới</span>
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  id="picture"
+                  className="hidden"
+                  accept=".jpg, .jpeg, .png, .heic, .heif"
+                  type="file"
+                  onChange={handleAvatarChange}
+                ></input>
+              </div>
+              <div
+                className={`grid text-sm font-medium text-neutral-700 ${
+                  isMobile ? "text-center" : ""
+                }`}
+              >
+                <p>Dung lượng file tối đa 5 MB.</p>
+                <p>Định dạng: .JPEG, .PNG</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form>
+          {isMobile ? (
+            // Mobile layout - single column
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Họ và tên</Label>
+                <Input
+                  id="fullName"
+                  placeholder="Họ và Tên"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dob">Ngày Sinh</Label>
                 <div>
-                  <div className="mb-2 flex">
-                    <Button
-                      className="bg-neutral-300 text-neutral-900 hover:bg-neutral-200"
-                      onClick={handleFileInputClick}
-                    >
-                      <span>Cập nhật ảnh mới</span>
-                    </Button>
-                    <input
-                      ref={fileInputRef}
-                      id="picture"
-                      className="hidden"
-                      accept=".jpg, .jpeg, .png, .heic, .heif"
-                      type="file"
-                      onChange={handleAvatarChange}
-                    ></input>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="dob"
+                        variant={"outline"}
+                        className={cn(
+                          "justify-start text-left font-normal w-full",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? (
+                          format(date, "dd/MM/yyyy", {
+                            locale: vi,
+                          })
+                        ) : (
+                          <span>Ngày sinh</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <VietnameseCalendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender">Giới Tính</Label>
+                <Select onValueChange={setGender} value={gender}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn giới tính" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Nam">Nam</SelectItem>
+                    <SelectItem value="Nữ">Nữ</SelectItem>
+                    <SelectItem value="Khác">Khác</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Số điện thoại</Label>
+                <div className="p-3 bg-gray-50 rounded-md text-gray-500">
+                  {hidePhone(phone)}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                  <span className="text-gray-700 break-all">
+                    {userInfo?.accountId?.email || "Chưa cập nhật"}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-green-500 p-0"
+                    onClick={() => navigate("/account/info/update-email")}
+                  >
+                    <span>Cập nhật</span>
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Mật khẩu</Label>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                  <span className="text-gray-700">Tạo mật khẩu</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-green-500 p-0"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate("/account/info/update-password");
+                    }}
+                  >
+                    <span>Cập nhật</span>
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                disabled={isDisabled()}
+                className="w-full mt-4 bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700"
+                onClick={handleSubmit}
+              >
+                Lưu thay đổi
+              </Button>
+            </div>
+          ) : (
+            // Desktop layout - two columns
+            <div className="grid grid-cols-2 gap-5">
+              <div className="col-span-1 grid gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Họ và tên</Label>
+                  <Input
+                    id="fullName"
+                    placeholder="Họ và Tên"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dob">Ngày Sinh</Label>
+                  <div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="dob"
+                          variant={"outline"}
+                          className={cn(
+                            "justify-start text-left font-normal w-full",
+                            !date && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? (
+                            format(date, "dd/MM/yyyy", {
+                              locale: vi,
+                            })
+                          ) : (
+                            <span>Ngày sinh</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <VietnameseCalendar
+                          mode="single"
+                          selected={date}
+                          onSelect={setDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
-                  <div className="grid text-sm font-medium text-neutral-700">
-                    <p>Dung lượng file tối đa 5 MB.</p>
-                    <p>Định dạng: .JPEG, .PNG</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Giới Tính</Label>
+                  <Select onValueChange={setGender} value={gender}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn giới tính" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Nam">Nam</SelectItem>
+                      <SelectItem value="Nữ">Nữ</SelectItem>
+                      <SelectItem value="Khác">Khác</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="col-span-1 grid gap-3 border-l border-divider pl-5">
+                <div className="flex justify-between">
+                  <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
+                    <p className="">Số điện thoại</p>
+                    <p className="font-medium text-neutral-400 break-all">
+                      {hidePhone(phone)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
+                    <p>Email</p>
+                    <p className="font-medium text-neutral-600 break-all">
+                      {userInfo?.accountId?.email || "Chưa cập nhật"}
+                    </p>
+                  </div>
+                  <div
+                    className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
+                    onClick={() => navigate("/account/info/update-email")}
+                  >
+                    <span className="cursor-pointer text-green-500">
+                      Cập nhật
+                    </span>
+                    <FaChevronRight className="mt-1 text-green-500" />
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
+                    <p className="">Mật khẩu</p>
+                    <div className="text-sm font-medium">Tạo mật khẩu</div>
+                  </div>
+                  <div
+                    className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
+                    onClick={() => navigate("/account/info/update-password")}
+                  >
+                    <span className="cursor-pointer text-green-500">
+                      Cập nhật
+                    </span>
+                    <FaChevronRight className="mt-1 text-green-500" />
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <form>
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="col-span-1 grid gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Họ và tên</Label>
-                      <Input
-                        id="fullName"
-                        placeholder="Họ và Tên"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
+          )}
 
-                    <div className="space-y-2">
-                      <Label htmlFor="dob">Ngày Sinh</Label>
-                      <div>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              id="dob"
-                              variant={"outline"}
-                              className={cn(
-                                "justify-start text-left font-normal w-full",
-                                !date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {date ? (
-                                format(date, "dd/MM/yyyy", {
-                                  locale: vi,
-                                })
-                              ) : (
-                                <span>Ngày sinh</span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <VietnameseCalendar
-                              mode="single"
-                              selected={date}
-                              onSelect={setDate}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="gender">Giới Tính</Label>
-                      <Select onValueChange={setGender} value={gender}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn giới tính" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Nam">Nam</SelectItem>
-                          <SelectItem value="Nữ">Nữ</SelectItem>
-                          <SelectItem value="Khác">Khác</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="col-span-1 grid gap-3 border-l border-divider pl-5">
-                    {/* <div className="flex justify-between">
-                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
-                        <p className="">Số điện thoại</p>
-                        <p className="font-medium text-neutral-600 break-all">
-                          **** *** 764
-                        </p>
-                      </div>
-                    </div> */}
-
-                    <div className="flex justify-between">
-                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
-                        <p className="">Số điện thoại</p>
-                        <p className="font-medium text-neutral-400 break-all">
-                          {hidePhone(phone)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* <div className="space-y-2">
-                      <Label htmlFor="phone">Số điện thoại</Label>
-                      <Input
-                        disabled
-                        id="phone"
-                        placeholder="Số điện thoại"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      />
-                    </div> */}
-
-                    <div className="flex justify-between">
-                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
-                        <p>Email</p>
-                        <p className="font-medium text-neutral-600 break-all">
-                          {userInfo?.accountId?.email || "Chưa cập nhật"}
-                        </p>
-                      </div>
-                      <div
-                        className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
-                        onClick={() => navigate("/account/info/update-email")}
-                      >
-                        <span className="cursor-pointer text-green-500">
-                          Cập nhật
-                        </span>
-                        <FaChevronRight className="mt-1 text-green-500" />
-                      </div>
-                    </div>
-
-                    {/* <div className="flex justify-between">
-                      <div className="flex-1">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" placeholder="Email" />
-                      </div>
-                    </div> */}
-
-                    <div className="flex justify-between">
-                      <div className="flex flex-1 flex-col gap-1 text-sm font-semibold text-neutral-900">
-                        <p className="">Mật khẩu</p>
-                        <div className="text-sm font-medium">Tạo mật khẩu</div>
-                      </div>
-                      <div
-                        className="flex-2 flex cursor-pointer justify-end gap-1 text-sm font-normal"
-                        onClick={() =>
-                          navigate("/account/info/update-password")
-                        }
-                      >
-                        <span className="cursor-pointer text-green-500">
-                          Cập nhật
-                        </span>
-                        <FaChevronRight className="mt-1 text-green-500" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  disabled={isDisabled()}
-                  className="mt-10 bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700"
-                  onClick={handleSubmit}
-                >
-                  Lưu thay đổi
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
+          {!isMobile && (
+            <Button
+              disabled={isDisabled()}
+              className="mt-10 bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700"
+              onClick={handleSubmit}
+            >
+              Lưu thay đổi
+            </Button>
+          )}
+        </form>
       </div>
     </div>
   );

@@ -14,6 +14,9 @@ import { apiClient } from "@/lib/api-client.js";
 import { UPDATE_PASSWORD_ROUTE } from "@/API/index.api.js";
 import { isDisableAll } from "@/utils/isDisableAll.jsx";
 import { useAppStore } from "@/store/index.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobilePersonalInfoHeader from "./MobilePersonalInfoHeader.jsx";
+import { Label } from "@/components/ui/label.jsx";
 
 const UpdatePassword = () => {
   // const { userData } = useContext(PharmacyContext);
@@ -24,6 +27,7 @@ const UpdatePassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 640px)");
   const navigate = useNavigate();
 
   const toggleNewPasswordVisibility = () =>
@@ -81,8 +85,11 @@ const UpdatePassword = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <div>
-        <div className=" hidden md:block">
+      {/* Mobile header */}
+      {isMobile && <MobilePersonalInfoHeader title="Tạo mật khẩu mới" />}
+
+      {!isMobile && (
+        <div className="hidden md:block">
           <div className="flex items-center text-xl font-semibold">
             <Button
               className="bg-transparent shadow-none text-black hover:bg-transparent"
@@ -95,84 +102,94 @@ const UpdatePassword = () => {
             <p>Tạo mật khẩu mới</p>
           </div>
         </div>
+      )}
 
-        <div className="rounded-lg bg-white p-4 md:p-6">
-          <div className="mb-4 text-sm font-medium">
-            Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác
-            Bạn có thể tạo mật khẩu từ 8 - 16 kí tự
-          </div>
-          <form className="max-w-[416px] block">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="new-password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mật khẩu mới
-                </label>
-                <div className="relative">
-                  <Input
-                    id="new-password"
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="pr-10"
-                    autoComplete="new-password"
-                  />
-                  <Button
-                    type="button"
-                    className="absolute shadow-none right-0 top-0 h-full px-3 py-2 bg-transparent hover:bg-transparent"
-                    onClick={toggleNewPasswordVisibility}
-                  >
-                    {showNewPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <FaEye className="h-4 w-4 text-gray-500" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="confirm-password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Nhập lại mật khẩu mới
-                </label>
-                <div className="relative">
-                  <Input
-                    id="confirm-password"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pr-10"
-                    autoComplete="new-password"
-                  />
-                  <Button
-                    type="button"
-                    className="absolute shadow-none right-0 top-0 h-full px-3 py-2 bg-transparent hover:bg-transparent"
-                    onClick={toggleConfirmPasswordVisibility}
-                  >
-                    {showConfirmPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <FaEye className="h-4 w-4 text-gray-500" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="mt-10">
-              <Button
-                disabled={isDisable}
-                onClick={handleChangePassword}
-                className="bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700"
-              >
-                Lưu thay đổi
-              </Button>
-            </div>
-          </form>
+      <div className={`rounded-lg bg-white ${isMobile ? "p-4" : "p-6"}`}>
+        <div className="mb-4 text-sm font-medium">
+          Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác.
+          Bạn có thể tạo mật khẩu từ 8 - 16 kí tự.
         </div>
+
+        <form
+          className={`${isMobile ? "w-full" : "max-w-[416px]"} block`}
+          onSubmit={(e) => e.preventDefault()} // Ngăn form submit theo cách thông thường
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="new-password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mật khẩu mới
+              </Label>
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="pr-10"
+                  autoComplete="new-password"
+                />
+                <Button
+                  type="button"
+                  className="absolute shadow-none right-0 top-0 h-full px-3 py-2 bg-transparent hover:bg-transparent"
+                  onClick={toggleNewPasswordVisibility}
+                >
+                  {showNewPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-500" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="confirm-password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Nhập lại mật khẩu mới
+              </Label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pr-10"
+                  autoComplete="new-password"
+                />
+                <Button
+                  type="button"
+                  className="absolute shadow-none right-0 top-0 h-full px-3 py-2 bg-transparent hover:bg-transparent"
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  {showConfirmPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-500" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <Button
+            disabled={isDisable}
+            onClick={(e) => {
+              e.preventDefault(); // Ngăn sự kiện click gây submit form
+              handleChangePassword(e);
+            }}
+            type="button" // Đã đúng, nhưng đảm bảo lại một lần nữa
+            className={`${
+              isMobile ? "w-full" : ""
+            } mt-10 bg-green-500 hover:bg-green-600 disabled:bg-neutral-100 disabled:text-neutral-700`}
+          >
+            Lưu thay đổi
+          </Button>
+        </form>
       </div>
     </div>
   );
