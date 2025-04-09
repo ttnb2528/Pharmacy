@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { useMediaQuery } from "@/hook/use-media-query.js";
 import { apiClient } from "@/lib/api-client.js";
-import AddAddressForm from "@/pages/component/AddAddressForm.jsx";
+// import AddAddressForm from "@/pages/component/AddAddressForm.jsx";
 import ConfirmForm from "@/pages/component/ConfirmForm.jsx";
-import EditAddressForm from "@/pages/component/EditAddressForm.jsx";
+// import EditAddressForm from "@/pages/component/EditAddressForm.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { useContext, useState } from "react";
 
@@ -20,6 +20,10 @@ import { CiCirclePlus } from "react-icons/ci";
 import { IoTrashOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import MobileAccountHeaderChild from "./MobileAccountHeaderChild.jsx";
+import { Plus } from "lucide-react";
+import MobileAddressItem from "./MobileAddressItem.jsx";
+import MobileAddressForm from "./MobileAddressForm.jsx";
+import MobileAddressDeleteConfirm from "./MobileAddressDeleteConfirm.jsx";
 
 const Addresses = () => {
   const { addressData, setAddressData } = useContext(PharmacyContext);
@@ -185,16 +189,41 @@ const Addresses = () => {
             className="bg-gray-100 text-green-500 shadow-none border-green-500 border hover:bg-gray-100 hover:border-green-400 hover:text-green-400"
             onClick={handleOpenAddDialog}
           >
-            <CiCirclePlus />
-            <span className="ml-1">Thêm địa chỉ</span>
+            <CiCirclePlus className="mr-1" />
+            <span>Thêm địa chỉ</span>
           </Button>
         </div>
       </div>
-      <div className="bg-white px-4 md:rounded-lg md:px-6  md:py-3">
+
+      <div
+        className={`bg-white ${
+          isMobile ? "px-4 pb-3" : "rounded-lg px-6 py-3"
+        }`}
+      >
         {/* child */}
         {addressData?.length === 0 ? (
-          <div className="text-center text-neutral-500 py-3">
-            Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới.
+          <div className="text-center text-neutral-500 py-8">
+            <p>Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới.</p>
+            <Button
+              className="mt-4 bg-green-500 hover:bg-green-600 text-white"
+              onClick={handleOpenAddDialog}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm địa chỉ mới
+            </Button>
+          </div>
+        ) : isMobile ? (
+          // Mobile address list
+          <div className="divide-y">
+            {addressData.map((address) => (
+              <MobileAddressItem
+                key={address._id}
+                address={address}
+                onEdit={() => handleEditAddress(address)}
+                onDelete={() => handleConfirmDeleteOpen(address)}
+                // onSetDefault={() => handleSetDefaultAddress(address._id)}
+              />
+            ))}
           </div>
         ) : (
           addressData.map((address) => (
@@ -246,7 +275,23 @@ const Addresses = () => {
           ))
         )}
       </div>
-      {isAddOpen && (
+
+      {/* Mobile add button */}
+      {isMobile && addressData && addressData.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden">
+          <Button
+            className="w-full bg-green-500 hover:bg-green-600 text-white"
+            onClick={handleOpenAddDialog}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm địa chỉ mới
+          </Button>
+        </div>
+      )}
+
+      {/* Add/Edit address form - uses sheet on mobile, dialog on desktop */}
+
+      {/* {isAddOpen && (
         <AddAddressForm
           open={isAddOpen}
           onClose={() => {
@@ -257,10 +302,22 @@ const Addresses = () => {
           setAddress={setNewAddress}
           handleSubmit={handleAddress}
         />
-      )}
+      )} */}
+      <MobileAddressForm
+        isOpen={isAddOpen || isEditing}
+        onClose={() => {
+          setIsAddOpen(false);
+          setIsEditing(false);
+        }}
+        address={newAddress}
+        setAddress={setNewAddress}
+        isEditing={isEditing}
+        onSubmit={handleAddress}
+        isMobile={isMobile}
+      />
 
       {/* Edit address dialog */}
-      {isEditing && (
+      {/* {isEditing && (
         <EditAddressForm
           open={isEditing}
           onClose={() => {
@@ -271,15 +328,30 @@ const Addresses = () => {
           setAddress={setNewAddress}
           handleSubmit={handleAddress}
         />
-      )}
+      )} */}
 
       {/* Confirm delete dialog */}
-      <ConfirmForm
+      {/* <ConfirmForm
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
         handleConfirm={() => handleDeleteAddress(confirmDeleteId)}
         type={"address"}
-      />
+      /> */}
+      {/* Delete confirmation */}
+      {isMobile ? (
+        <MobileAddressDeleteConfirm
+          isOpen={confirmDelete}
+          onClose={() => setConfirmDelete(false)}
+          onConfirm={() => handleDeleteAddress(confirmDeleteId)}
+        />
+      ) : (
+        <ConfirmForm
+          open={confirmDelete}
+          onClose={() => setConfirmDelete(false)}
+          handleConfirm={() => handleDeleteAddress(confirmDeleteId)}
+          type={"address"}
+        />
+      )}
     </div>
   );
 };
