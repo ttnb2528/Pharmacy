@@ -2,17 +2,8 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const MobilePersonalInfoHeader = ({ title = "Thông tin cá nhân" }) => {
+const MobileAccountHeaderChild = ({ title = "Địa chỉ nhận hàng" }) => {
   const navigate = useNavigate();
-
-  const handleBack = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    navigate(-1);
-  };
 
   return (
     <div className="sticky top-0 z-10 bg-white p-3 flex items-center justify-between border-b md:hidden">
@@ -20,8 +11,7 @@ const MobilePersonalInfoHeader = ({ title = "Thông tin cá nhân" }) => {
         variant="ghost"
         size="icon"
         className="h-9 w-9"
-        type="button"
-        onClick={handleBack}
+        onClick={() => navigate(-1)}
       >
         <ArrowLeft className="h-5 w-5" />
       </Button>
@@ -31,4 +21,4 @@ const MobilePersonalInfoHeader = ({ title = "Thông tin cá nhân" }) => {
   );
 };
 
-export default MobilePersonalInfoHeader;
+export default MobileAccountHeaderChild;

@@ -44,7 +44,7 @@ import { useAppStore } from "@/store/index.js";
 // Mobile components
 
 import { useMediaQuery } from "@/hook/use-media-query.js";
-import MobilePersonalInfoHeader from "./MobilePersonalInfoHeader.jsx";
+import MobileAccountHeaderChild from "./MobileAccountHeaderChild.jsx";
 
 const PersonalInfo = () => {
   const { userInfo, setUserInfo } = useAppStore();
@@ -222,7 +222,7 @@ const PersonalInfo = () => {
       {isLoading && <Loading />}
 
       {/* Mobile header */}
-      {isMobile && <MobilePersonalInfoHeader />}
+      {isMobile && <MobileAccountHeaderChild />}
 
       {/* Desktop header */}
       {!isMobile && (

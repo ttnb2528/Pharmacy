@@ -15,7 +15,7 @@ import { UPDATE_PASSWORD_ROUTE } from "@/API/index.api.js";
 import { isDisableAll } from "@/utils/isDisableAll.jsx";
 import { useAppStore } from "@/store/index.js";
 import { useMediaQuery } from "@/hook/use-media-query.js";
-import MobilePersonalInfoHeader from "./MobilePersonalInfoHeader.jsx";
+import MobileAccountHeaderChild from "./MobileAccountHeaderChild.jsx";
 import { Label } from "@/components/ui/label.jsx";
 
 const UpdatePassword = () => {
@@ -86,7 +86,7 @@ const UpdatePassword = () => {
     <div>
       {isLoading && <Loading />}
       {/* Mobile header */}
-      {isMobile && <MobilePersonalInfoHeader title="Tạo mật khẩu mới" />}
+      {isMobile && <MobileAccountHeaderChild title="Tạo mật khẩu mới" />}
 
       {!isMobile && (
         <div className="hidden md:block">

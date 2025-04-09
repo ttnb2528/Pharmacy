@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { apiClient } from "@/lib/api-client.js";
 import { GET_CURRENT_USER_ORDER_ROUTE } from "@/API/index.api.js";
+import { useMediaQuery } from "@/hook/use-media-query.js";
+import MobileAccountHeaderChild from "./MobileAccountHeaderChild.jsx";
 
 const orderStatuses = [
   { value: "completed", label: "Hoàn thành" },
@@ -46,6 +48,8 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
+  const isMobile = useMediaQuery("(max-width: 640px)");
+
   useEffect(() => {
     const resOrders = async () => {
       try {
@@ -75,28 +79,32 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-semibold mb-6">Lịch sử đơn hàng</h2>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2">
-          <TabsTrigger value="all">Tất cả</TabsTrigger>
-          {orderStatuses.map((status) => (
-            <TabsTrigger key={status.value} value={status.value}>
-              {status.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <TabsContent value={activeTab} className="mt-6">
-          {filteredOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              onViewDetails={handleViewDetails}
-            />
-          ))}
-        </TabsContent>
-      </Tabs>
-    </div>
+    <>
+      {isMobile && <MobileAccountHeaderChild title="Lịch sử mua hàng" />}
+
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-semibold mb-6">Lịch sử đơn hàng</h2>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2">
+            <TabsTrigger value="all">Tất cả</TabsTrigger>
+            {orderStatuses.map((status) => (
+              <TabsTrigger key={status.value} value={status.value}>
+                {status.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value={activeTab} className="mt-6">
+            {filteredOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
   );
 };
 

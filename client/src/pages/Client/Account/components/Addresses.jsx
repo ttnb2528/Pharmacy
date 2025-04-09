@@ -7,6 +7,7 @@ import {
 } from "@/API/index.api.js";
 import { Button } from "@/components/ui/button.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 import { apiClient } from "@/lib/api-client.js";
 import AddAddressForm from "@/pages/component/AddAddressForm.jsx";
 import ConfirmForm from "@/pages/component/ConfirmForm.jsx";
@@ -18,6 +19,7 @@ import { useContext, useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoTrashOutline } from "react-icons/io5";
 import { toast } from "sonner";
+import MobileAccountHeaderChild from "./MobileAccountHeaderChild.jsx";
 
 const Addresses = () => {
   const { addressData, setAddressData } = useContext(PharmacyContext);
@@ -41,6 +43,8 @@ const Addresses = () => {
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const handleAddress = async (e) => {
     e.preventDefault();
@@ -167,6 +171,9 @@ const Addresses = () => {
   return (
     <div>
       {isLoading && <Loading />}
+
+      {isMobile && <MobileAccountHeaderChild />}
+
       <div className="items-center space-x-4 mb-4 hidden flex-row md:flex">
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-neutral-900">
