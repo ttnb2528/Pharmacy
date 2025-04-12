@@ -29,6 +29,8 @@ import { GET_USER_INFO } from "./API/index.api.js";
 import { useAppStore } from "./store/index.js";
 import PaymentReturn from "./pages/Client/Payment/PaymentReturn.jsx";
 import UpdateEmail from "./pages/Client/Account/components/UpdateEmail.jsx";
+import AboutPharmacy from "./pages/Client/About/AboutPharmacy.jsx";
+import Setting from "./pages/Client/Setting/Setting.jsx";
 
 const App = () => {
   const { userInfo, setUserInfo } = useAppStore();
@@ -104,6 +106,14 @@ const App = () => {
               },
             ])
             .flat() || []),
+          {
+            path: "/about",
+            element: <AboutPharmacy />,
+          },
+          {
+            path: "/settings",
+            element: <Setting />,
+          },
         ],
       },
     ];
@@ -165,6 +175,10 @@ const App = () => {
           {
             path: "info/update-email",
             element: <UpdateEmail />,
+          },
+          {
+            path: "settings",
+            element: <Setting />,
           },
         ],
       },

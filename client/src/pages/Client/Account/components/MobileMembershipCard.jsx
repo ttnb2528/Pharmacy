@@ -20,7 +20,7 @@ const MobileMembershipCard = () => {
   const rank = userInfo?.accountId?.loyaltyProgramId?.rank;
 
   return (
-    <div className="px-4 pb-4 md:hidden">
+    <div className="px-4 py-4 md:hidden">
       <div
         className="rounded-xl bg-cover px-3 py-4"
         style={{

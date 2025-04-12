@@ -17,6 +17,7 @@ import { LuNotepadText } from "react-icons/lu";
 import { GrMapLocation } from "react-icons/gr";
 import { PiMedal } from "react-icons/pi";
 import { PiHandCoins } from "react-icons/pi";
+import { IoSettingsOutline } from "react-icons/io5";
 import { getInitials } from "@/utils/getInitialName.jsx";
 import {
   CalculatePercentProgress,
@@ -240,6 +241,24 @@ const AccountSmall = () => {
           >
             <PiMedal className="mr-2" />
             Quy chế tích điểm
+          </NavLink>
+        </div>
+
+        <Separator />
+
+        <div>
+          <NavLink
+            to="/account/settings"
+            className={({ isActive }) =>
+              `px-4 py-3 flex items-center ${
+                isActive
+                  ? "bg-green-50 text-green-500 font-semibold"
+                  : "hover:bg-accent"
+              }`
+            }
+          >
+            <IoSettingsOutline className="mr-2" />
+            Cài đặt
           </NavLink>
         </div>
       </div>

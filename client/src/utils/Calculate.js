@@ -71,5 +71,8 @@ export const CalculatePercentProgressGold = (rank, totalSpending) => {
     if (totalSpending > 8000000) return 100;
     return (totalSpending / 8000000) * 100;
   }
-  return 100;
+  if (rank === "Kim cương") {
+    return 100;
+  }
+  return 0;
 };

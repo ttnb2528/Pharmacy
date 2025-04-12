@@ -6,8 +6,11 @@ import { PiMedal, PiHandCoins } from "react-icons/pi";
 import { LuTicketPercent } from "react-icons/lu";
 import { IoInformationCircleOutline, IoSettingsOutline } from "react-icons/io5";
 import { BiCategoryAlt } from "react-icons/bi";
+import MobileNav from "@/pages/component/Navbar/components/mobileNav.jsx";
+import { useState } from "react";
 
 const MobileAccountMenu = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="bg-gray-50 pb-20 md:hidden">
       {/* Main sections */}
@@ -124,18 +127,16 @@ const MobileAccountMenu = () => {
           <span>Cài đặt</span>
         </NavLink>
 
-        <NavLink
-          to="/categories"
-          className={({ isActive }) =>
-            `flex items-center py-3 ${
-              isActive ? "text-green-500 font-semibold" : "text-gray-700"
-            }`
-          }
+        <div
+          onClick={() => setMobileMenuOpen(true)}
+          className="flex items-center py-3 cursor-pointer text-gray-700"
         >
           <BiCategoryAlt className="mr-3 text-lg" />
           <span>Danh mục</span>
-        </NavLink>
+        </div>
       </div>
+
+      <MobileNav open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
     </div>
   );
 };
