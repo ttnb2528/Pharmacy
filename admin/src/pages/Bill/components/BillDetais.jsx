@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,26 +8,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { convertVND } from "@/utils/convertVND.js";
-import { Check, X } from "lucide-react";
+import { Check, X, ArrowDownLeft, ShoppingBag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const BillDetails = ({ bill }) => {
   const tax = bill.total * 0.05;
   const totalAfterTax = bill.total + tax;
-console.log(bill);
+
+  // Xác định loại hóa đơn và tạo hiển thị tương ứng
+  const getBillTypeBadge = () => {
+    if (bill.type === "return") {
+      return (
+        <Badge variant="destructive" className="flex items-center gap-1">
+          <ArrowDownLeft className="h-3 w-3" />
+          Hoàn trả
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="default" className="bg-green-500 flex items-center gap-1">
+        <ShoppingBag className="h-3 w-3" />
+        Bán hàng
+      </Badge>
+    );
+  };
 
   return (
     <div className="space-y-4">
-      {/* Customer Information - No changes needed */}
+      {/* Customer Information with Bill Type */}
       <div className="space-y-2">
         <span className="italic text-gray-500 text-sm">Thông tin cá nhân</span>
         <Card>
-          <CardContent>
+          <CardContent className="pt-6 relative">
+            {/* Add bill type badge in top-right corner */}
+            <div className="absolute top-2 right-2">{getBillTypeBadge()}</div>
+
             <p>
-              <strong>Tên khách hàng:</strong> {bill.customer.name ?? "Khách vãng lai"}
+              <strong>Tên khách hàng:</strong>{" "}
+              {bill.customer.name ?? "Khách vãng lai"}
             </p>
             <p>
-              <strong>Số điện thoại:</strong> {bill.customer.phone ?? "Không có"}
+              <strong>Số điện thoại:</strong>{" "}
+              {bill.customer.phone ?? "Không có"}
             </p>
+            {bill.type === "return" && bill.reason && (
+              <p className="mt-2">
+                <strong>Lý do hoàn trả:</strong>{" "}
+                <span className="text-red-500">{bill.reason}</span>
+              </p>
+            )}
+            {bill.type === "return" && bill.originalBillId && (
+              <p>
+                <strong>Hóa đơn gốc:</strong> #{bill.originalBillId}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -130,6 +164,13 @@ console.log(bill);
         <CardContent className="py-4">
           {/* Desktop Layout - Hidden on mobile */}
           <div className="hidden sm:grid sm:grid-cols-3 gap-2 my-2">
+            {/* Add bill type in desktop layout */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 font-semibold">
+                Loại hóa đơn:
+              </span>
+              {getBillTypeBadge()}
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 font-semibold">
                 Tổng tiền trước thuế:
@@ -172,6 +213,13 @@ console.log(bill);
 
           {/* Mobile Layout - Visible only on mobile */}
           <div className="grid sm:hidden grid-cols-1 gap-2">
+            {/* Add bill type in mobile layout */}
+            <div className="grid grid-cols-2 items-center">
+              <span className="text-sm text-gray-500 font-semibold">
+                Loại hóa đơn:
+              </span>
+              <span className="text-right">{getBillTypeBadge()}</span>
+            </div>
             <div className="grid grid-cols-2 items-center">
               <span className="text-sm text-gray-500 font-semibold">
                 Tổng tiền trước thuế:

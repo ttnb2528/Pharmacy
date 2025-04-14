@@ -219,6 +219,8 @@ export const getCurrentUserOrders = asyncHandler(async (req, res) => {
       "customer.customerId": req.user._id,
     });
 
+    console.log(bills);
+
     // Transform orders and bills to have a consistent format with a type identifier
     const formattedOrders = orders.map((order) => ({
       ...order._doc,
@@ -228,7 +230,7 @@ export const getCurrentUserOrders = asyncHandler(async (req, res) => {
 
     const formattedBills = bills.map((bill) => ({
       ...bill._doc,
-      type: "bill",
+      type: bill.type,
     }));
 
     // Merge both arrays
@@ -292,7 +294,7 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
       }
 
       result = { ...orderDetail._doc, type: "store" };
-    } else if (type === "bill") {
+    } else if (type === "sell" || type === "return") {
       const billDetail = await Bill.findOne({ id: orderId });
 
       if (!billDetail) {
@@ -301,7 +303,7 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
         );
       }
 
-      result = { ...billDetail._doc, type: "bill" };
+      result = { ...billDetail._doc, type: billDetail.type };
     } else {
       return res.json(
         jsonGenerate(StatusCode.BAD_REQUEST, "Loại đơn hàng không hợp lệ")

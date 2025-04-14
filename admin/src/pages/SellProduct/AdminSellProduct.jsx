@@ -6,6 +6,7 @@ import CustomerSearch from "./components/CustomerSearch";
 import PrescriptionInfo from "./components/PrescriptionInfo";
 import MedicineSearch from "./components/MedicineSearch";
 import Cart from "./components/Cart";
+import ReturnProducts from "./components/ReturnProducts"; // Component mới
 import Header from "../component/Header.jsx";
 import Loading from "../component/Loading.jsx";
 
@@ -24,12 +25,13 @@ const SellMedicinePage = () => {
   return (
     <div>
       {isLoading && <Loading />}
-      <Header title="Bán thuốc" />
+      <Header title="Quản lý bán hàng" />
       <main className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="prescription">Thuốc kê đơn</TabsTrigger>
             <TabsTrigger value="otc">Thuốc không kê đơn</TabsTrigger>
+            <TabsTrigger value="return">Hoàn trả thuốc</TabsTrigger>
           </TabsList>
           <TabsContent value="prescription">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -112,6 +114,11 @@ const SellMedicinePage = () => {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="return">
+            <ReturnProducts
+              setIsLoading={setIsLoading}
+            />
           </TabsContent>
         </Tabs>
       </main>

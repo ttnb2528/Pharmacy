@@ -112,6 +112,16 @@ const BillSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Thêm trường lưu ID hóa đơn gốc (nếu là hóa đơn hoàn trả)
+    originalBillId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+    // Thêm trường lý do hoàn trả
+    reason: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

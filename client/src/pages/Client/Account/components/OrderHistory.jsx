@@ -80,7 +80,7 @@ const OrderHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-
+  
   const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {

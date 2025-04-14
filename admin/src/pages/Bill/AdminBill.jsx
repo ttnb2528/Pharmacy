@@ -97,8 +97,8 @@ const AdminBill = () => {
                   <TableCell>
                     {new Date(bill.createdAt).toLocaleDateString("vi")}
                   </TableCell>
-                  <TableCell>{bill.prescription.number || "..."}</TableCell>
-                  <TableCell>{bill.prescription.source || "..."}</TableCell>
+                  <TableCell>{bill.prescription?.number || "..."}</TableCell>
+                  <TableCell>{bill.prescription?.source || "..."}</TableCell>
                   <TableCell>
                     {bill.billIsRx ? (
                       <Check className="text-green-500" />

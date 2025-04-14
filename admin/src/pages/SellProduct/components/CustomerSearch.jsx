@@ -60,10 +60,17 @@ const CustomerSearch = ({
     }
 
     const filteredCustomers = customers.filter((cus) => {
-      return (
-        cus.name.toLowerCase().includes(newSearchTerm.toLowerCase()) ||
-        cus.phone.includes(newSearchTerm)
-      );
+      if (!cus) return false;
+
+      const nameMatch =
+        cus.name &&
+        typeof cus.name === "string" &&
+        cus.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+
+      const phoneMatch =
+        cus.phone && cus.phone.toString().includes(newSearchTerm);
+
+      return nameMatch || phoneMatch;
     });
     setSearchResults(filteredCustomers);
   };

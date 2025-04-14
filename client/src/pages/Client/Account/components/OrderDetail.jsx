@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client.js";
 import {
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button.jsx";
 import { toast } from "sonner";
 import axios from "axios";
 import Loading from "@/pages/component/Loading.jsx";
+import { ArrowDownLeft, ShoppingBag } from "lucide-react";
 
 const orderStatuses = [
   { value: import.meta.env.VITE_STATUS_ORDER_COMPLETED, vi: "Hoàn thành" },
@@ -21,6 +23,7 @@ const orderStatuses = [
   { value: import.meta.env.VITE_STATUS_ORDER_SHIPPING, vi: "Đang giao" },
   { value: import.meta.env.VITE_STATUS_ORDER_CANCELED, vi: "Đã hủy" },
   { value: import.meta.env.VITE_STATUS_ORDER_PENDING, vi: "Chờ xử lý" },
+  { value: import.meta.env.VITE_STATUS_ORDER_REFUNDED, vi: "Đã hoàn tiền" },
 ];
 
 const OrderDetail = () => {
@@ -28,6 +31,32 @@ const OrderDetail = () => {
   const [orderDetail, setOrderDetail] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
+  console.log("Order Detail:", orderDetail);
+
+  // Xác định xem đơn hàng có phải là đơn hoàn tiền không
+  const isRefundOrder = orderDetail?.type === "return";
+
+  // Tạo badge hiển thị loại đơn hàng
+  const getOrderTypeBadge = () => {
+    if (isRefundOrder) {
+      return (
+        <Badge variant="destructive" className="flex items-center gap-1 ml-2">
+          <ArrowDownLeft className="h-3 w-3" />
+          Hoàn tiền
+        </Badge>
+      );
+    }
+    return (
+      <Badge
+        variant="default"
+        className="bg-green-500 flex items-center gap-1 ml-2"
+      >
+        <ShoppingBag className="h-3 w-3" />
+        Mua hàng
+      </Badge>
+    );
+  };
 
   useEffect(() => {
     const resOrderDetail = async () => {
@@ -38,7 +67,6 @@ const OrderDetail = () => {
             type: "order",
           }
         );
-        console.log(res);
 
         if (res.status === 200 && res.data.status === 200) {
           setOrderDetail(res.data.data);
@@ -222,6 +250,7 @@ const OrderDetail = () => {
             onClick={() => navigate(-1)}
           />
           Chi tiết đơn hàng
+          {getOrderTypeBadge()}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <Card>
@@ -235,14 +264,23 @@ const OrderDetail = () => {
                   ? orderDetail?.orderId.nameCustomer
                   : orderDetail?.customer.name}
               </p>
-              {/* {orderDetail?.orderId.address && (
-                <p>
-                  <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
-                </p>
-              )} */}
               {type === "store" && (
                 <p>
                   <strong>Địa chỉ:</strong> {orderDetail?.orderId.address}
+                </p>
+              )}
+              {isRefundOrder && orderDetail?.orderId?.reason && (
+                <p className="mt-2">
+                  <strong>Lý do hoàn tiền:</strong>{" "}
+                  <span className="text-red-500">
+                    {orderDetail.orderId.reason}
+                  </span>
+                </p>
+              )}
+              {isRefundOrder && orderDetail?.orderId?.originalBillId && (
+                <p>
+                  <strong>Mã đơn hàng gốc:</strong> #
+                  {orderDetail.orderId.originalBillId}
                 </p>
               )}
             </CardContent>
@@ -266,22 +304,27 @@ const OrderDetail = () => {
               {type === "store" && (
                 <p>
                   <strong>Trạng thái:</strong>{" "}
-                  {orderDetail?.orderId.status &&
-                    orderStatuses.find(
-                      (status) => status.value === orderDetail?.orderId.status
-                    )?.vi}
+                  <span className={isRefundOrder ? "text-red-500" : ""}>
+                    {orderDetail?.orderId.status &&
+                      orderStatuses.find(
+                        (status) => status.value === orderDetail?.orderId.status
+                      )?.vi}
+                  </span>
                 </p>
               )}
-              {/* <p>
-                <strong>Trạng thái:</strong>{" "}
-                {orderDetail?.orderId.status &&
-                  orderStatuses.find(
-                    (status) => status.value === orderDetail?.orderId.status
-                  )?.vi}
-              </p> */}
-              {/* Hiển thị nút hủy/refund dựa trên trạng thái và phương thức thanh toán */}
+
+              {isRefundOrder && orderDetail?.orderId?.refundDate && (
+                <p>
+                  <strong>Ngày hoàn tiền:</strong>{" "}
+                  {new Date(orderDetail.orderId.refundDate).toLocaleString(
+                    "vi-VN"
+                  )}
+                </p>
+              )}
+
               {type === "store" &&
-                orderDetail?.orderId?.status === "pending" && (
+                orderDetail?.orderId?.status === "pending" &&
+                !isRefundOrder && (
                   <div className="flex justify-end">
                     <Button
                       className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -377,7 +420,7 @@ const OrderDetail = () => {
               <span>
                 {type === "store"
                   ? convertVND(orderDetail?.orderId?.totalTemp)
-                  : convertVND(orderDetail.total)}
+                  : convertVND(orderDetail?.total)}
               </span>
             </div>
             <div className="flex justify-between mb-2">
@@ -410,23 +453,29 @@ const OrderDetail = () => {
             <div className="border-t mt-2 pt-2">
               <div className="flex justify-between font-bold text-lg">
                 <span>
-                  Tổng tiền (
+                  {isRefundOrder ? "Tổng hoàn tiền" : "Tổng tiền"} (
                   {(type === "store"
                     ? orderDetail?.items
                     : orderDetail?.medicines
                   )?.reduce((sum, item) => sum + item.quantity, 0)}{" "}
                   sản phẩm)
                 </span>
-                <span className="text-red-600">
+                <span
+                  className={isRefundOrder ? "text-red-600" : "text-red-600"}
+                >
+                  {isRefundOrder ? "-" : ""}
                   {type === "store"
                     ? convertVND(orderDetail?.orderId?.total)
-                    : convertVND(orderDetail.total)}
+                    : convertVND(orderDetail?.total)}
                 </span>
               </div>
             </div>
             <div className="mt-4">
               <strong>Phương thức thanh toán:</strong>{" "}
               {type == "store" ? orderDetail?.orderId?.paymentMethod : "COD"}
+              {isRefundOrder && (
+                <span className="ml-2 text-red-500">(Đã hoàn tiền)</span>
+              )}
             </div>
           </CardContent>
         </Card>
