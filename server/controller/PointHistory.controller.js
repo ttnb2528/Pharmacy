@@ -4,7 +4,9 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import PointHistory from "../model/PointHistory.model.js";
 
 export const getPointHistories = asyncHandler(async (req, res) => {
-  const pointHistories = await PointHistory.find().populate("orderId");
+  const pointHistories = await PointHistory.find({
+    AccountId: req.user._id,
+  }).populate("orderId");
 
   return res.json(
     jsonGenerate(StatusCode.OK, "Lấy danh sách thành công", pointHistories)
