@@ -40,7 +40,7 @@ const ProductDetailRight = ({ product }) => {
     getSimilarProduct();
   }, [category]);
 
-  console.log(productSimilar);
+  // console.log(productSimilar);
 
   return (
     <div className="hidden md:block">
