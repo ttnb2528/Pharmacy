@@ -35,6 +35,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Edit, Trash } from "lucide-react";
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILES = 5;
+
 const ProductComments = ({ productId }) => {
   const { userInfo } = useAppStore();
   const { setShowLogin } = useContext(HomeContext);
@@ -102,8 +105,36 @@ const ProductComments = ({ productId }) => {
   }, [productId, userInfo, userData._id]);
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    setImages(files);
+    const selectedFiles = Array.from(e.target.files);
+    
+    // Kiểm tra số lượng file
+    if (images.length + selectedFiles.length > MAX_FILES) {
+      toast.error(`Bạn chỉ có thể tải lên tối đa ${MAX_FILES} ảnh!`);
+      return;
+    }
+
+    // Kiểm tra kích thước từng file
+    let validFiles = [];
+    let hasInvalidSize = false;
+    
+    selectedFiles.forEach(file => {
+      if (file.size > MAX_FILE_SIZE) {
+        hasInvalidSize = true;
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (hasInvalidSize) {
+      toast.error(`Một số ảnh có dung lượng trên 2MB và sẽ không được tải lên.`);
+    }
+
+    // Cập nhật state với các file hợp lệ
+    setImages(prevImages => [...prevImages, ...validFiles]);
+  };
+
+  const removeImage = (index) => {
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
   const uploadToCloudinary = async (files) => {
@@ -146,6 +177,19 @@ const ProductComments = ({ productId }) => {
 
     if (reviewRating < 1 || reviewRating > 5) {
       toast.error("Vui lòng chọn số sao từ 1 đến 5!");
+      return;
+    }
+
+    // Kiểm tra số lượng ảnh
+    if (reviewImages.length > MAX_FILES) {
+      toast.error(`Chỉ được phép tải lên tối đa ${MAX_FILES} ảnh!`);
+      return;
+    }
+    
+    // Kiểm tra kích thước của từng ảnh
+    const hasLargeImage = reviewImages.some(img => img.size > MAX_FILE_SIZE);
+    if (hasLargeImage) {
+      toast.error("Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB!");
       return;
     }
 
@@ -570,9 +614,16 @@ const ProductComments = ({ productId }) => {
                     className="w-full border-gray-300 focus:border-green-500"
                     disabled={isLoading}
                   />
-                  <label className="flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-200 transition">
+                  {/* Cập nhật phần hiển thị ảnh */}
+                  <label
+                    className={`flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-200 transition ${
+                      images.length >= MAX_FILES
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
                     <span className="text-sm text-gray-600">
-                      Chọn ảnh (tối đa 5)
+                      Chọn ảnh (tối đa {MAX_FILES} ảnh, mỗi ảnh ≤ 2MB)
                     </span>
                     <input
                       type="file"
@@ -580,19 +631,58 @@ const ProductComments = ({ productId }) => {
                       multiple
                       onChange={handleImageChange}
                       className="hidden"
-                      disabled={isLoading}
+                      disabled={isLoading || images.length >= MAX_FILES}
                     />
                   </label>
+
                   {images.length > 0 && (
                     <div className="flex gap-2 flex-wrap">
                       {images.map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={URL.createObjectURL(img) || "/placeholder.svg"}
-                          alt="Preview"
-                          className="w-16 h-16 object-cover rounded-md border"
-                        />
+                        <div key={idx} className="relative group">
+                          <img
+                            src={
+                              URL.createObjectURL(img) || "/placeholder.svg"
+                            }
+                            alt="Preview"
+                            className="w-16 h-16 object-cover rounded-md border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(idx)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                          >
+                            ×
+                          </button>
+                          <p className="text-xs text-gray-500 mt-1 text-center">
+                            {(img.size / 1024 / 1024).toFixed(1)}MB
+                          </p>
+                        </div>
                       ))}
+                      {images.length < MAX_FILES && (
+                        <label className="flex items-center justify-center w-16 h-16 bg-gray-100 border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 transition">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 5v14M5 12h14" />
+                          </svg>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageChange}
+                            className="hidden"
+                            disabled={isLoading}
+                          />
+                        </label>
+                      )}
                     </div>
                   )}
                   {warning && (

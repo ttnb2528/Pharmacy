@@ -11,6 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
+// Thêm các hằng số giới hạn
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILES = 5;
+
 const MobileReviewDialog = ({
   isOpen,
   onClose,
@@ -33,13 +37,39 @@ const MobileReviewDialog = ({
     }
   }, [isOpen, initialRating, initialText]);
 
+  // Cập nhật hàm handleImageChange để kiểm tra kích thước và số lượng file
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length > 5) {
-      toast.error("Chỉ được chọn tối đa 5 ảnh");
+    const selectedFiles = Array.from(e.target.files);
+    
+    // Kiểm tra số lượng file
+    if (images.length + selectedFiles.length > MAX_FILES) {
+      toast.error(`Chỉ được chọn tối đa ${MAX_FILES} ảnh`);
       return;
     }
-    setImages(files);
+
+    // Kiểm tra kích thước file
+    let validFiles = [];
+    let hasInvalidSize = false;
+    
+    selectedFiles.forEach(file => {
+      if (file.size > MAX_FILE_SIZE) {
+        hasInvalidSize = true;
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (hasInvalidSize) {
+      toast.error(`Một số ảnh có dung lượng trên 2MB và sẽ không được tải lên`);
+    }
+
+    // Cập nhật state với các file hợp lệ
+    setImages(prevImages => [...prevImages, ...validFiles]);
+  };
+
+  // Thêm hàm xóa ảnh
+  const removeImage = (index) => {
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
@@ -50,6 +80,13 @@ const MobileReviewDialog = ({
 
     if (!text.trim()) {
       toast.error("Vui lòng nhập nội dung đánh giá");
+      return;
+    }
+
+    // Thêm kiểm tra kích thước ảnh trước khi submit
+    const hasLargeImage = images.some(img => img.size > MAX_FILE_SIZE);
+    if (hasLargeImage) {
+      toast.error("Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB");
       return;
     }
 
@@ -103,25 +140,49 @@ const MobileReviewDialog = ({
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              Hình ảnh (tối đa 5 ảnh)
+              Hình ảnh (tối đa {MAX_FILES} ảnh, mỗi ảnh ≤ 2MB)
             </label>
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              className="cursor-pointer"
-            />
+            
+            {/* Hiển thị nút upload chỉ khi chưa đạt tối đa */}
+            {images.length < MAX_FILES && (
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                className="cursor-pointer"
+                disabled={isLoading}
+              />
+            )}
 
+            {/* Hiển thị thông báo khi đã đạt giới hạn */}
+            {images.length >= MAX_FILES && (
+              <p className="text-orange-500 text-sm mt-1">
+                Đã đạt tối đa số lượng ảnh cho phép
+              </p>
+            )}
+
+            {/* Hiển thị preview ảnh với khả năng xóa */}
             {images.length > 0 && (
               <div className="flex gap-2 mt-2 flex-wrap">
                 {images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={URL.createObjectURL(img) || "/placeholder.svg"}
-                    alt="Preview"
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
+                  <div key={idx} className="relative group">
+                    <img
+                      src={URL.createObjectURL(img) || "/placeholder.svg"}
+                      alt="Preview"
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1 text-center">
+                      {(img.size / 1024 / 1024).toFixed(1)}MB
+                    </p>
+                  </div>
                 ))}
               </div>
             )}
