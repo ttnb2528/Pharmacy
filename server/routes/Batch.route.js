@@ -9,6 +9,7 @@ import {
   getBatchesForMedicine,
   getBatchesForStatistics,
   updateBatch,
+  updateBatchPartial,
 } from "../controller/Batch.controller.js";
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.get("/getBatchesForMedicine/:id", authenticate, getBatchesForMedicine);
 router.get("/getBatchesForStatistics", authenticate, getBatchesForStatistics);
 router.get("/getBatchById/:id", authenticate, getBatchById);
 router.put("/updateBatch/:id", authenticate, updateBatch);
+router.put("/update-partial/:id", authenticate, updateBatchPartial);
 router.delete("/deleteBatch/:id", authenticate, deleteBatch);
 
 export default router;

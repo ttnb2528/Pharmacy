@@ -26,6 +26,13 @@ const BatchSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    // Thêm trường mới để lưu số lượng ban đầu
+    initialQuantity: {
+      type: Number,
+      default: function () {
+        return this.quantity;
+      },
+    },
     price: {
       type: Number,
       required: true,
@@ -52,6 +59,12 @@ const BatchSchema = new mongoose.Schema(
     isExpiredHandled: {
       type: Boolean,
       default: false,
+    },
+    // Thêm trường mới để lưu thông tin người cập nhật
+    updatedBy: {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
+      name: String,
+      timestamp: Date,
     },
   },
   {

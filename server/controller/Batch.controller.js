@@ -274,7 +274,7 @@ export const bulkImportBatches = asyncHandler(async (req, res) => {
         manufacture = new Manufacture({
           id,
           name: mappedBatch.manufactureName,
-          country: mappedBatch.country
+          country: mappedBatch.country,
         });
         await manufacture.save();
         // console.log(`Đã tạo mới nơi sản xuất: ${mappedBatch.manufactureName}`);
@@ -328,6 +328,70 @@ export const bulkImportBatches = asyncHandler(async (req, res) => {
   }
 
   res.json(jsonGenerate(StatusCode.CREATED, "Nhập kho thành công", newBatches));
+});
+
+export const updateBatchPartial = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity, price, retailPrice, updatedBy } = req.body;
+
+    // Kiểm tra batch có tồn tại không
+    const batch = await Batch.findById(id);
+    if (!batch) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy lô thuốc")
+      );
+    }
+
+    // Tính số lượng đã bán
+    const soldQuantity = batch.initialQuantity
+      ? batch.initialQuantity - batch.quantity
+      : 0;
+
+    // Kiểm tra số lượng mới phải hợp lệ
+    if (quantity < soldQuantity) {
+      return res.json(
+        jsonGenerate(
+          StatusCode.BAD_REQUEST,
+          `Số lượng không thể nhỏ hơn số lượng đã bán (${soldQuantity})`
+        )
+      );
+    }
+
+    // Lưu số lượng ban đầu nếu chưa có
+    if (!batch.initialQuantity) {
+      batch.initialQuantity = batch.quantity;
+    }
+
+    // Cập nhật thông tin batch
+    const oldQuantity = batch.quantity;
+    batch.quantity = quantity;
+    batch.price = price;
+    batch.retailPrice = retailPrice;
+    batch.updatedBy = updatedBy;
+
+    await batch.save();
+
+    // Cập nhật tổng số lượng trong Medicine
+    if (oldQuantity !== quantity) {
+      const quantityDiff = quantity - oldQuantity;
+      await Medicine.findByIdAndUpdate(
+        batch.MedicineId,
+        { $inc: { quantityStock: quantityDiff } },
+        { new: true }
+      );
+    }
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Cập nhật thông tin lô thuốc thành công",
+        batch
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
 });
 
 const validate = (data) => {
