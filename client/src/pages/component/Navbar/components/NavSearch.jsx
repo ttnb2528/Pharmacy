@@ -39,8 +39,10 @@ import Loading from "../../Loading.jsx";
 import slugify from "slugify";
 import { useAppStore } from "@/store/index.js";
 import { useMediaQuery } from "@/hook/use-media-query.js";
+import { useTranslation } from "react-i18next";
 
 const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
+  const { t } = useTranslation();
   const { userInfo, setUserInfo } = useAppStore();
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
@@ -186,7 +188,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
         <Input
           ref={inputRef}
           className="w-full h-10 rounded border-none bg-white focus-visible:ring-0 p-2 outline-none"
-          placeholder="Tìm kiếm sản phẩm..."
+          placeholder={t("search.placeholder")}
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={handleFocus}
@@ -233,7 +235,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                   }}
                 >
                   <span className="text-[#f48120] font-semibold">
-                    Xem tất cả {searchResults.length} sản phẩm
+                    {t("search.view_all", { count: searchResults.length })}
                   </span>
                 </div>
               </>
@@ -254,14 +256,14 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
             <span className="absolute -top-1 -right-1 sm:top-1 sm:right-20 bg-white rounded-full text-[#4cb551] text-xs min-w-[18px] h-[18px] flex items-center justify-center">
               {CalculateTotalItems(cart)}
             </span>
-            <span className="ml-2 hidden sm:inline">Giỏ hàng</span>
+            <span className="ml-2 hidden sm:inline">{t("cart.cart")}</span>
           </Button>
         </DropdownMenuTrigger>
 
         {cart && CalculateTotalItems(cart) > 0 ? (
           <DropdownMenuContent className="w-[320px] right-0 relative">
             <DropdownMenuLabel className="text-right">
-              Tổng tiền:
+              {t("cart.total")}:
               <span className="text-[#f48120] font-bold ml-1">
                 {convertVND(CalculateTotalPriceTemp(cart))}
               </span>
@@ -353,12 +355,12 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
             <DropdownMenuGroup className="flex justify-between mb-3">
               <DropdownMenuItem onClick={() => navigate("/cart")}>
                 <Button className="bg-white text-[#f48120] border-[#f48120] border hover:bg-[#f48120] hover:text-white transition-all duration-300">
-                  Xem giỏ hàng
+                  {t("cart.view_cart")}
                 </Button>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/checkout")}>
                 <Button className="bg-[#0e562e] hover:bg-[#227748]">
-                  Thanh toán
+                  {t("cart.checkout")}
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -367,7 +369,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
           <DropdownMenuContent className="w-56 right-0 relative">
             <DropdownMenuGroup>
               <DropdownMenuItem className="text-center justify-center">
-                <span>Giỏ hàng trống</span>
+                <span>{t("cart.empty_cart")}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -414,7 +416,9 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                 </svg>
               )}
               <div className="line-clamp-1 flex-1 text-left text-xs font-bold">
-                {userInfo.name ? `Chào, ${userInfo.name}` : "Chào, Khach Hang"}
+                {userInfo.name
+                  ? t("user.greeting", { name: userInfo.name })
+                  : t("user.greeting_default")}
               </div>
             </div>
           </DropdownMenuTrigger>
@@ -424,7 +428,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                 className="flex items-center"
                 onClick={() => navigate("/account/info")}
               >
-                <FaRegUserCircle /> Thông tin cá nhân
+                <FaRegUserCircle /> {t("user.personal_info")}
               </DropdownMenuItem>
 
               <Separator />
@@ -433,7 +437,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                 className="flex items-center"
                 onClick={() => navigate("/account/history")}
               >
-                <LuNotepadText /> Lịch sử đơn hàng
+                <LuNotepadText /> {t("user.order_history")}
               </DropdownMenuItem>
 
               <Separator />
@@ -459,7 +463,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                   <path d="m15 9-6 6"></path>
                   <path d="M15 15h.01"></path>
                 </svg>
-                Mã giảm giá
+                {t("user.coupons")}
               </DropdownMenuItem>
 
               <Separator />
@@ -469,7 +473,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
                 onClick={() => navigate("/account/addresses")}
               >
                 <GrMapLocation />
-                Sổ tay địa chỉ
+                {t("user.address_book")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
 
@@ -487,7 +491,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
               }}
             >
               <IoIosLogOut />
-              Đăng xuất
+              {t("user.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -498,7 +502,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
         >
           <FaUserCircle />
           <span className="hover:opacity-85 transition-all duration-200 cursor-pointer">
-            Đăng nhập
+            {t("user.login")}
           </span>
         </div>
       )}

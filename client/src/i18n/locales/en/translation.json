@@ -1,0 +1,59 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "language_desc": "Choose display language",
+    "app_version": "App Version",
+    "current_version": "Current version",
+    "logout": "Logout",
+    "confirm_logout": "Confirm Logout",
+    "confirm_logout_desc": "Are you sure you want to log out of your account?",
+    "cancel": "Cancel"
+  },
+  "categories": {
+    "Dược Phẩm": "Pharmaceuticals",
+    "Chăm sóc sức khỏe": "Health Care",
+    "Chăm sóc cá nhân": "Personal Care",
+    "Sản phẩm tiện lợi": "Convenience Products",
+    "Thực phẩm chức năng": "Functional Foods",
+    "Mẹ và Bé": "Mother and Baby",
+    "Chăm sóc nhan sắc": "Beauty Care",
+    "Thiết bị y tế": "Medical Devices"
+  },
+  "profile": {
+    "title": "Personal Information",
+    "name": "Full name",
+    "phone": "Phone number",
+    "email": "Email",
+    "address": "Address",
+    "update": "Update"
+  },
+  "menu": {
+    "home": "Home",
+    "categories": "Categories",
+    "orders": "Orders",
+    "profile": "Account",
+    "cart": "Cart"
+  },
+  "search": {
+    "placeholder": "Search for products...",
+    "view_all": "View all {{count}} products"
+  },
+  "cart": {
+    "cart": "Cart",
+    "total": "Total:",
+    "view_cart": "View cart",
+    "checkout": "Checkout",
+    "empty_cart": "Empty cart"
+  },
+  "user": {
+    "greeting": "Hi, {{name}}",
+    "greeting_default": "Hi, Customer",
+    "personal_info": "Personal Information",
+    "order_history": "Order History",
+    "coupons": "Coupons",
+    "address_book": "Address Book",
+    "logout": "Logout",
+    "login": "Login"
+  }
+}

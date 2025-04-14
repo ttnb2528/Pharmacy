@@ -1,0 +1,44 @@
+{
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "language_desc": "Chọn ngôn ngữ hiển thị",
+    "app_version": "Phiên bản ứng dụng",
+    "current_version": "Phiên bản hiện tại",
+    "logout": "Đăng xuất",
+    "confirm_logout": "Xác nhận đăng xuất",
+    "confirm_logout_desc": "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?",
+    "cancel": "Hủy"
+  },
+  "categories": {
+    "Dược Phẩm": "Dược Phẩm",
+    "Chăm sóc sức khỏe": "Chăm sóc sức khỏe",
+    "Chăm sóc cá nhân": "Chăm sóc cá nhân",
+    "Sản phẩm tiện lợi": "Sản phẩm tiện lợi",
+    "Thực phẩm chức năng": "Thực phẩm chức năng",
+    "Mẹ và Bé": "Mẹ và Bé",
+    "Chăm sóc nhan sắc": "Chăm sóc nhan sắc",
+    "Thiết bị y tế": "Thiết bị y tế"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm sản phẩm...",
+    "view_all": "Xem tất cả {{count}} sản phẩm"
+  },
+  "cart": {
+    "cart": "Giỏ hàng",
+    "total": "Tổng tiền:",
+    "view_cart": "Xem giỏ hàng",
+    "checkout": "Thanh toán",
+    "empty_cart": "Giỏ hàng trống"
+  },
+  "user": {
+    "greeting": "Chào, {{name}}",
+    "greeting_default": "Chào, Khách Hàng",
+    "personal_info": "Thông tin cá nhân",
+    "order_history": "Lịch sử đơn hàng",
+    "coupons": "Mã giảm giá",
+    "address_book": "Sổ tay địa chỉ",
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập"
+  }
+}

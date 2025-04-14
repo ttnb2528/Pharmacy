@@ -23,31 +23,29 @@ import {
 import { apiClient } from "@/lib/api-client.js";
 import { LOGOUT_ROUTE } from "@/API/index.api.js";
 import { useAppStore } from "@/store/index.js";
+import { useTranslation } from 'react-i18next'; // Import hook từ react-i18next
 
 const Setting = () => {
   const { setUserInfo } = useAppStore();
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [language, setLanguage] = useState("vi"); // Default language is Vietnamese
-
+  
+  // Sử dụng hook useTranslation
+  const { t, i18n } = useTranslation();
+  
   const handleLogout = () => {
-    // Here you would implement actual logout logic
-    // For example: clearing localStorage, cookies, etc.
     console.log("User logged out");
-
-    // Redirect to login page
     navigate("/login");
   };
 
+  // Hàm thay đổi ngôn ngữ
   const handleLanguageChange = (lang) => {
-    setLanguage(lang);
-    // Here you would implement actual language change logic
-    console.log(`Language changed to: ${lang}`);
+    i18n.changeLanguage(lang);
   };
 
   return (
-    <div className=" min-h-screen pb-10">
+    <div className="min-h-screen pb-10">
       {/* Mobile Header */}
       {isMobile && (
         <div className="sticky top-0 z-10 bg-white p-3 flex items-center justify-between border-b">
@@ -59,7 +57,7 @@ const Setting = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-base font-semibold">Cài đặt</h1>
+          <h1 className="text-base font-semibold">{t('settings.title')}</h1>
           <div className="w-9"></div> {/* Empty div for alignment */}
         </div>
       )}
@@ -67,7 +65,7 @@ const Setting = () => {
       {/* Main Content */}
       <div className={`${isMobile ? "p-4" : ""}`}>
         {/* Desktop Title (hidden on mobile) */}
-        {!isMobile && <h2 className="text-2xl font-semibold mb-6">Cài đặt</h2>}
+        {!isMobile && <h2 className="text-2xl font-semibold mb-6">{t('settings.title')}</h2>}
 
         <div className="max-w-2xl mx-auto">
           {/* Language Settings */}
@@ -77,9 +75,9 @@ const Setting = () => {
                 <div className="flex items-center">
                   <Globe className="h-5 w-5 text-green-600 mr-3" />
                   <div>
-                    <h3 className="text-lg font-medium">Ngôn ngữ</h3>
+                    <h3 className="text-lg font-medium">{t('settings.language')}</h3>
                     <p className="text-sm text-gray-500">
-                      Chọn ngôn ngữ hiển thị
+                      {t('settings.language_desc')}
                     </p>
                   </div>
                 </div>
@@ -91,7 +89,7 @@ const Setting = () => {
                         variant="ghost"
                         className="flex items-center gap-1 text-green-600"
                       >
-                        {language === "vi" ? "Tiếng Việt" : "English"}
+                        {i18n.language === "vi" ? "Tiếng Việt" : "English"}
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -101,7 +99,7 @@ const Setting = () => {
                         className="flex items-center justify-between"
                       >
                         Tiếng Việt
-                        {language === "vi" && (
+                        {i18n.language === "vi" && (
                           <Check className="h-4 w-4 ml-2" />
                         )}
                       </DropdownMenuItem>
@@ -110,7 +108,7 @@ const Setting = () => {
                         className="flex items-center justify-between"
                       >
                         English
-                        {language === "en" && (
+                        {i18n.language === "en" && (
                           <Check className="h-4 w-4 ml-2" />
                         )}
                       </DropdownMenuItem>
@@ -119,9 +117,9 @@ const Setting = () => {
                 ) : (
                   <div className="flex gap-2">
                     <Button
-                      variant={language === "vi" ? "default" : "outline"}
+                      variant={i18n.language === "vi" ? "default" : "outline"}
                       className={
-                        language === "vi"
+                        i18n.language === "vi"
                           ? "bg-green-600 hover:bg-green-700"
                           : ""
                       }
@@ -130,9 +128,9 @@ const Setting = () => {
                       Tiếng Việt
                     </Button>
                     <Button
-                      variant={language === "en" ? "default" : "outline"}
+                      variant={i18n.language === "en" ? "default" : "outline"}
                       className={
-                        language === "en"
+                        i18n.language === "en"
                           ? "bg-green-600 hover:bg-green-700"
                           : ""
                       }
@@ -151,9 +149,9 @@ const Setting = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium">Phiên bản ứng dụng</h3>
+                  <h3 className="text-lg font-medium">{t('settings.app_version')}</h3>
                   <p className="text-sm text-gray-500">
-                    Phiên bản hiện tại: 1.0.0
+                    {t('settings.current_version')}: 1.0.0
                   </p>
                 </div>
               </div>
@@ -166,7 +164,6 @@ const Setting = () => {
               <Button
                 variant="destructive"
                 className="w-full flex items-center justify-center gap-2"
-                // onClick={() => setShowLogoutDialog(true)}
                 onClick={async () => {
                   localStorage.removeItem("token");
                   setUserInfo(null);
@@ -177,7 +174,7 @@ const Setting = () => {
                 }}
               >
                 <LogOut className="h-5 w-5" />
-                Đăng xuất
+                {t('settings.logout')}
               </Button>
             </CardContent>
           </Card>
@@ -185,7 +182,7 @@ const Setting = () => {
           {/* Version info at bottom */}
           <div className="mt-8 text-center text-gray-500 text-sm">
             <p>NB Pharmacy © 2025</p>
-            <p>Phiên bản 1.0.0</p>
+            <p>{t('settings.current_version')}: 1.0.0</p>
           </div>
         </div>
       </div>
@@ -194,18 +191,18 @@ const Setting = () => {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận đăng xuất</AlertDialogTitle>
+            <AlertDialogTitle>{t('settings.confirm_logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?
+              {t('settings.confirm_logout_desc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogCancel>{t('settings.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleLogout}
               className="bg-red-500 hover:bg-red-600"
             >
-              Đăng xuất
+              {t('settings.logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
