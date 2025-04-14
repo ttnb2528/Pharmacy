@@ -296,12 +296,19 @@ const ProductComments = ({ productId }) => {
   };
 
   const sortedComments = useMemo(() => {
-    if (!comments || !userComment) return comments;
+    // Luôn lọc bình luận độc hại trước
+    const nonToxicComments = Array.isArray(comments)
+      ? comments.filter((cmt) => !cmt?.isToxic)
+      : [];
 
+    // Nếu không có userComment, chỉ trả về bình luận không độc hại
+    if (!userComment) return nonToxicComments;
+
+    // Nếu có userComment, sắp xếp với bình luận của người dùng lên đầu
     return [
-      ...comments.filter((c) => c._id === userComment._id),
-      ...comments.filter((c) => c._id !== userComment._id),
-    ].filter((cmt) => !cmt.isToxic);
+      ...nonToxicComments.filter((c) => c._id === userComment._id),
+      ...nonToxicComments.filter((c) => c._id !== userComment._id),
+    ];
   }, [comments, userComment]);
 
   const hasVisibleComments = sortedComments.length > 0;
