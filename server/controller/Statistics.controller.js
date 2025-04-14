@@ -63,7 +63,7 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
     },
   ]);
 
-  // Tổng hợp doanh thu từ `Bill`
+  // Tổng hợp doanh thu từ `Bill` - hóa đơn bán hàng
   const billRevenue = await Bill.aggregate([
     {
       $match: {
@@ -78,24 +78,51 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
       },
     },
   ]);
+  
+  // Tổng hợp giá trị hoàn trả từ `Bill` - hóa đơn hoàn trả
+  const returnRevenue = await Bill.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: start, $lte: end },
+        type: "return",  // Lấy các hóa đơn hoàn trả
+      },
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+        totalReturn: { $sum: "$total" },  // Tổng giá trị hoàn trả
+      },
+    },
+  ]);
 
   // Map để gom dữ liệu theo ngày
   const revenueMap = new Map();
 
+  // Xử lý doanh thu từ đơn hàng trực tuyến
   orderRevenue.forEach(({ _id, totalRevenue }) => {
     if (!revenueMap.has(_id)) {
-      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, totalRevenue: 0 });
+      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
     }
     revenueMap.get(_id).orders += totalRevenue;
     revenueMap.get(_id).totalRevenue += totalRevenue;
   });
 
+  // Xử lý doanh thu từ hóa đơn bán tại quầy
   billRevenue.forEach(({ _id, totalRevenue }) => {
     if (!revenueMap.has(_id)) {
-      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, totalRevenue: 0 });
+      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
     }
     revenueMap.get(_id).bills += totalRevenue;
     revenueMap.get(_id).totalRevenue += totalRevenue;
+  });
+  
+  // Xử lý giảm trừ từ hóa đơn hoàn trả
+  returnRevenue.forEach(({ _id, totalReturn }) => {
+    if (!revenueMap.has(_id)) {
+      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
+    }
+    revenueMap.get(_id).returns += totalReturn;
+    revenueMap.get(_id).totalRevenue -= totalReturn;  // Trừ giá trị hoàn trả khỏi doanh thu
   });
 
   // Chuyển map thành array
@@ -131,6 +158,19 @@ export const getMonthlyRevenue = asyncHandler(async (req, res) => {
               $gte: new Date(`${selectedYear}-01-01`),
               $lt: new Date(`${selectedYear + 1}-01-01`),
             },
+            type: "sell", // Thêm điều kiện lọc chỉ lấy hóa đơn bán hàng
+          })
+        : [];
+
+    // Trừ đi giá trị của hóa đơn hoàn trả nếu muốn tính chính xác hơn
+    const returnBills =
+      type === "all" || type === "bills"
+        ? await Bill.find({
+            createdAt: {
+              $gte: new Date(`${selectedYear}-01-01`),
+              $lt: new Date(`${selectedYear + 1}-01-01`),
+            },
+            type: "return", // Lấy hóa đơn hoàn trả
           })
         : [];
 
@@ -145,11 +185,18 @@ export const getMonthlyRevenue = asyncHandler(async (req, res) => {
           })
         : [];
 
-    // Cộng tổng doanh thu theo tháng
+    // Cộng tổng doanh thu theo tháng cho hóa đơn bán và đơn hàng
     [...bills, ...orders].forEach((item) => {
       const itemDate = new Date(item.createdAt || item.date);
       const monthIndex = itemDate.getMonth(); // Lấy chỉ số tháng (0-11)
       revenueByMonth[monthIndex].total += item.total;
+    });
+
+    // Trừ đi giá trị hoàn trả
+    returnBills.forEach((item) => {
+      const itemDate = new Date(item.createdAt);
+      const monthIndex = itemDate.getMonth();
+      revenueByMonth[monthIndex].total -= item.total; // Trừ giá trị hoàn trả
     });
 
     res.json(
@@ -187,7 +234,13 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
     // 🔹 Lấy tổng doanh thu tháng này
     const billsThisMonth = await Bill.find({
       createdAt: { $gte: startOfThisMonth, $lte: endOfThisMonth },
-      type: "sell",
+      type: "sell", // Chỉ lấy hóa đơn bán hàng
+    });
+
+    // Lấy hóa đơn hoàn trả tháng này
+    const returnBillsThisMonth = await Bill.find({
+      createdAt: { $gte: startOfThisMonth, $lte: endOfThisMonth },
+      type: "return",
     });
 
     const ordersThisMonth = await Order.find({
@@ -195,15 +248,23 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
       status: "completed",
     });
 
-    const totalRevenueThisMonth = [
-      ...billsThisMonth,
-      ...ordersThisMonth,
-    ].reduce((total, item) => total + item.total, 0);
+    // Cộng doanh thu bán hàng và trừ đi hoàn trả
+    const totalRevenueThisMonth =
+      [...billsThisMonth, ...ordersThisMonth].reduce(
+        (total, item) => total + item.total,
+        0
+      ) - returnBillsThisMonth.reduce((total, item) => total + item.total, 0);
 
-    // 🔹 Lấy tổng doanh thu tháng trước
+    // 🔹 Lấy tổng doanh thu tháng trước - ĐÃ SỬA
     const billsLastMonth = await Bill.find({
       createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
-      type: "sell",
+      type: "sell", // Chỉ lấy hóa đơn bán hàng
+    });
+
+    // Lấy hóa đơn hoàn trả tháng trước
+    const returnBillsLastMonth = await Bill.find({
+      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+      type: "return",
     });
 
     const ordersLastMonth = await Order.find({
@@ -211,10 +272,12 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
       status: "completed",
     });
 
-    const totalRevenueLastMonth = [
-      ...billsLastMonth,
-      ...ordersLastMonth,
-    ].reduce((total, item) => total + item.total, 0);
+    // Cộng doanh thu bán hàng và trừ đi hoàn trả
+    const totalRevenueLastMonth =
+      [...billsLastMonth, ...ordersLastMonth].reduce(
+        (total, item) => total + item.total,
+        0
+      ) - returnBillsLastMonth.reduce((total, item) => total + item.total, 0);
 
     // 🔥 Tính phần trăm thay đổi doanh thu
     const revenueChange =
