@@ -55,5 +55,25 @@
     "address_book": "Address Book",
     "logout": "Logout",
     "login": "Login"
+  },
+  "deal": {
+    "deal_title": "Deal Hunt",
+    "flash": "Flash Sale",
+    "ends_in": "Ends in:",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  "bestSelling": {
+    "title": "Best Selling Products"
+  },
+  "productForGroup": {
+    "title": "Products by Group"
+  },
+  "suggestion": {
+    "title": "Today's Suggestions"
+  },
+  "RecentlyViewed": {
+    "title": "Recently Viewed Products"
   }
 }

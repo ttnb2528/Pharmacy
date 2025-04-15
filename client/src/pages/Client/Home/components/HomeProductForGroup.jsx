@@ -8,8 +8,10 @@ import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCT_BY_CATEGORY_NAME_ROUTE } from "@/API/index.api.js";
 import Loading from "@/pages/component/Loading.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useTranslation } from "react-i18next";
 
 const HomeProductForGroup = () => {
+  const { t } = useTranslation();
   const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [activeTab, setActiveTab] = useState("Sản phẩm tiện lợi");
   const [productForGroups, setProductForGroups] = useState([]);
@@ -79,7 +81,7 @@ const HomeProductForGroup = () => {
         <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
           <div className="product_carousel-header mb-3 md:mb-5">
             <span className="product_carousel-title text-xl md:text-3xl font-bold">
-              Sản phẩm theo nhóm
+              {t("productForGroup.title")}
             </span>
           </div>
 
@@ -92,7 +94,7 @@ const HomeProductForGroup = () => {
               }`}
               onClick={() => setActiveTab("Sản phẩm tiện lợi")}
             >
-              Sản phẩm tiện lợi
+              {t("categories.Sản phẩm tiện lợi")}
             </Button>
             <Button
               className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
@@ -102,7 +104,7 @@ const HomeProductForGroup = () => {
               }`}
               onClick={() => setActiveTab("Mẹ và Bé")}
             >
-              Mẹ và Bé
+             {t("categories.Mẹ và Bé")}
             </Button>
             <Button
               className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
@@ -112,7 +114,7 @@ const HomeProductForGroup = () => {
               }`}
               onClick={() => setActiveTab("Chăm sóc cá nhân")}
             >
-              Chăm sóc cá nhân
+              {t("categories.Chăm sóc cá nhân")}
             </Button>
             <Button
               className={`bg-transparent text-black border border-[#0e562e] hover:bg-[#0e562e] hover:text-white font-normal hover:font-medium text-xs md:text-sm py-1 md:py-2 px-2 md:px-4 whitespace-nowrap flex-shrink-0 snap-start ${
@@ -122,7 +124,7 @@ const HomeProductForGroup = () => {
               }`}
               onClick={() => setActiveTab("Thiết bị y tế")}
             >
-              Thiết bị y tế
+              {t("categories.Thiết bị y tế")}
             </Button>
           </div>
 

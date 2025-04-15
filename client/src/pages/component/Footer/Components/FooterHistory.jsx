@@ -7,8 +7,10 @@ import Loading from "../../Loading.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import { GET_ALL_PRODUCTS_BY_HISTORY_ROUTE } from "@/API/index.api.js";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useTranslation } from "react-i18next";
 
 const FooterHistory = () => {
+  const {t} = useTranslation();
   const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [isLoading, setIsLoading] = useState(false);
   const [viewedProducts, setViewedProducts] = useState([]);
@@ -104,7 +106,7 @@ const FooterHistory = () => {
         <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
           <div className="product_carousel-header mb-3 md:mb-5">
             <span className="product_carousel-title text-xl md:text-3xl font-bold">
-              Sản phẩm vừa xem
+              {t("RecentlyViewed.title")}
             </span>
           </div>
 

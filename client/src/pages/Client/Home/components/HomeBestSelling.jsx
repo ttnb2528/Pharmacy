@@ -6,8 +6,10 @@ import { useContext, useState } from "react";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import Loading from "@/pages/component/Loading.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useTranslation } from "react-i18next";
 
 const HomeBestSelling = () => {
+  const { t } = useTranslation();
   const { hasLogin, setShowLogin } = useContext(HomeContext);
   const { productsBestSelling } = useContext(PharmacyContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -116,7 +118,7 @@ const HomeBestSelling = () => {
         <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
           <div className="product_carousel-header mb-3 md:mb-5">
             <span className="product_carousel-title text-xl md:text-3xl font-bold">
-              Sản phẩm bán chạy
+              {t("bestSelling.title")}
             </span>
           </div>
 

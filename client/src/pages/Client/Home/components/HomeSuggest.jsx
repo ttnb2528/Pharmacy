@@ -6,7 +6,10 @@ import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { useContext, useState } from "react";
 import Loading from "@/pages/component/Loading.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useTranslation } from "react-i18next";
+
 const HomeSuggest = () => {
+  const { t } = useTranslation();
   const { hasLogin, setShowLogin } = useContext(HomeContext);
   const { allProducts } = useContext(PharmacyContext);
   // get random 5 products
@@ -58,7 +61,7 @@ const HomeSuggest = () => {
         <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
           <div className="product_carousel-header mb-3 md:mb-5">
             <span className="product_carousel-title text-xl md:text-3xl font-bold">
-              Gợi ý hôm nay
+              {t("suggestion.title")}
             </span>
           </div>
 

@@ -8,8 +8,10 @@ import Loading from "@/pages/component/Loading.jsx";
 import { GET_ALL_PRODUCTS_DISCOUNT_ROUTE } from "@/API/index.api.js";
 import { apiClient } from "@/lib/api-client.js";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useTranslation } from "react-i18next";
 
 const HomeDeal = () => {
+  const { t } = useTranslation();
   const { hasLogin, setShowLogin } = useContext(HomeContext);
   const [remainingTime, setRemainingTime] = useState(moment.duration(0));
   const [all_products, setAllProducts] = useState([]);
@@ -174,11 +176,12 @@ const HomeDeal = () => {
       <div className="px-3 md:px-6 pt-4 md:pt-6 pb-6 md:pb-9">
         <div className="flex md:justify-between md:items-center gap-4">
           <h1 className="text-2xl md:text-4xl font-bold text-[#c31731] text-center sm:text-left">
-            Săn Deal <span className="hidden sm:inline-block">Chớp Nhoáng</span>
+            {t("deal.deal_title")}{" "}
+            <span className="hidden sm:inline-block">{t("deal.flash")}</span>
           </h1>
           <div className="flex items-center text-white">
             <h5 className="font-bold text-black text-lg md:text-2xl hidden sm:inline-block">
-              Kết Thúc trong:
+              {t("deal.ends_in")}
             </h5>
             <h5 className="font-bold mx-1 md:mx-2 bg-red-300 p-1 md:p-2 rounded text-sm md:text-base">
               {remainingTime.hours().toString().padStart(2, "0")}

@@ -40,5 +40,25 @@
     "address_book": "Sổ tay địa chỉ",
     "logout": "Đăng xuất",
     "login": "Đăng nhập"
+  },
+  "deal": {
+    "deal_title": "Săn Deal",
+    "flash": "Chớp Nhoáng",
+    "ends_in": "Kết Thúc trong:",
+    "hours": "giờ",
+    "minutes": "phút",
+    "seconds": "giây"
+  },
+  "bestSelling": {
+    "title": "Sản phẩm bán chạy"
+  },
+  "productForGroup": {
+    "title": "Sản phẩm theo nhóm"
+  },
+  "suggestion": {
+    "title": "Gợi ý hôm nay"
+  },
+  "RecentlyViewed": {
+    "title": "Sản phẩm vừa xem"
   }
 }
