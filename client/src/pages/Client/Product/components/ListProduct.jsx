@@ -4,8 +4,10 @@ import Loading from "@/pages/component/Loading.jsx";
 import { useMediaQuery } from "@/hook/use-media-query.js";
 import GridProduct from "./GridProduct";
 import MobileFilterControls from "./MobileFilterControls.jsx";
+import { useTranslation } from "react-i18next";
 
 const ProductList = ({ products }) => {
+  const { t } = useTranslation();
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +115,7 @@ const ProductList = ({ products }) => {
                     className="px-6 py-2 bg-white border border-[#26773d] text-[#26773d] rounded-lg font-medium"
                     onClick={loadMoreProducts}
                   >
-                    Xem thêm sản phẩm
+                    {t("Other.moreProduct")}
                   </button>
                 </div>
               )}
@@ -121,8 +123,7 @@ const ProductList = ({ products }) => {
           ) : (
             <div className="mt-4 p-6 bg-white rounded-lg flex items-center justify-center">
               <p className="text-base font-semibold text-gray-500">
-                Ôi không! Có lẽ không có sản phẩm nào phù hợp với yêu cầu của
-                bạn
+                {t("Other.emptyFilter")}
               </p>
             </div>
           )}
@@ -144,8 +145,7 @@ const ProductList = ({ products }) => {
           ) : (
             <div className="w-3/4 flex items-center justify-center rounded-lg">
               <p className="text-lg font-semibold text-gray-500">
-                Ôi không! Có lẽ không có sản phẩm nào phù hợp với yêu cầu của
-                bạn
+                {t("Other.emptyFilter")}
               </p>
             </div>
           )}

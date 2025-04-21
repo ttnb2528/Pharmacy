@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/index.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import slugify from "slugify";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ const Item = ({
   setShowLogin,
 }) => {
   // const { setSelectedProduct } = useContext(ProductContext);
+  const { t } = useTranslation();
   const { userInfo } = useAppStore();
   const navigate = useNavigate();
   const { setCart } = useContext(PharmacyContext);
@@ -172,7 +174,7 @@ const Item = ({
                 <div className="my-1 items-center whitespace-nowrap">
                   <div className="h-4 md:h-5"></div>
                   <span className="mt-1 block h-5 md:h-6 text-sm md:text-base font-bold text-red-600">
-                    Tạm hết hàng
+                    {t("Item.tempEmptyStock")}
                   </span>
                 </div>
               )}
@@ -185,14 +187,14 @@ const Item = ({
                     userInfo ? AddToCart(product.id) : setShowLogin(true)
                   }
                 >
-                  Thêm giỏ hàng
+                  {t("Item.add_to_cart")}
                 </Button>
               ) : (
                 <Button
                   className="w-5/6 bg-[#26773d] hover:bg-[#0e562e] text-xs md:text-sm py-1 md:py-2"
                   disabled
                 >
-                  Tạm hết hàng
+                  {t("Item.tempEmptyStock")}
                 </Button>
               )}
             </div>

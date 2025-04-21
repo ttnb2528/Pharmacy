@@ -17,8 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import MobileFilterOptions from "./MobileFilterOptions.jsx";
+import { useTranslation } from "react-i18next";
 
 const MobileFilterControls = ({ products, onFilter, onSort }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState({
     priceRange: null,
@@ -61,7 +63,7 @@ const MobileFilterControls = ({ products, onFilter, onSort }) => {
               }`}
             >
               <Filter className="h-4 w-4" />
-              Bộ lọc
+              {t("Filter.title")}
               {isFilterApplied && (
                 <span className="ml-1 h-5 w-5 rounded-full bg-[#26773d] text-white text-xs flex items-center justify-center">
                   {filters.selectedBrands.length +
@@ -73,7 +75,7 @@ const MobileFilterControls = ({ products, onFilter, onSort }) => {
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[80vh]">
             <SheetHeader>
-              <SheetTitle>Bộ lọc</SheetTitle>
+              <SheetTitle>{t("Filter.title")}</SheetTitle>
             </SheetHeader>
 
             <div className="py-4 overflow-auto h-[calc(100%-120px)]">
@@ -91,13 +93,13 @@ const MobileFilterControls = ({ products, onFilter, onSort }) => {
                 onClick={handleResetFilters}
                 disabled={!isFilterApplied}
               >
-                Thiết lập lại
+                {t("Filter.reset")}
               </Button>
               <Button
                 className="flex-1 bg-[#26773d] hover:bg-[#1e5f31]"
                 onClick={handleApplyFilters}
               >
-                Áp dụng
+                {t("Filter.apply")}
               </Button>
             </SheetFooter>
           </SheetContent>
@@ -105,12 +107,18 @@ const MobileFilterControls = ({ products, onFilter, onSort }) => {
 
         <Select onValueChange={handleSortChange}>
           <SelectTrigger className="w-[140px] h-9 text-sm">
-            <SelectValue placeholder="Sắp xếp theo" />
+            <SelectValue placeholder={t("Filter.sort_by.title")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="default">Mặc định</SelectItem>
-            <SelectItem value="price-asc">Giá tăng dần</SelectItem>
-            <SelectItem value="price-desc">Giá giảm dần</SelectItem>
+            <SelectItem value="default">
+              {t("Filter.sort_by.default")}
+            </SelectItem>
+            <SelectItem value="price-asc">
+              {t("Filter.sort_by.low_to_high")}
+            </SelectItem>
+            <SelectItem value="price-desc">
+              {t("Filter.sort_by.high_to_low")}
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>

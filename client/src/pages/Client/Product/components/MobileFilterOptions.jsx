@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const MobileFilterOptions = ({ products, filters, setFilters }) => {
+  const { t } = useTranslation();
   const [brands, setBrands] = useState([]);
   const [origins, setOrigins] = useState([]);
   const [searchBrand, setSearchBrand] = useState("");
@@ -89,7 +91,7 @@ const MobileFilterOptions = ({ products, filters, setFilters }) => {
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="price">
         <AccordionTrigger className="text-base font-semibold">
-          Khoảng giá
+          {t("Filter.price_range")}
         </AccordionTrigger>
         <AccordionContent>
           <RadioGroup
@@ -99,7 +101,7 @@ const MobileFilterOptions = ({ products, filters, setFilters }) => {
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="0-100000" id="price-1" />
-              <Label htmlFor="price-1">Dưới 100.000đ</Label>
+              <Label htmlFor="price-1">{t("Filter.under")} 100.000đ</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="100000-500000" id="price-2" />
@@ -111,7 +113,7 @@ const MobileFilterOptions = ({ products, filters, setFilters }) => {
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1000000" id="price-4" />
-              <Label htmlFor="price-4">Trên 1.000.000đ</Label>
+              <Label htmlFor="price-4">{t("Filter.over")} 1.000.000đ</Label>
             </div>
           </RadioGroup>
         </AccordionContent>
@@ -119,11 +121,11 @@ const MobileFilterOptions = ({ products, filters, setFilters }) => {
 
       <AccordionItem value="brand">
         <AccordionTrigger className="text-base font-semibold">
-          Thương hiệu
+        {t("Filter.brand")}
         </AccordionTrigger>
         <AccordionContent>
           <Input
-            placeholder="Tìm kiếm thương hiệu"
+            placeholder={t("Filter.searchBrand")}
             value={searchBrand}
             onChange={(e) => setSearchBrand(e.target.value)}
             className="mb-3"
@@ -147,11 +149,11 @@ const MobileFilterOptions = ({ products, filters, setFilters }) => {
 
       <AccordionItem value="origin">
         <AccordionTrigger className="text-base font-semibold">
-          Xuất xứ
+          {t("Filter.origin")}
         </AccordionTrigger>
         <AccordionContent>
           <Input
-            placeholder="Tìm kiếm xuất xứ"
+            placeholder={t("Filter.searchOrigin")}
             value={searchOrigin}
             onChange={(e) => setSearchOrigin(e.target.value)}
             className="mb-3"

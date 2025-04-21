@@ -75,5 +75,36 @@
   },
   "RecentlyViewed": {
     "title": "Recently Viewed Products"
+  },
+  "Item": {
+    "add_to_cart": "Add to Cart",
+    "selectProduct": "Select Product",
+    "tempEmptyStock": "Temporarily Out of Stock",
+    "productInfo": "Product Information",
+    "inStock": "In Stock",
+    "quantity": "Quantity",
+    "total": "Total"
+  },
+  "Filter": {
+    "title": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "price_range": "Price Range",
+    "under": "Under",
+    "over": "Over",
+    "brand": "Brand",
+    "searchBrand": "Search Brand",
+    "origin": "Origin",
+    "searchOrigin": "Search Origin",
+    "sort_by": {
+      "title": "Sort by",
+      "default": "Default",
+      "low_to_high": "Price Low to High",
+      "high_to_low": "Price High to Low"
+    }
+  },
+  "Other": {
+    "emptyFilter": "Oh no! There are probably no products that meet your requirements",
+    "moreProduct": "See more products"
   }
 }

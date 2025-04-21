@@ -1,8 +1,10 @@
 import { Collapse, Input, Checkbox, Radio } from "antd";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaRedo } from "react-icons/fa";
 
 const FilterProduct = ({ products, onFilter, setIsLoading }) => {
+  const { t } = useTranslation();
   const [priceRange, setPriceRange] = useState(null);
   const [brands, setBrands] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -93,26 +95,26 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     {
       key: "1",
       label: (
-        <span className="text-lg font-bold text-gray-400">Khoảng giá</span>
+        <span className="text-lg font-bold text-gray-400">{t("Filter.price_range")}</span>
       ),
       children: (
         <Radio.Group onChange={handlePriceChange} value={priceRange}>
-          <Radio value="0-100000">Dưới 100.000đ</Radio>
+          <Radio value="0-100000">{t("Filter.under")} 100.000đ</Radio>
           <Radio value="100000-500000">100.000đ - 500.000đ</Radio>
           <Radio value="500000-1000000">500.000đ - 1.000.000đ</Radio>
-          <Radio value="1000000">Trên 1.000.000đ</Radio>
+          <Radio value="1000000">{t("Filter.over")} 1.000.000đ</Radio>
         </Radio.Group>
       ),
     },
     {
       key: "2",
       label: (
-        <span className="text-lg font-bold text-gray-400">Thương hiệu</span>
+        <span className="text-lg font-bold text-gray-400">{t("Filter.brand")}</span>
       ),
       children: (
         <>
           <Input
-            placeholder="Tìm kiếm thương hiệu"
+            placeholder={t("Filter.searchBrand")}
             onChange={handleSearchBrandChange}
             value={searchBrand}
             className="mb-4"
@@ -135,11 +137,11 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     },
     {
       key: "3",
-      label: <span className="text-lg font-bold text-gray-400">Xuất xứ</span>,
+      label: <span className="text-lg font-bold text-gray-400">{t("Filter.origin")}</span>,
       children: (
         <>
           <Input
-            placeholder="Tìm kiếm xuất xứ"
+            placeholder={t("Filter.searchOrigin")}
             onChange={handleSearchOriginChange}
             value={searchOrigin}
             className="mb-4"
@@ -164,7 +166,7 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
 
   return (
     <div className="bg-white rounded-lg p-5 w-1/4 sticky top-3 h-fit">
-      <span className="text-xl font-bold">Bộ Lọc</span>
+      <span className="text-xl font-bold">{t("Filter.title")}</span>
       <Collapse
         items={items}
         bordered={false}
@@ -176,7 +178,7 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
           className="mt-4 flex justify-end items-center text-sm font-semibold text-neutral-500 cursor-pointer"
           onClick={handleResetFilter}
         >
-          <FaRedo className="mr-2" /> <span>Thiết lập lại</span>
+          <FaRedo className="mr-2" /> <span>{t("Filter.reset")}</span>
         </div>
       )}
     </div>

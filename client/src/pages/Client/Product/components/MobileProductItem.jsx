@@ -20,8 +20,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const MobileProductItem = ({ product, setIsLoading }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { setCart } = useContext(PharmacyContext);
   const { userInfo } = useAppStore();
@@ -162,7 +164,7 @@ const MobileProductItem = ({ product, setIsLoading }) => {
           </div>
         ) : (
           <span className="block text-sm font-bold text-red-600 mt-auto">
-            Tạm hết hàng
+            {t("Item.tempEmptyStock")}
           </span>
         )}
 
@@ -174,12 +176,14 @@ const MobileProductItem = ({ product, setIsLoading }) => {
                 !(product?.batches.length > 0 && product?.quantityStock > 0)
               }
             >
-              Chọn sản phẩm
+              {t("Item.selectProduct")}
             </Button>
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[80vh]">
             <SheetHeader>
-              <SheetTitle className="text-left">Thông tin sản phẩm</SheetTitle>
+              <SheetTitle className="text-left">
+                {t("Item.productInfo")}
+              </SheetTitle>
             </SheetHeader>
 
             <div className="py-4 overflow-auto h-[calc(100%-120px)]">
@@ -211,13 +215,13 @@ const MobileProductItem = ({ product, setIsLoading }) => {
                     </span>
                   )}
                   <p className="text-xs text-gray-500 mt-1">
-                    Còn lại: {product?.quantityStock} sản phẩm
+                    {t("Item.inStock")}
                   </p>
                 </div>
               </div>
 
               <div className="border-t pt-4">
-                <p className="font-medium mb-2">Số lượng</p>
+                <p className="font-medium mb-2">{t("Item.quantity")}</p>
                 <div className="flex items-center">
                   <Button
                     variant="outline"
@@ -249,7 +253,7 @@ const MobileProductItem = ({ product, setIsLoading }) => {
               </div>
 
               <div className="mt-4">
-                <p className="font-medium mb-2">Tổng tiền</p>
+                <p className="font-medium mb-2">{t("Item.total")}</p>
                 <p className="text-lg font-bold text-green-600">
                   {product?.isDiscount
                     ? convertVND(
@@ -268,7 +272,7 @@ const MobileProductItem = ({ product, setIsLoading }) => {
                 className="w-full bg-[#26773d] hover:bg-[#1e5f31]"
                 onClick={AddToCart}
               >
-                Thêm vào giỏ hàng
+                {t("Item.add_to_cart")}
               </Button>
             </SheetFooter>
           </SheetContent>

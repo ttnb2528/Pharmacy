@@ -60,5 +60,37 @@
   },
   "RecentlyViewed": {
     "title": "Sản phẩm vừa xem"
+  },
+  "Item": {
+    "add_to_cart": "Thêm vào giỏ hàng",
+    "selectProduct": "Chọn sản phẩm",
+    "tempEmptyStock": "Tạm hết hàng",
+    "productInfo": "Thông tin sản phẩm",
+    "inStock": "Còn hàng",
+    "quantity": "Số lượng",
+    "total": "Tổng tiền"
+  },
+  "Filter": {
+    "title": "Bộ lọc",
+    "reset": "Thiết lập lại",
+    "apply": "Áp dụng",
+    "price_range": "Khoảng giá",
+    "under": "Dưới",
+    "over": "Trên",
+    "brand": "Thương hiệu",
+    "searchBrand": "Tìm kiếm thương hiệu",
+    "origin": "Xuất xứ",
+    "searchOrigin": "Tìm kiếm xuất xứ",
+    "sort_by": {
+      "title": "Sắp xếp theo",
+      "default": "Mặc định",
+      "low_to_high": "Giá tăng dần",
+      "high_to_low": "Giá giảm dần"
+    }
+  },
+  "Other": {
+    "emptyFilter": "Ôi không! Có lẽ không có sản phẩm nào phù hợp với yêu cầu của bạn",
+    "moreProduct": "Xem thêm sản phẩm"
   }
+
 }
