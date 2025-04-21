@@ -18,7 +18,6 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     const uniqueBrands = Array.from(
       new Set(products.map((product) => product.brandId.name))
     );
-
     setBrands(uniqueBrands);
 
     // Extract unique origins from products
@@ -27,26 +26,25 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
         products.map((product) => product?.batches[0]?.ManufactureId?.country)
       )
     );
-
     setOrigins(uniqueOrigins);
   }, [products]);
 
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      onFilter({ priceRange, selectedBrands, selectedOrigins });
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [priceRange, selectedBrands, selectedOrigins]);
-
   const handlePriceChange = (e) => {
     setPriceRange(e.target.value);
+    setIsLoading(true);
+    setTimeout(() => {
+      onFilter({ priceRange: e.target.value, selectedBrands, selectedOrigins });
+      setIsLoading(false);
+    }, 500);
   };
 
   const handleBrandChange = (checkedValues) => {
     setSelectedBrands(checkedValues);
+    setIsLoading(true);
+    setTimeout(() => {
+      onFilter({ priceRange, selectedBrands: checkedValues, selectedOrigins });
+      setIsLoading(false);
+    }, 500);
   };
 
   const handleSearchBrandChange = (e) => {
@@ -55,6 +53,11 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
 
   const handleOriginChange = (checkedValues) => {
     setSelectedOrigins(checkedValues);
+    setIsLoading(true);
+    setTimeout(() => {
+      onFilter({ priceRange, selectedBrands, selectedOrigins: checkedValues });
+      setIsLoading(false);
+    }, 500);
   };
 
   const handleSearchOriginChange = (e) => {
@@ -79,23 +82,25 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     priceRange || selectedBrands.length > 0 || selectedOrigins.length > 0;
 
   const handleResetFilter = () => {
-    if (priceRange) setPriceRange(null);
-
-    if (selectedBrands.length > 0) {
-      setSelectedBrands([]);
-      setSearchBrand("");
-    }
-    if (selectedOrigins.length > 0) {
-      setSelectedOrigins([]);
-      setSearchOrigin("");
-    }
+    setIsLoading(true);
+    setPriceRange(null);
+    setSelectedBrands([]);
+    setSearchBrand("");
+    setSelectedOrigins([]);
+    setSearchOrigin("");
+    setTimeout(() => {
+      onFilter({ priceRange: null, selectedBrands: [], selectedOrigins: [] });
+      setIsLoading(false);
+    }, 500);
   };
 
   const items = [
     {
       key: "1",
       label: (
-        <span className="text-lg font-bold text-gray-400">{t("Filter.price_range")}</span>
+        <span className="text-lg font-bold text-gray-400">
+          {t("Filter.price_range")}
+        </span>
       ),
       children: (
         <Radio.Group onChange={handlePriceChange} value={priceRange}>
@@ -109,7 +114,9 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     {
       key: "2",
       label: (
-        <span className="text-lg font-bold text-gray-400">{t("Filter.brand")}</span>
+        <span className="text-lg font-bold text-gray-400">
+          {t("Filter.brand")}
+        </span>
       ),
       children: (
         <>
@@ -137,7 +144,11 @@ const FilterProduct = ({ products, onFilter, setIsLoading }) => {
     },
     {
       key: "3",
-      label: <span className="text-lg font-bold text-gray-400">{t("Filter.origin")}</span>,
+      label: (
+        <span className="text-lg font-bold text-gray-400">
+          {t("Filter.origin")}
+        </span>
+      ),
       children: (
         <>
           <Input

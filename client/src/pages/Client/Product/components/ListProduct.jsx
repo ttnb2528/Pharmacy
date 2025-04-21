@@ -8,48 +8,47 @@ import { useTranslation } from "react-i18next";
 
 const ProductList = ({ products }) => {
   const { t } = useTranslation();
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState(null);
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
   const isMobile = useMediaQuery("(max-width: 640px)");
   const [page, setPage] = useState(1);
   const productsPerPage = isMobile ? 6 : 12;
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setFilteredProducts(products);
-      setIsLoading(false);
-    }, 500);
+    if (products && products.length > 0) {
+      // Initialize or update products
+      let updatedProducts = [...products];
 
-    return () => clearTimeout(timer);
-  }, [products]);
+      // Apply sorting if needed
+      if (sortOrder === "price-asc") {
+        updatedProducts.sort(
+          (a, b) => a.batches[0].retailPrice - b.batches[0].retailPrice
+        );
+      } else if (sortOrder === "price-desc") {
+        updatedProducts.sort(
+          (a, b) => b.batches[0].retailPrice - a.batches[0].retailPrice
+        );
+      }
 
-  useEffect(() => {
-    // Apply sorting if needed
-    const sortedProducts = [...filteredProducts];
-
-    if (sortOrder === "price-asc") {
-      sortedProducts.sort(
-        (a, b) => a.batches[0].retailPrice - b.batches[0].retailPrice
-      );
-    } else if (sortOrder === "price-desc") {
-      sortedProducts.sort(
-        (a, b) => b.batches[0].retailPrice - a.batches[0].retailPrice
-      );
+      // Update filtered and displayed products
+      setFilteredProducts(products); // Set to full list on initial load
+      setDisplayedProducts(updatedProducts.slice(0, page * productsPerPage));
     }
-
-    // Set displayed products based on pagination
-    setDisplayedProducts(sortedProducts.slice(0, page * productsPerPage));
-  }, [filteredProducts, sortOrder, page, productsPerPage]);
+  }, [products, sortOrder, page, productsPerPage]);
 
   const handleFilter = (filters) => {
-    const { priceRange, selectedBrands, selectedOrigins } = filters;
+    setIsLoading(true);
+    setIsFilterApplied(true); // Mark that a user-applied filter has occurred
 
     let updatedProducts = products;
 
-    // Lọc theo khoảng giá
+    // Apply filters only if they exist
+    const { priceRange, selectedBrands, selectedOrigins } = filters;
+
+    // Filter by price range
     if (priceRange) {
       const [minPrice, maxPrice] = priceRange.split("-").map(Number);
       updatedProducts = updatedProducts.filter((product) => {
@@ -60,22 +59,35 @@ const ProductList = ({ products }) => {
       });
     }
 
-    // Lọc theo thương hiệu
+    // Filter by brands
     if (selectedBrands && selectedBrands.length > 0) {
       updatedProducts = updatedProducts.filter((product) =>
         selectedBrands.includes(product.brandId.name)
       );
     }
 
-    // Lọc theo xuất xứ
+    // Filter by origins
     if (selectedOrigins && selectedOrigins.length > 0) {
       updatedProducts = updatedProducts.filter((product) =>
         selectedOrigins.includes(product.batches[0].ManufactureId.country)
       );
     }
 
+    // Apply sorting to filtered products
+    if (sortOrder === "price-asc") {
+      updatedProducts.sort(
+        (a, b) => a.batches[0].retailPrice - b.batches[0].retailPrice
+      );
+    } else if (sortOrder === "price-desc") {
+      updatedProducts.sort(
+        (a, b) => b.batches[0].retailPrice - a.batches[0].retailPrice
+      );
+    }
+
     setFilteredProducts(updatedProducts);
-    setPage(1); // Reset pagination when filter changes
+    setDisplayedProducts(updatedProducts.slice(0, productsPerPage)); // Reset to first page
+    setPage(1);
+    setIsLoading(false);
   };
 
   const handleSort = (order) => {
@@ -121,11 +133,13 @@ const ProductList = ({ products }) => {
               )}
             </div>
           ) : (
-            <div className="mt-4 p-6 bg-white rounded-lg flex items-center justify-center">
-              <p className="text-base font-semibold text-gray-500">
-                {t("Other.emptyFilter")}
-              </p>
-            </div>
+            isFilterApplied && (
+              <div className="mt-4 p-6 bg-white rounded-lg flex items-center justify-center">
+                <p className="text-base font-semibold text-gray-500">
+                  {t("Other.emptyFilter")}
+                </p>
+              </div>
+            )
           )}
         </>
       ) : (
@@ -136,18 +150,20 @@ const ProductList = ({ products }) => {
             setIsLoading={setIsLoading}
           />
 
-          {filteredProducts.length > 0 ? (
+          {displayedProducts.length > 0 ? (
             <GridProduct
-              products={filteredProducts}
+              products={displayedProducts}
               setIsLoading={setIsLoading}
               isMobile={isMobile}
             />
           ) : (
-            <div className="w-3/4 flex items-center justify-center rounded-lg">
-              <p className="text-lg font-semibold text-gray-500">
-                {t("Other.emptyFilter")}
-              </p>
-            </div>
+            isFilterApplied && (
+              <div className="w-3/4 flex items-center justify-center rounded-lg">
+                <p className="text-lg font-semibold text-gray-500">
+                  {t("Other.emptyFilter")}
+                </p>
+              </div>
+            )
           )}
         </div>
       )}
