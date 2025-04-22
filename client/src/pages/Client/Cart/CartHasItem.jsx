@@ -5,16 +5,17 @@ import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { useMediaQuery } from "@/hook/use-media-query.js";
 import { apiClient } from "@/lib/api-client.js";
 import { CLEAR_CART_ROUTE } from "@/API/index.api.js";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import Loading from "@/pages/component/Loading.jsx";
 import MobileCartHeader from "./components/MobileCartHeader.jsx";
 import MobileCartSummary from "./components/MobileCartSummary.jsx";
+import { useNotification } from "@/context/NotificationContext.jsx";
 
 const CartHasItem = () => {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const [isLoading, setIsLoading] = useState(false);
   const { setCart } = useContext(PharmacyContext);
-  
+  const { showNotification } = useNotification();
 
   const handleRemoveAllProducts = async () => {
     try {
@@ -29,13 +30,24 @@ const CartHasItem = () => {
           });
           return newCart;
         });
-        toast.success(res.data.message);
+        // toast.success(res.data.message);
+        showNotification(
+          "success",
+          "Xóa giỏ hàng",
+          "Đã xóa tất cả sản phẩm trong giỏ hàng"
+        );
       } else {
-        toast.error(res.data.message);
+        // toast.error(res.data.message || "Không thể xóa giỏ hàng");
+        showNotification(
+          "error",
+          "Lỗi",
+          res.data.message || "Không thể xóa giỏ hàng"
+        );
       }
     } catch (error) {
       console.log(error);
-      toast.error("Đã xảy ra lỗi khi xóa giỏ hàng");
+      // toast.error("Đã xảy ra lỗi khi xóa giỏ hàng");
+      showNotification("error", "Lỗi", "Đã xảy ra lỗi khi xóa giỏ hàng");
     } finally {
       setIsLoading(false);
     }

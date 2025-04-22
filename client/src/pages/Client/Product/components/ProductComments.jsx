@@ -2,7 +2,7 @@ import { useState, useContext, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client.js";
 import {
   CHECK_PURCHASE_ROUTE,
@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Edit, Trash } from "lucide-react";
+import { useNotification } from "@/context/NotificationContext.jsx";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MAX_FILES = 5;
@@ -55,6 +56,7 @@ const ProductComments = ({ productId }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 640px)");
   const [commentToDelete, setCommentToDelete] = useState(null);
+  const { showNotification } = useNotification();
 
   const fetchComments = async () => {
     try {
@@ -106,18 +108,23 @@ const ProductComments = ({ productId }) => {
 
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    
+
     // Kiểm tra số lượng file
     if (images.length + selectedFiles.length > MAX_FILES) {
-      toast.error(`Bạn chỉ có thể tải lên tối đa ${MAX_FILES} ảnh!`);
+      // toast.error(`Bạn chỉ có thể tải lên tối đa ${MAX_FILES} ảnh!`);
+      showNotification(
+        "error",
+        "Lỗi",
+        `Bạn chỉ có thể tải lên tối đa ${MAX_FILES} ảnh!`
+      );
       return;
     }
 
     // Kiểm tra kích thước từng file
     let validFiles = [];
     let hasInvalidSize = false;
-    
-    selectedFiles.forEach(file => {
+
+    selectedFiles.forEach((file) => {
       if (file.size > MAX_FILE_SIZE) {
         hasInvalidSize = true;
       } else {
@@ -126,15 +133,22 @@ const ProductComments = ({ productId }) => {
     });
 
     if (hasInvalidSize) {
-      toast.error(`Một số ảnh có dung lượng trên 2MB và sẽ không được tải lên.`);
+      // toast.error(
+      //   `Một số ảnh có dung lượng trên 2MB và sẽ không được tải lên.`
+      // );
+      showNotification(
+        "error",
+        "Lỗi",
+        `Một số ảnh có dung lượng trên 2MB và sẽ không được tải lên.`
+      );
     }
 
     // Cập nhật state với các file hợp lệ
-    setImages(prevImages => [...prevImages, ...validFiles]);
+    setImages((prevImages) => [...prevImages, ...validFiles]);
   };
 
   const removeImage = (index) => {
-    setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const uploadToCloudinary = async (files) => {
@@ -171,25 +185,37 @@ const ProductComments = ({ productId }) => {
     const reviewImages = mobileReviewData?.images || images;
 
     if (!reviewText.trim()) {
-      toast.error("Vui lòng nhập bình luận!");
+      // toast.error("Vui lòng nhập bình luận!");
+      showNotification("error", "Lỗi", "Vui lòng nhập bình luận!");
       return;
     }
 
     if (reviewRating < 1 || reviewRating > 5) {
-      toast.error("Vui lòng chọn số sao từ 1 đến 5!");
+      // toast.error("Vui lòng chọn số sao từ 1 đến 5!");
+      showNotification("error", "Lỗi", "Vui lòng chọn số sao từ 1 đến 5!");
       return;
     }
 
     // Kiểm tra số lượng ảnh
     if (reviewImages.length > MAX_FILES) {
-      toast.error(`Chỉ được phép tải lên tối đa ${MAX_FILES} ảnh!`);
+      // toast.error(`Chỉ được phép tải lên tối đa ${MAX_FILES} ảnh!`);
+      showNotification(
+        "error",
+        "Lỗi",
+        `Chỉ được phép tải lên tối đa ${MAX_FILES} ảnh!`
+      );
       return;
     }
-    
+
     // Kiểm tra kích thước của từng ảnh
-    const hasLargeImage = reviewImages.some(img => img.size > MAX_FILE_SIZE);
+    const hasLargeImage = reviewImages.some((img) => img.size > MAX_FILE_SIZE);
     if (hasLargeImage) {
-      toast.error("Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB!");
+      // toast.error("Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB!");
+      showNotification(
+        "error",
+        "Lỗi",
+        "Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB!"
+      );
       return;
     }
 
@@ -200,7 +226,12 @@ const ProductComments = ({ productId }) => {
         imageUrls = await uploadToCloudinary(reviewImages);
       } catch (error) {
         console.error("Error uploading images:", error);
-        toast.error("Không thể upload ảnh, vui lòng thử lại!");
+        // toast.error("Không thể upload ảnh, vui lòng thử lại!");
+        showNotification(
+          "error",
+          "Lỗi",
+          "Không thể upload ảnh, vui lòng thử lại!"
+        );
         setIsLoading(false);
         return;
       }
@@ -243,12 +274,22 @@ const ProductComments = ({ productId }) => {
       setEditCommentId(null);
       setWarning(null);
 
-      toast.success(
+      // toast.success(
+      //   editCommentId ? "Đánh giá đã được cập nhật!" : "Đánh giá đã được gửi!"
+      // );
+      showNotification(
+        "success",
+        "Thành công",
         editCommentId ? "Đánh giá đã được cập nhật!" : "Đánh giá đã được gửi!"
       );
     } catch (error) {
       console.error("Error submitting comment:", error.response?.data || error);
-      toast.error(
+      // toast.error(
+      //   error.response?.data?.message || "Đã xảy ra lỗi khi gửi bình luận."
+      // );
+      showNotification(
+        "error",
+        "Lỗi",
         error.response?.data?.message || "Đã xảy ra lỗi khi gửi bình luận."
       );
     } finally {
@@ -640,9 +681,7 @@ const ProductComments = ({ productId }) => {
                       {images.map((img, idx) => (
                         <div key={idx} className="relative group">
                           <img
-                            src={
-                              URL.createObjectURL(img) || "/placeholder.svg"
-                            }
+                            src={URL.createObjectURL(img) || "/placeholder.svg"}
                             alt="Preview"
                             className="w-16 h-16 object-cover rounded-md border"
                           />

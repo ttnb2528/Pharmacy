@@ -34,12 +34,12 @@ import {
 import { Input } from "@/components/ui/input.jsx";
 import { convertVND } from "@/utils/ConvertVND.js";
 import { CalculateProductWithSale } from "@/utils/Calculate.js";
-import { toast } from "sonner";
 import Loading from "../../Loading.jsx";
 import slugify from "slugify";
 import { useAppStore } from "@/store/index.js";
 import { useMediaQuery } from "@/hook/use-media-query.js";
 import { useTranslation } from "react-i18next";
+import { useNotification } from "@/context/NotificationContext.jsx";
 
 const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
   const { t } = useTranslation();
@@ -60,6 +60,7 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
   const [loading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
   const searchContainerRef = useRef(null);
+  const { showNotification } = useNotification();
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
 
@@ -124,9 +125,14 @@ const NavSearch = ({ setMobileMenuOpen, mobileMenuOpen }) => {
           ...prev,
           [productId]: 0,
         }));
-        toast.success(res.data.message);
+
+        showNotification("success", "Xóa sản phẩm", `${res.data.message}`);
       } else {
-        toast.error(res.data.message);
+        showNotification(
+          "error",
+          "Lỗi",
+          res.data.message || "Không thể xóa sản phẩm khỏi giỏ hàng"
+        );
       }
     } catch (error) {
       console.error(error);

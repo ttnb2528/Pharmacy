@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useNotification } from "@/context/NotificationContext.jsx";
 import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { apiClient } from "@/lib/api-client.js";
 import Loading from "@/pages/component/Loading.jsx";
@@ -14,7 +15,7 @@ import {
 import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { toast } from "sonner";
+
 
 const ProductDetailInfo = ({ product }) => {
   const { userInfo } = useAppStore();
@@ -22,6 +23,7 @@ const ProductDetailInfo = ({ product }) => {
   const { setCart } = useContext(PharmacyContext);
   const [qty, setQty] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const { showNotification } = useNotification();
 
   const rank = userInfo?.accountId?.loyaltyProgramId?.rank;
 
@@ -46,7 +48,11 @@ const ProductDetailInfo = ({ product }) => {
     try {
       setIsLoading(true);
       if (quantity > 20) {
-        toast.error("Số lượng sản phẩm tối đa là 20");
+        showNotification(
+          "error",
+          "Lỗi",
+          "Số lượng sản phẩm không được vượt quá 20"
+        );
         setIsLoading(false);
         return;
       }
@@ -63,7 +69,11 @@ const ProductDetailInfo = ({ product }) => {
           };
         });
 
-        toast.success("Thêm vào giỏ hàng thành công");
+        showNotification(
+          "success",
+          "Thêm vào giỏ hàng",
+          `${product.name} đã được thêm vào giỏ hàng!`
+        );
       }
     } catch (error) {
       console.error(error);
@@ -235,7 +245,11 @@ const ProductDetailInfo = ({ product }) => {
                 if (qty > 0) {
                   userInfo ? AddToCart(product?.id, qty) : setShowLogin(true);
                 } else {
-                  toast.error("Số lượng phải lớn hơn 0");
+                  showNotification(
+                    "warning",
+                    "Lỗi",
+                    "Số lượng phải lớn hơn không"
+                  );
                 }
               }}
               disabled={!(product?.quantityStock > 0)}

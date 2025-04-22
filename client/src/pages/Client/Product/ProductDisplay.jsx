@@ -12,24 +12,28 @@ import { PharmacyContext } from "@/context/Pharmacy.context.jsx";
 import { HomeContext } from "@/context/HomeContext.context.jsx";
 import { useAppStore } from "@/store/index.js";
 import { apiClient } from "@/lib/api-client.js";
-import { ADD_TO_CART_ROUTE, GET_PRODUCT_BY_SLUG_ROUTE, GET_PRODUCT_ROUTE } from "@/API/index.api.js";
+import {
+  ADD_TO_CART_ROUTE,
+  GET_PRODUCT_BY_SLUG_ROUTE,
+} from "@/API/index.api.js";
 import { toast } from "sonner";
 import MobileProductHeader from "./components/MobileProductHeader.jsx";
 import MobileProductSwiper from "./components/MobileProductSwiper.jsx";
 import MobileProductDescription from "./components/MobileProductDescription.jsx";
 import MobileProductActions from "./components/MobileProductActions.jsx";
 import Loading from "@/pages/component/Loading.jsx";
-import slugify from "slugify";
+import { useNotification } from "@/context/NotificationContext.jsx";
 
 const ProductDisplay = () => {
   const { state } = useLocation();
   const { categorySlug, productSlug } = useParams();
   const navigate = useNavigate();
-  
+  const { showNotification } = useNotification();
+
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [apiError, setApiError] = useState(null);
-  
+
   const isMobile = useMediaQuery("(max-width: 640px)");
   const [quantity, setQuantity] = useState(1);
   const { setCart } = useContext(PharmacyContext);
@@ -39,8 +43,12 @@ const ProductDisplay = () => {
   // Fetch product data regardless of state
   useEffect(() => {
     const fetchProductData = async () => {
-      console.log("fetchProductData được gọi với:", { categorySlug, productSlug, hasState: !!state?.product });
-      
+      console.log("fetchProductData được gọi với:", {
+        categorySlug,
+        productSlug,
+        hasState: !!state?.product,
+      });
+
       // Nếu có state, sử dụng data từ state trước
       if (state?.product) {
         console.log("Sử dụng dữ liệu từ state:", state.product.name);
@@ -49,24 +57,30 @@ const ProductDisplay = () => {
         setIsLoading(false);
         return;
       }
-      
+
       // Nếu không có state hoặc không có product trong state, fetch từ API
       if (categorySlug && productSlug) {
         try {
           setIsLoading(true);
-          console.log(`Đang tải sản phẩm với slug: ${categorySlug}/${productSlug}`);
+          console.log(
+            `Đang tải sản phẩm với slug: ${categorySlug}/${productSlug}`
+          );
           console.log("API endpoint:", GET_PRODUCT_BY_SLUG_ROUTE);
-          
+
           const response = await apiClient.get(GET_PRODUCT_BY_SLUG_ROUTE, {
-            params: { 
-              categorySlug, 
-              productSlug 
-            }
+            params: {
+              categorySlug,
+              productSlug,
+            },
           });
 
-          console.log('API response full:', response);
-          
-          if (response.status === 200 && response.data.status === 200 && response.data.data) {
+          console.log("API response full:", response);
+
+          if (
+            response.status === 200 &&
+            response.data.status === 200 &&
+            response.data.data
+          ) {
             console.log("Dữ liệu sản phẩm nhận được:", response.data.data.name);
             setProduct(response.data.data);
             updateViewedProducts(response.data.data);
@@ -78,7 +92,9 @@ const ProductDisplay = () => {
           }
         } catch (error) {
           console.error("Lỗi khi lấy thông tin sản phẩm:", error);
-          setApiError(error.message || "Có lỗi xảy ra khi tải thông tin sản phẩm");
+          setApiError(
+            error.message || "Có lỗi xảy ra khi tải thông tin sản phẩm"
+          );
           toast.error("Có lỗi xảy ra khi tải thông tin sản phẩm");
           // Không navigate ngay để xem lỗi
         } finally {
@@ -96,16 +112,19 @@ const ProductDisplay = () => {
 
   const updateViewedProducts = (productData) => {
     if (!productData) return;
-    
+
     try {
-      const storedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
-      let updatedProducts = storedProducts.filter((p) => p.id !== productData.id);
+      const storedProducts =
+        JSON.parse(localStorage.getItem("viewedProducts")) || [];
+      let updatedProducts = storedProducts.filter(
+        (p) => p.id !== productData.id
+      );
       updatedProducts = [...updatedProducts, productData];
-      
+
       if (updatedProducts.length > 10) {
         updatedProducts = updatedProducts.slice(1);
       }
-      
+
       localStorage.setItem("viewedProducts", JSON.stringify(updatedProducts));
       window.dispatchEvent(new CustomEvent("viewedProductsUpdated"));
     } catch (error) {
@@ -122,7 +141,11 @@ const ProductDisplay = () => {
     try {
       setIsLoading(true);
       if (quantity > 20) {
-        toast.error("Số lượng sản phẩm tối đa là 20");
+        showNotification(
+          "error",
+          "Lỗi",
+          "Số lượng sản phẩm không được vượt quá 20"
+        );
         setIsLoading(false);
         return;
       }
@@ -140,11 +163,20 @@ const ProductDisplay = () => {
           };
         });
 
-        toast.success("Thêm vào giỏ hàng thành công");
+        showNotification(
+          "success",
+          "Thêm vào giỏ hàng",
+          `${product.name} đã được thêm vào giỏ hàng!`
+        );
       }
     } catch (error) {
       console.error(error);
-      toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
+      showNotification(
+        "error",
+        "Lỗi",
+        error.response?.data?.message ||
+          "Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -158,11 +190,13 @@ const ProductDisplay = () => {
     return (
       <div className="container mx-auto py-20 text-center">
         <h2 className="text-2xl font-bold mb-4">Không tìm thấy sản phẩm</h2>
-        <p className="mb-6">Sản phẩm bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+        <p className="mb-6">
+          Sản phẩm bạn tìm kiếm không tồn tại hoặc đã bị xóa.
+        </p>
         {apiError && (
           <p className="mb-4 text-red-500">Chi tiết lỗi: {apiError}</p>
         )}
-        <button 
+        <button
           onClick={() => navigate("/")}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
         >
