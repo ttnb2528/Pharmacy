@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import Loading from "@/pages/component/Loading.jsx";
 import { ArrowDownLeft, ShoppingBag } from "lucide-react";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 
 const orderStatuses = [
   { value: import.meta.env.VITE_STATUS_ORDER_COMPLETED, vi: "Hoàn thành" },
@@ -32,7 +33,7 @@ const OrderDetail = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log("Order Detail:", orderDetail);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   // Xác định xem đơn hàng có phải là đơn hoàn tiền không
   const isRefundOrder = orderDetail?.type === "return";
@@ -246,7 +247,7 @@ const OrderDetail = () => {
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-semibold mb-6 flex items-center">
           <IoIosArrowBack
-            className="px-4 w-auto cursor-pointer"
+            className={`${isMobile ? "" : "px-4"} w-auto cursor-pointer"`}
             onClick={() => navigate(-1)}
           />
           Chi tiết đơn hàng
@@ -359,9 +360,11 @@ const OrderDetail = () => {
                 : orderDetail?.medicines
               )?.map((item, index) => (
                 <div key={index}>
-                  <div className="grid grid-cols-[1fr_calc(26rem/2)] gap-10 py-2">
+                  {/* Thay đổi cấu trúc grid cho responsive tốt hơn */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 py-2">
+                    {/* Thông tin sản phẩm */}
                     <div className="flex items-center">
-                      <div>
+                      <div className="flex-shrink-0">
                         <img
                           src={
                             type === "store"
@@ -372,25 +375,27 @@ const OrderDetail = () => {
                           className="w-10 h-10 object-cover border mr-4"
                         />
                       </div>
-                      <div>
-                        <div className="line-clamp-1">{item.name}</div>
+                      <div className="min-w-0 flex-grow">
+                        <div className="line-clamp-1 font-medium">{item.name}</div>
                         <div className="text-sm text-gray-500">{item.unit}</div>
                       </div>
                     </div>
-                    <div className="flex-1 flex justify-between">
-                      <div>{item.quantity}x</div>
-                      <div>
+                    
+                    {/* Giá và số lượng */}
+                    <div className="flex justify-between gap-2 items-center sm:ml-auto sm:w-[140px] sm:flex-shrink-0 flex-row-reverse sm:flex-row">
+                      <div className="text-sm">{item.quantity}x</div>
+                      <div className="text-right">
                         {item.discount > 0 ? (
-                          <>
-                            <span className="line-through mr-2 text-gray-500">
+                          <div className="flex gap-2 items-center">
+                            <div className="line-through text-xs text-gray-500">
                               {convertVND(item.price)}
-                            </span>
-                            <span className="font-semibold">
+                            </div>
+                            <div className="font-semibold">
                               {convertVND(
                                 item.price * (1 - item.discount / 100)
                               )}
-                            </span>
-                          </>
+                            </div>
+                          </div>
                         ) : (
                           <span className="font-semibold">
                             {convertVND(item.price)}

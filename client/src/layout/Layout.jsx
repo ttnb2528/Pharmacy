@@ -1,4 +1,5 @@
 import { HomeContext } from "@/context/HomeContext.context.jsx";
+import { useMediaQuery } from "@/hook/use-media-query.js";
 import Login from "@/pages/Client/Home/components/Login.jsx";
 import FloatingActions from "@/pages/component/FloatingActions.jsx";
 import Footer from "@/pages/component/Footer/Footer.jsx";
@@ -11,10 +12,15 @@ export const Layout = () => {
   const { showLogin, setShowLogin } = useContext(HomeContext);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const isMobile = useMediaQuery("(max-width: 640px)");
   return (
     <>
       {showLogin && <Login close={() => setShowLogin(false)} />}
-      <div className="h-[100vh] md:h-full flex flex-col w-full bg-[#e5e5e5] pb-16 md:pb-0">
+      <div
+        className={`${
+          isMobile ? "h-full" : "h-[100vh]"
+        }  md:h-full flex flex-col w-full bg-[#e5e5e5] pb-16 md:pb-0`}
+      >
         <div
           className={`${
             !isHomePage ? "hidden md:block" : ""
