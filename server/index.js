@@ -21,8 +21,8 @@ app.use(
       process.env.ADMIN,
       process.env.CLOUDINARY,
       // test phone
-      "http://192.168.1.8:5174",
-      "http://192.168.1.8:5173",
+      "http://10.2.8.140:5174",
+      "http://10.2.8.140:5173",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,

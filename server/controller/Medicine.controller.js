@@ -12,6 +12,7 @@ import { Readable } from "stream";
 import unzipper from "unzipper";
 import * as XLSX from "xlsx";
 import axios from "axios";
+import slugify from "slugify";
 
 export const addMedicine = asyncHandler(async (req, res) => {
   const { error } = validate(req.body);
@@ -197,6 +198,66 @@ export const getMedicine = asyncHandler(async (req, res) => {
   );
 });
 
+export const getMedicineBySlug = asyncHandler(async (req, res) => {
+  try {
+    const { categorySlug, productSlug } = req.query;
+    console.log("Tìm kiếm sản phẩm theo slug:", { categorySlug, productSlug });
+    
+    // Lấy tất cả danh mục
+    const categories = await Category.find({});
+    console.log("Số lượng danh mục tìm được:", categories.length);
+    
+    // Tìm danh mục phù hợp bằng cách so sánh slug
+    const foundCategory = categories.find(category => {
+      const catSlug = slugify(category.name, { lower: true });
+      console.log(`So sánh: '${catSlug}' với '${categorySlug}'`);
+      return catSlug === categorySlug;
+    });
+    
+    if (!foundCategory) {
+      console.log("Không tìm thấy danh mục nào phù hợp với:", categorySlug);
+      return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục"));
+    }
+    
+    console.log("Đã tìm thấy danh mục:", foundCategory.name);
+    
+    // Lấy tất cả thuốc thuộc danh mục này
+    const medicines = await Medicine.find({ categoryId: foundCategory._id })
+      .populate("categoryId")
+      .populate("brandId");
+    
+    console.log("Số lượng thuốc trong danh mục này:", medicines.length);
+    
+    // Tìm thuốc phù hợp với slug
+    const foundMedicine = medicines.find(medicine => {
+      const medSlug = slugify(medicine.name, { lower: true });
+      console.log(`So sánh sản phẩm: '${medSlug}' với '${productSlug}'`);
+      return medSlug === productSlug;
+    });
+    
+    if (!foundMedicine) {
+      console.log("Không tìm thấy thuốc nào phù hợp với:", productSlug);
+      return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+    }
+    
+    console.log("Đã tìm thấy thuốc:", foundMedicine.name);
+    
+    // Lấy thông tin về batches
+    const batches = await Batch.find({ MedicineId: foundMedicine._id })
+      .populate("SupplierId")
+      .populate("ManufactureId");
+      
+    foundMedicine._doc.batches = batches;
+    
+    res.json(
+      jsonGenerate(StatusCode.OK, "Lấy thông tin thuốc thành công", foundMedicine)
+    );
+  } catch (error) {
+    console.error("Lỗi trong hàm getMedicineBySlug:", error);
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
 export const getMedicineByBestSelling = asyncHandler(async (req, res) => {
   const medicines = await Medicine.find()
     .sort({ sold: -1 })
@@ -318,139 +379,6 @@ export const updateImagesMedicine = asyncHandler(async (req, res) => {
     )
   );
 });
-
-// export const bulkAddMedicines = async (req, res) => {
-//   const zipFile = req.file;
-//   console.log("Received zipFile:", zipFile ? zipFile.originalname : "No file");
-
-//   if (!zipFile) {
-//     return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Vui lòng gửi file .zip"));
-//   }
-
-//   try {
-//     console.log("Starting zip processing...");
-//     const zipStream = Readable.from(zipFile.buffer);
-//     const zip = zipStream.pipe(unzipper.Parse({ forceStream: true }));
-
-//     let excelData = null;
-//     const imageBuffers = new Map();
-
-//     console.log("Parsing zip entries...");
-//     for await (const entry of zip) {
-//       const fileName = entry.path;
-//       console.log("Processing entry:", fileName);
-
-//       try {
-//         const fileBuffer = await entry.buffer();
-//         if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
-//           console.log("Reading Excel file:", fileName);
-//           const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-//           const sheetName = workbook.SheetNames[0];
-//           const worksheet = workbook.Sheets[sheetName];
-//           excelData = XLSX.utils.sheet_to_json(worksheet);
-//           console.log("Excel data extracted:", excelData.length, "rows");
-//         } else if (fileName.startsWith("images/")) {
-//           const imageName = fileName.split("/")[1];
-//           console.log("Storing image buffer:", imageName);
-//           imageBuffers.set(imageName, fileBuffer);
-//         } else {
-//           console.log("Skipping unknown file:", fileName);
-//           entry.autodrain();
-//         }
-//       } catch (entryError) {
-//         console.error("Error processing entry:", fileName, entryError);
-//         entry.autodrain();
-//       }
-//     }
-
-//     if (!excelData) {
-//       console.log("No Excel data found in zip");
-//       return res.json(jsonGenerate(StatusCode.BAD_REQUEST, "Không tìm thấy file Excel trong zip"));
-//     }
-
-//     console.log("Processing medicines...");
-//     const uploadedMedicines = [];
-
-//     for (const medicineData of excelData) {
-//       let imageUrls = [];
-
-//       if (medicineData["Hình ảnh"]) {
-//         const imageFileNames = medicineData["Hình ảnh"].split(",").map((name) => name.trim());
-//         console.log("Image file names for", medicineData["Tên thuốc"], ":", imageFileNames);
-
-//         for (const imageFileName of imageFileNames) {
-//           const imageBuffer = imageBuffers.get(imageFileName);
-//           console.log("Image buffer for", imageFileName, ":", imageBuffer ? "Found" : "Not found");
-
-//           if (imageBuffer) {
-//             try {
-//               console.log("Uploading", imageFileName, "to Cloudinary...");
-//               const uploadPromise = new Promise((resolve, reject) => {
-//                 const uploadStream = cloudinary.uploader.upload_stream(
-//                   { folder: "pharmacy-product" },
-//                   (error, result) => {
-//                     if (error) {
-//                       console.error("Cloudinary upload error:", error);
-//                       reject(error);
-//                     } else {
-//                       console.log("Uploaded", imageFileName, ":", result.secure_url);
-//                       resolve(result);
-//                     }
-//                   }
-//                 );
-//                 Readable.from(imageBuffer).pipe(uploadStream);
-//                 // Xử lý timeout thủ công
-//                 setTimeout(() => reject(new Error("Upload timeout")), 30000); // Timeout 30s
-//               });
-
-//               const result = await uploadPromise;
-//               imageUrls.push(result.secure_url);
-//             } catch (uploadError) {
-//               console.error("Failed to upload", imageFileName, ":", uploadError.message);
-//               // Tiếp tục với ảnh tiếp theo thay vì treo
-//             }
-//           } else {
-//             console.warn(`Không tìm thấy ảnh ${imageFileName} trong zip`);
-//           }
-//         }
-//       }
-
-//       console.log("Creating medicine:", medicineData["Tên thuốc"]);
-//       const newMedicine = new Medicine({
-//         name: medicineData["Tên thuốc"],
-//         dosage: medicineData["Liều lượng"],
-//         unit: medicineData["Đơn vị"],
-//         instructions: medicineData["Hướng dẫn"],
-//         description: medicineData["Mô tả"],
-//         usage: medicineData["Công dụng"],
-//         packaging: medicineData["Quy cách đóng gói"],
-//         sideEffects: medicineData["Tác dụng phụ"],
-//         isRx: medicineData["Kê đơn"] === "True",
-//         targetUser: medicineData["Đối tượng sử dụng"],
-//         brandName: medicineData["Tên thương hiệu"],
-//         categoryId: medicineData["Tên danh mục"],
-//         discount: medicineData["Giảm giá"] === "True",
-//         discountPercentage: Number(medicineData["Phần trăm giảm giá"]),
-//         ingredients: medicineData["Thành phần"]?.split(", ") || [],
-//         images: imageUrls,
-//       });
-
-//       const savedMedicine = await newMedicine.save();
-//       uploadedMedicines.push(savedMedicine);
-//       console.log("Saved medicine:", savedMedicine.name);
-//     }
-
-//     console.log("Processing complete, sending response...");
-//     return res.json(
-//       jsonGenerate(StatusCode.CREATED, "Nhập thuốc thành công", uploadedMedicines)
-//     );
-//   } catch (error) {
-//     console.error("Error in bulkAddMedicines:", error);
-//     return res.json(
-//       jsonGenerate(StatusCode.INTERNAL_SERVER_ERROR, "Lỗi máy chủ khi nhập thuốc")
-//     );
-//   }
-// };
 
 export const bulkAddMedicines = async (req, res) => {
   const zipFile = req.file;

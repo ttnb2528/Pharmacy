@@ -68,17 +68,13 @@ const App = () => {
       {
         path: "/",
         element: (
-          // <HomeContextProvider>
           <Layout />
-          // </HomeContextProvider>
         ),
         children: [
           {
             path: "/",
             element: (
-              // <HomeContextProvider>
               <Home />
-              // </HomeContextProvider>
             ),
           },
           {
@@ -89,23 +85,16 @@ const App = () => {
             path: "/cart",
             element: <Cart />,
           },
-          // Thêm các category routes vào đây
-          ...(categories
-            ?.map((category) => [
-              {
-                path: `/${slugify(category?.name, { lower: true })}`,
-                element: (
-                  <Product title={category?.name} categoryId={category?._id} />
-                ),
-              },
-              {
-                path: `/${slugify(category?.name, {
-                  lower: true,
-                })}/:productName`,
-                element: <ProductDisplay />,
-              },
-            ])
-            .flat() || []),
+          // Route cho danh sách sản phẩm theo danh mục
+          {
+            path: "/:categorySlug",
+            element: <Product />,
+          },
+          // Route cho trang chi tiết sản phẩm
+          {
+            path: "/:categorySlug/:productSlug",
+            element: <ProductDisplay />,
+          },
           {
             path: "/about",
             element: <AboutPharmacy />,
@@ -196,7 +185,7 @@ const App = () => {
         element: <NotFound />,
       },
     ];
-  }, [categories]);
+  }, []); // Loại bỏ phụ thuộc categories
 
   if (loading || isLoading) {
     return (

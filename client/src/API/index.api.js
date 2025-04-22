@@ -44,6 +44,7 @@ export const GET_ALL_PRODUCT_BY_CATEGORY_ROUTE = `${PRODUCT_ROUTES}/getMedicineB
 export const GET_ALL_PRODUCT_BY_CATEGORY_NAME_ROUTE = `${PRODUCT_ROUTES}/getMedicinesByCategoryName`;
 export const GET_PRODUCT_BY_BEST_SELLING_ROUTE = `${PRODUCT_ROUTES}/getMedicineByBestSelling`;
 export const GET_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/getMedicine/:id`;
+export const GET_PRODUCT_BY_SLUG_ROUTE = `${PRODUCT_ROUTES}/getMedicineBySlug`;
 export const CREATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/addMedicine`;
 export const UPDATE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/updateMedicine/:id`;
 export const DELETE_PRODUCT_ROUTE = `${PRODUCT_ROUTES}/deleteMedicine/:id`;

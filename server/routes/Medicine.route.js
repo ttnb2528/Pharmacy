@@ -10,6 +10,7 @@ import {
   getMedicinesByCategory,
   getMedicinesByCategoryName,
   getMedicinesByIsDiscount,
+  getMedicineBySlug,
   updateImagesMedicine,
   updateMedicine,
 } from "../controller/Medicine.controller.js";
@@ -31,6 +32,7 @@ router.get(
   getMedicinesByCategoryName
 );
 router.get("/getMedicineByBestSelling", getMedicineByBestSelling);
+router.get("/getMedicineBySlug", getMedicineBySlug);
 router.get("/getMedicine/:id", getMedicine);
 router.put("/updateMedicine/:id", updateMedicine);
 router.put("/updateImagesMedicine/:id", updateImagesMedicine);
