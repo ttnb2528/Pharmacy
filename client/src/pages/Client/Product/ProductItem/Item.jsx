@@ -9,21 +9,15 @@ import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import slugify from "slugify";
-import { toast } from "sonner";
+import { useNotification } from "@/context/NotificationContext.jsx";
 
-const Item = ({
-  product,
-  setIsLoading,
-  setViewedProducts,
-  // hasLogin,
-  setShowLogin,
-}) => {
-  // const { setSelectedProduct } = useContext(ProductContext);
+const Item = ({ product, setIsLoading, setViewedProducts, setShowLogin }) => {
   const { t } = useTranslation();
   const { userInfo } = useAppStore();
   const navigate = useNavigate();
   const { setCart } = useContext(PharmacyContext);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const { showNotification } = useNotification();
 
   const handleMouseDown = (e) => {
     setStartPosition({ x: e.clientX, y: e.clientY });
@@ -46,7 +40,6 @@ const Item = ({
   const [prevPath, setPrevPath] = useState(location.pathname);
 
   useEffect(() => {
-    // Chỉ scroll to top khi đường dẫn thay đổi thực sự
     if (location.pathname !== prevPath) {
       window.scrollTo(0, 0);
       setPrevPath(location.pathname);
@@ -66,26 +59,39 @@ const Item = ({
   const AddToCart = async (productId) => {
     try {
       setIsLoading(true);
+
       const res = await apiClient.post(ADD_TO_CART_ROUTE, {
         productId: productId,
         quantity: 1,
       });
 
-      console.log(res);
-
       if (res.status === 200 && res.data.status === 200) {
         setCart((prev) => {
           return {
             ...prev,
-            [productId]: prev[productId] + 1,
+            [productId]: (prev[productId] || 0) + 1,
           };
         });
-        toast.success(res.data.message);
-      }
 
-      console.log(res);
+        showNotification(
+          "success",
+          "Thêm vào giỏ hàng",
+          `${product.name} đã được thêm vào giỏ hàng!`
+        );
+      } else {
+        showNotification(
+          "error",
+          "Lỗi",
+          res.data.message || "Không thể thêm sản phẩm vào giỏ hàng"
+        );
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      showNotification(
+        "error",
+        "Lỗi",
+        "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -99,22 +105,17 @@ const Item = ({
     const storedProducts =
       JSON.parse(localStorage.getItem("viewedProducts")) || [];
 
-    // Lọc bỏ sản phẩm cũ nếu đã tồn tại
     let updatedProducts = storedProducts.filter((p) => p.id !== product.id);
 
-    // Thêm sản phẩm mới vào cuối danh sách
     updatedProducts = [...updatedProducts, product];
 
-    // Nếu vượt quá 10 sản phẩm, loại bỏ sản phẩm đầu tiên
     if (updatedProducts.length > 10) {
       updatedProducts = updatedProducts.slice(1);
     }
 
-    // Cập nhật localStorage và dispatch một custom event
     localStorage.setItem("viewedProducts", JSON.stringify(updatedProducts));
     window.dispatchEvent(new CustomEvent("viewedProductsUpdated"));
 
-    // Cập nhật state nếu có
     setViewedProducts?.(updatedProducts);
   };
 

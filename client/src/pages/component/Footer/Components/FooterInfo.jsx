@@ -41,7 +41,7 @@ const FooterInfo = () => {
                 expandedSections.about ? "block" : "hidden"
               } md:block`}
             >
-              <a href="/#" className="footer_top-link">
+              <a href="/about" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Giới thiệu
                 </p>
@@ -95,37 +95,37 @@ const FooterInfo = () => {
                 expandedSections.categories ? "block" : "hidden"
               } md:block`}
             >
-              <a href="/#" className="footer_top-link">
+              <a href="/duoc-pham" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Dược Phẩm
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/cham-soc-suc-khoe" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Chăm sóc sức khoẻ
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/cham-soc-ca-nhan" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Chăm sóc cá nhân
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/thuc-pham-chuc-nang" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Thực phẩm chức năng
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/me-va-be" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Mẹ và bé
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/cham-soc-sac-dep" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Chăm sóc sắc đẹp
                 </p>
               </a>
-              <a href="/#" className="footer_top-link">
+              <a href="/thiet-bi-y-te" className="footer_top-link">
                 <p className="text-[#5e6f88] mb-3 md:mb-5 text-sm md:text-base">
                   Thiết bị y tế
                 </p>
@@ -184,7 +184,7 @@ const FooterInfo = () => {
                 expandedSections.social ? "block" : "hidden"
               } md:block`}
             >
-              <a href="/#">
+              <a href="https://www.facebook.com/thientan2528/">
                 <p className="flex items-center text-black mb-3 md:mb-5 text-sm md:text-base">
                   <FaFacebook className="text-blue-700 text-lg md:text-xl mr-2" />
                   FaceBook
@@ -205,7 +205,7 @@ const FooterInfo = () => {
                 </p>
               </a>
 
-              <a href="/#">
+              <a href="https://zalo.me/84866554764">
                 <p className="flex items-center text-black text-sm md:text-base">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
