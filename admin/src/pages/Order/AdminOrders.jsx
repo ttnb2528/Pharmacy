@@ -39,7 +39,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-
 import { OrderContext } from "@/context/OrderContext.context.jsx";
 import { convertVND } from "@/utils/convertVND.js";
 import Loading from "../component/Loading.jsx";
@@ -51,6 +50,16 @@ import {
 import { toast } from "sonner";
 import Header from "../component/Header.jsx";
 import CustomPagination from "../component/Pagination.jsx";
+
+// Map trạng thái từ tiếng Anh sang tiếng Việt
+const statusTranslations = {
+  pending: "Chờ xử lý",
+  processing: "Đang xử lý",
+  packaged: "Đã đóng gói",
+  shipping: "Đang giao hàng",
+  completed: "Hoàn thành",
+  cancelled: "Đã hủy",
+};
 
 export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
@@ -150,6 +159,11 @@ export default function AdminOrders() {
     }
   };
 
+  // Hàm chuyển đổi trạng thái từ tiếng Anh sang tiếng Việt
+  const translateStatus = (status) => {
+    return statusTranslations[status] || status;
+  };
+
   useEffect(() => {
     if (isDetailsDialogOpen && selectedOrder) {
       const fetchOrderDetails = async (orderId) => {
@@ -222,7 +236,7 @@ export default function AdminOrders() {
                     <TableCell>{convertVND(order.total)}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadgeVariant(order.status)}>
-                        {order.status}
+                        {translateStatus(order.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -311,7 +325,7 @@ export default function AdminOrders() {
                         variant={getStatusBadgeVariant(selectedOrder.status)}
                         className="font-normal"
                       >
-                        {selectedOrder.status}
+                        {translateStatus(selectedOrder.status)}
                       </Badge>
                     </div>
                   </div>
@@ -475,7 +489,7 @@ export default function AdminOrders() {
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng thành{" "}
-                      {newStatus} không?
+                      {translateStatus(newStatus)} không?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
