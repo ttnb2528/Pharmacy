@@ -61,6 +61,16 @@ const statusTranslations = {
   cancelled: "Đã hủy",
 };
 
+// Define valid status transitions map
+const validStatusTransitions = {
+  pending: ["processing", "cancelled"],
+  processing: ["packaged", "cancelled"],
+  packaged: ["shipping", "cancelled"],
+  shipping: ["completed", "cancelled"],
+  completed: [], // No further transitions allowed
+  cancelled: [], // No further transitions allowed
+};
+
 export default function AdminOrders() {
   // const [orders, setOrders] = useState(mockOrders);
   const { orders, setOrders } = useContext(OrderContext);
@@ -189,7 +199,13 @@ export default function AdminOrders() {
 
   useEffect(() => {
     if (selectedOrder) {
-      setNewStatus(selectedOrder.status);
+      const validNextStatuses =
+        validStatusTransitions[selectedOrder.status] || [];
+      setNewStatus(
+        validNextStatuses.length > 0
+          ? validNextStatuses[0]
+          : selectedOrder.status
+      );
     }
   }, [selectedOrder]);
   return (
@@ -254,7 +270,10 @@ export default function AdminOrders() {
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={order.status === "cancelled"}
+                          disabled={
+                            order.status === "cancelled" ||
+                            order.status === "completed"
+                          }
                           onClick={() => {
                             setSelectedOrder(order);
                             setIsStatusUpdateDialogOpen(true);
@@ -467,12 +486,14 @@ export default function AdminOrders() {
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Chờ xử lý</SelectItem>
-                    <SelectItem value="processing">Đang xử lý</SelectItem>
-                    <SelectItem value="packaged">Đã đóng gói</SelectItem>
-                    <SelectItem value="shipping">Đang giao hàng</SelectItem>
-                    <SelectItem value="completed">Hoàn thành</SelectItem>
-                    <SelectItem value="cancelled">Đã hủy</SelectItem>
+                    {selectedOrder &&
+                      validStatusTransitions[selectedOrder.status]?.map(
+                        (status) => (
+                          <SelectItem key={status} value={status}>
+                            {translateStatus(status)}
+                          </SelectItem>
+                        )
+                      )}
                   </SelectContent>
                 </Select>
               </div>
@@ -480,7 +501,15 @@ export default function AdminOrders() {
             <DialogFooter>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button type="submit">Cập nhật trạng thái</Button>
+                  <Button
+                    type="submit"
+                    disabled={
+                      validStatusTransitions[selectedOrder?.status]?.length ===
+                      0
+                    }
+                  >
+                    Cập nhật trạng thái
+                  </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
