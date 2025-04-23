@@ -475,7 +475,7 @@ export const getTopCustomers = asyncHandler(async (req, res) => {
     const customers = await Account.aggregate([
       {
         $lookup: {
-          from: "orders", // Include online orders
+          from: "orders",
           localField: "_id",
           foreignField: "AccountId",
           as: "onlineOrders",
@@ -483,7 +483,7 @@ export const getTopCustomers = asyncHandler(async (req, res) => {
       },
       {
         $lookup: {
-          from: "bills", // Include in-store purchases
+          from: "bills",
           localField: "_id",
           foreignField: "customer.customerId",
           as: "inStorePurchases",
@@ -493,32 +493,22 @@ export const getTopCustomers = asyncHandler(async (req, res) => {
         $lookup: {
           from: "customers",
           localField: "_id",
-          foreignField: "accountId", // Giả định là trường liên kết trong customer
+          foreignField: "accountId",
           as: "customerInfo",
         },
       },
       {
         $addFields: {
+          // Đơn giản hóa việc tính tổng chi tiêu
           totalSpending: {
             $add: [
-              { $sum: "$onlineOrders.total" },
-              { $sum: "$inStorePurchases.total" },
+              { $ifNull: [{ $sum: "$onlineOrders.total" }, 0] },
+              { $ifNull: [{ $sum: "$inStorePurchases.total" }, 0] },
             ],
           },
-          customerName: {
-            $cond: {
-              if: { $gt: [{ $size: "$customerInfo" }, 0] },
-              then: { $arrayElemAt: ["$customerInfo.name", 0] },
-              else: "Khách hàng",
-            },
-          },
-          customerPhone: {
-            $cond: {
-              if: { $gt: [{ $size: "$customerInfo" }, 0] },
-              then: { $arrayElemAt: ["$customerInfo.phone", 0] },
-              else: "Không có",
-            },
-          },
+          // Chỉ trả về thông tin khách hàng mà không xử lý mặc định
+          customerName: { $arrayElemAt: ["$customerInfo.name", 0] },
+          customerPhone: { $arrayElemAt: ["$customerInfo.phone", 0] },
         },
       },
       // Loại bỏ những khách hàng không có chi tiêu
@@ -533,6 +523,17 @@ export const getTopCustomers = asyncHandler(async (req, res) => {
       {
         $limit: 10,
       },
+      // Chỉ lấy các trường cần thiết
+      {
+        $project: {
+          _id: 1,
+          email: 1,
+          username: 1,
+          customerName: 1,
+          customerPhone: 1,
+          totalSpending: 1,
+        },
+      },
     ]);
 
     res.json(
@@ -543,6 +544,7 @@ export const getTopCustomers = asyncHandler(async (req, res) => {
       )
     );
   } catch (error) {
+    console.error("Error getting top customers:", error);
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
   }
 });
