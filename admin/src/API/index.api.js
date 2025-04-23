@@ -51,6 +51,9 @@ export const GET_EXPIRED_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/getExpiredMedic
 export const GET_DAILY_REVENUE_ROUTE = `${STATISTICS_ROUTES}/getDailyRevenue`;
 export const GET_MONTHLY_REVENUE_ROUTE = `${STATISTICS_ROUTES}/getMonthlyRevenue`;
 export const GET_DASHBOARD_OVERVIEW_ROUTE = `${STATISTICS_ROUTES}/getDashboardOverview`;
+export const GET_BEST_SELLING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/bestSellingMedicines`;
+export const GET_SLOWEST_SELLING_MEDICINES_ROUTE = `${STATISTICS_ROUTES}/slowestSellingMedicines`;
+export const GET_TOP_CUSTOMERS_ROUTE = `${STATISTICS_ROUTES}/topCustomers`;
 
 export const CUSTOMER_ROUTES = "/api/v1/customer";
 export const ADD_CUSTOMER_ROUTE = `${CUSTOMER_ROUTES}/createCustomer`;

@@ -9,6 +9,9 @@ import ExpiringMedicines from "./components/ExpiringMedicines";
 import ExpiredMedicines from "./components/ExpiredMedicines";
 import DailyRevenue from "./components/DailyRevenue";
 import MonthlyRevenue from "./components/MonthlyRevenue";
+import BestSellingMedicines from "./components/BestSellingMedicines";
+import SlowestSellingMedicines from "./components/SlowestSellingMedicines";
+import TopCustomers from "./components/TopCustomers";
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card.jsx";
 import Header from "../component/Header.jsx";
@@ -42,6 +45,21 @@ const Statistics = () => {
       value: "monthly-revenue",
       label: "Doanh thu theo tháng",
       component: <MonthlyRevenue />,
+    },
+    {
+      value: "best-selling",
+      label: "Thuốc bán chạy nhất",
+      component: <BestSellingMedicines />,
+    },
+    {
+      value: "slowest-selling",
+      label: "Thuốc bán chậm nhất",
+      component: <SlowestSellingMedicines />,
+    },
+    {
+      value: "top-customers",
+      label: "Khách hàng tiềm năng",
+      component: <TopCustomers />,
     },
   ];
 

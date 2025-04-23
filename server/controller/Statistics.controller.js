@@ -6,6 +6,8 @@ import { StatusCode } from "../utils/constants.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import Customer from "../model/Customer.model.js";
 import Medicine from "../model/Medicine.model.js";
+import OrderDetail from "../model/OrderDetail.model.js";
+import Account from "../model/Account.model.js";
 
 export const getExpiringMedicines = asyncHandler(async (req, res) => {
   try {
@@ -78,19 +80,19 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  
+
   // Tổng hợp giá trị hoàn trả từ `Bill` - hóa đơn hoàn trả
   const returnRevenue = await Bill.aggregate([
     {
       $match: {
         createdAt: { $gte: start, $lte: end },
-        type: "return",  // Lấy các hóa đơn hoàn trả
+        type: "return", // Lấy các hóa đơn hoàn trả
       },
     },
     {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-        totalReturn: { $sum: "$total" },  // Tổng giá trị hoàn trả
+        totalReturn: { $sum: "$total" }, // Tổng giá trị hoàn trả
       },
     },
   ]);
@@ -101,7 +103,13 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
   // Xử lý doanh thu từ đơn hàng trực tuyến
   orderRevenue.forEach(({ _id, totalRevenue }) => {
     if (!revenueMap.has(_id)) {
-      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
+      revenueMap.set(_id, {
+        date: _id,
+        orders: 0,
+        bills: 0,
+        returns: 0,
+        totalRevenue: 0,
+      });
     }
     revenueMap.get(_id).orders += totalRevenue;
     revenueMap.get(_id).totalRevenue += totalRevenue;
@@ -110,19 +118,31 @@ export const getDailyRevenue = asyncHandler(async (req, res) => {
   // Xử lý doanh thu từ hóa đơn bán tại quầy
   billRevenue.forEach(({ _id, totalRevenue }) => {
     if (!revenueMap.has(_id)) {
-      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
+      revenueMap.set(_id, {
+        date: _id,
+        orders: 0,
+        bills: 0,
+        returns: 0,
+        totalRevenue: 0,
+      });
     }
     revenueMap.get(_id).bills += totalRevenue;
     revenueMap.get(_id).totalRevenue += totalRevenue;
   });
-  
+
   // Xử lý giảm trừ từ hóa đơn hoàn trả
   returnRevenue.forEach(({ _id, totalReturn }) => {
     if (!revenueMap.has(_id)) {
-      revenueMap.set(_id, { date: _id, orders: 0, bills: 0, returns: 0, totalRevenue: 0 });
+      revenueMap.set(_id, {
+        date: _id,
+        orders: 0,
+        bills: 0,
+        returns: 0,
+        totalRevenue: 0,
+      });
     }
     revenueMap.get(_id).returns += totalReturn;
-    revenueMap.get(_id).totalRevenue -= totalReturn;  // Trừ giá trị hoàn trả khỏi doanh thu
+    revenueMap.get(_id).totalRevenue -= totalReturn; // Trừ giá trị hoàn trả khỏi doanh thu
   });
 
   // Chuyển map thành array
@@ -411,6 +431,116 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
         bestSellingProduct,
         dailyRevenue,
       })
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+// Get best-selling medicines
+export const getBestSellingMedicines = asyncHandler(async (req, res) => {
+  try {
+    const medicines = await Medicine.find().sort({ sold: -1 }).limit(10);
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách thuốc bán chạy nhất thành công",
+        medicines
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+// Get slowest-selling medicines
+export const getSlowestSellingMedicines = asyncHandler(async (req, res) => {
+  try {
+    const medicines = await Medicine.find().sort({ sold: 1 }).limit(10);
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách thuốc bán chậm nhất thành công",
+        medicines
+      )
+    );
+  } catch (error) {
+    res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
+  }
+});
+
+// Update the logic for getTopCustomers to include both online orders and in-store purchases
+export const getTopCustomers = asyncHandler(async (req, res) => {
+  try {
+    const customers = await Account.aggregate([
+      {
+        $lookup: {
+          from: "orders", // Include online orders
+          localField: "_id",
+          foreignField: "AccountId",
+          as: "onlineOrders",
+        },
+      },
+      {
+        $lookup: {
+          from: "bills", // Include in-store purchases
+          localField: "_id",
+          foreignField: "customer.customerId",
+          as: "inStorePurchases",
+        },
+      },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "_id",
+          foreignField: "accountId", // Giả định là trường liên kết trong customer
+          as: "customerInfo",
+        },
+      },
+      {
+        $addFields: {
+          totalSpending: {
+            $add: [
+              { $sum: "$onlineOrders.total" },
+              { $sum: "$inStorePurchases.total" },
+            ],
+          },
+          customerName: {
+            $cond: {
+              if: { $gt: [{ $size: "$customerInfo" }, 0] },
+              then: { $arrayElemAt: ["$customerInfo.name", 0] },
+              else: "Khách hàng",
+            },
+          },
+          customerPhone: {
+            $cond: {
+              if: { $gt: [{ $size: "$customerInfo" }, 0] },
+              then: { $arrayElemAt: ["$customerInfo.phone", 0] },
+              else: "Không có",
+            },
+          },
+        },
+      },
+      // Loại bỏ những khách hàng không có chi tiêu
+      {
+        $match: {
+          totalSpending: { $gt: 0 },
+        },
+      },
+      {
+        $sort: { totalSpending: -1 },
+      },
+      {
+        $limit: 10,
+      },
+    ]);
+
+    res.json(
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy danh sách khách hàng tiềm năng thành công",
+        customers
+      )
     );
   } catch (error) {
     res.json(jsonGenerate(StatusCode.SERVER_ERROR, error.message));
