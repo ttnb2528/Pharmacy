@@ -26,6 +26,7 @@ export const createCustomer = asyncHandler(async (req, res) => {
 
     const newCustomer = new Customer({
       id,
+      name: req.body.name || "Khách hàng",
       ...req.body,
     });
 

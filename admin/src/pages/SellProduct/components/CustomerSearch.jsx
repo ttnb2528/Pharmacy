@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { UserPlus, X } from "lucide-react";
 import { SellProductContext } from "@/context/SellProductContext.context.jsx";
+import { apiClient } from "@/lib/api-admin"; // Import API client
+import { ADD_CUSTOMER_ROUTE } from "@/API/index.api"; // Import route
 
 // Mock data for customers
 // const customers = [
@@ -91,16 +93,35 @@ const CustomerSearch = ({
     }
   };
 
-  const handleAddCustomer = () => {
+  const handleAddCustomer = async () => {
+    // Validate số điện thoại Việt Nam
+    const phoneRegex = /^[0-9]{10}$/; // Số điện thoại phải có đúng 10 chữ số
+    if (!phoneRegex.test(customerPhone)) {
+      alert("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại có 10 chữ số.");
+      return;
+    }
+
     if (customerName && customerPhone) {
-      const newCustomer = {
-        id: customers.length + 1,
-        name: customerName,
-        phone: customerPhone,
-      };
-      customers.push(newCustomer);
-      setSelectedCustomer(newCustomer);
-      setCustomerType("loyalty");
+      try {
+        const response = await apiClient.post(ADD_CUSTOMER_ROUTE, {
+          name: customerName || "Khách hàng", // Nếu không có tên, đặt mặc định là "Khách hàng"
+          phone: customerPhone,
+        });
+
+        if (response.status === 201 || response.data.status === 201) {
+          const newCustomer = response.data.data; // Lấy thông tin khách hàng từ API
+          setSelectedCustomer(newCustomer);
+          setCustomerType("loyalty");
+          alert("Thêm khách hàng thành công!");
+        } else {
+          alert(response.data.message || "Không thể thêm khách hàng");
+        }
+      } catch (error) {
+        console.error("Error adding customer:", error);
+        alert("Đã xảy ra lỗi khi thêm khách hàng");
+      }
+    } else {
+      alert("Vui lòng nhập đầy đủ thông tin khách hàng");
     }
   };
 

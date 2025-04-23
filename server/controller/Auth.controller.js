@@ -105,6 +105,7 @@ export const signup = asyncHandler(async (req, res) => {
     const customer = await Customer.create({
       accountId: user._id,
       id: idCus,
+      name: "Khách hàng",
       phone: formatPhone,
     });
 
