@@ -138,7 +138,7 @@ const Overview = () => {
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="font-bold line-clamp-1">
                 {data?.bestSellingProduct?.name || "Không có dữ liệu"}
               </div>
               <p className="text-xs text-muted-foreground">

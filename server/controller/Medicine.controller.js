@@ -202,55 +202,63 @@ export const getMedicineBySlug = asyncHandler(async (req, res) => {
   try {
     const { categorySlug, productSlug } = req.query;
     console.log("Tìm kiếm sản phẩm theo slug:", { categorySlug, productSlug });
-    
+
     // Lấy tất cả danh mục
     const categories = await Category.find({});
     console.log("Số lượng danh mục tìm được:", categories.length);
-    
+
     // Tìm danh mục phù hợp bằng cách so sánh slug
-    const foundCategory = categories.find(category => {
+    const foundCategory = categories.find((category) => {
       const catSlug = slugify(category.name, { lower: true });
       console.log(`So sánh: '${catSlug}' với '${categorySlug}'`);
       return catSlug === categorySlug;
     });
-    
+
     if (!foundCategory) {
       console.log("Không tìm thấy danh mục nào phù hợp với:", categorySlug);
-      return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục"));
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy danh mục")
+      );
     }
-    
+
     console.log("Đã tìm thấy danh mục:", foundCategory.name);
-    
+
     // Lấy tất cả thuốc thuộc danh mục này
     const medicines = await Medicine.find({ categoryId: foundCategory._id })
       .populate("categoryId")
       .populate("brandId");
-    
+
     console.log("Số lượng thuốc trong danh mục này:", medicines.length);
-    
+
     // Tìm thuốc phù hợp với slug
-    const foundMedicine = medicines.find(medicine => {
+    const foundMedicine = medicines.find((medicine) => {
       const medSlug = slugify(medicine.name, { lower: true });
       console.log(`So sánh sản phẩm: '${medSlug}' với '${productSlug}'`);
       return medSlug === productSlug;
     });
-    
+
     if (!foundMedicine) {
       console.log("Không tìm thấy thuốc nào phù hợp với:", productSlug);
-      return res.json(jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc"));
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy thuốc")
+      );
     }
-    
+
     console.log("Đã tìm thấy thuốc:", foundMedicine.name);
-    
+
     // Lấy thông tin về batches
     const batches = await Batch.find({ MedicineId: foundMedicine._id })
       .populate("SupplierId")
       .populate("ManufactureId");
-      
+
     foundMedicine._doc.batches = batches;
-    
+
     res.json(
-      jsonGenerate(StatusCode.OK, "Lấy thông tin thuốc thành công", foundMedicine)
+      jsonGenerate(
+        StatusCode.OK,
+        "Lấy thông tin thuốc thành công",
+        foundMedicine
+      )
     );
   } catch (error) {
     console.error("Lỗi trong hàm getMedicineBySlug:", error);
@@ -486,7 +494,9 @@ export const bulkAddMedicines = async (req, res) => {
 
       // Chuẩn hóa giá trị "True"/"False" thành boolean
       const isRxValue = String(medicineData["Kê đơn"]).trim().toLowerCase();
-      const discountValue = String(medicineData["Giảm giá"]).trim().toLowerCase();
+      const discountValue = String(medicineData["Giảm giá"])
+        .trim()
+        .toLowerCase();
 
       // console.log("Medicine ID:", medicineId);
       // console.log("Category ID:", categoryId);
@@ -558,7 +568,8 @@ const uploadToCloudinary = async (buffer, fileName) => {
 const findOrCreateCategory = async (categoryName) => {
   let category = await Category.findOne({ name: categoryName });
   if (!category) {
-    category = new Category({ name: categoryName });
+    let id = await generateID(Category); // Tạo ID mới cho category
+    category = new Category({ id, name: categoryName });
     await category.save();
   }
   return category._id;
