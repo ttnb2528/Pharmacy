@@ -16,7 +16,6 @@ import { convertVND } from "@/utils/ConvertVND.js";
 import { useContext, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
-
 const ProductDetailInfo = ({ product }) => {
   const { userInfo } = useAppStore();
   const { setShowLogin } = useContext(HomeContext);
@@ -107,159 +106,164 @@ const ProductDetailInfo = ({ product }) => {
             </div>
           </div>
 
-          {product?.isDiscount && (
-            <div className="flex flex-row items-center md:mb-1">
-              <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
-                Giảm {product?.discountPercentage}%
-              </span>
+          {/* Thông tin giá và giảm giá - chỉ hiển thị khi không phải thuốc kê đơn */}
+          {!product?.isRx ? (
+            <>
+              {product?.isDiscount && (
+                <div className="flex flex-row items-center md:mb-1">
+                  <span className="rounded-sm py-[2px] text-xs font-medium bg-green-600 px-1 text-white">
+                    Giảm {product?.discountPercentage}%
+                  </span>
+                  {product?.batches[0]?.retailPrice ? (
+                    <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                      {convertVND(product?.batches[0]?.retailPrice)}
+                    </del>
+                  ) : (
+                    <span className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                      Đang cập nhật
+                    </span>
+                  )}
+                </div>
+              )}
+
               {product?.batches[0]?.retailPrice ? (
-                <del className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
-                  {convertVND(product?.batches[0]?.retailPrice)}
-                </del>
+                <div className="text-xl font-bold md:mb-2 md:text-[28px]">
+                  {convertVND(
+                    CalculateProductWithSale(
+                      product?.batches[0]?.retailPrice,
+                      product?.discountPercentage
+                    )
+                  )}
+                </div>
               ) : (
-                <span className="ml-1 text-sm font-semibold text-neutral-600 md:ml-2 md:text-xl">
+                <div className="text-xl text-gray-500 font-bold md:mb-2 md:text-[28px]">
                   Đang cập nhật
-                </span>
+                </div>
               )}
-            </div>
-          )}
 
-          {product?.batches[0]?.retailPrice ? (
-            <div className="text-xl font-bold md:mb-2 md:text-[28px]">
-              {convertVND(
-                CalculateProductWithSale(
-                  product?.batches[0]?.retailPrice,
-                  product?.discountPercentage
-                )
-              )}
-            </div>
-          ) : (
-            <div className="text-xl text-gray-500 font-bold md:mb-2 md:text-[28px]">
-              Đang cập nhật
-            </div>
-          )}
+              <p className="text-[12px] leading-[20px] font-normal text-neutral-700 md:text-sm mb-1.5 md:mb-1">
+                Giá đã bao gồm thuế. Phí vận chuyển và các chi phí khác (nếu có) sẽ
+                được thể hiện khi đặt hàng.
+              </p>
 
-          <p className="text-[12px] leading-[20px] font-normal text-neutral-700 md:text-sm mb-1.5 md:mb-1">
-            Giá đã bao gồm thuế. Phí vận chuyển và các chi phí khác (nếu có) sẽ
-            được thể hiện khi đặt hàng.
-          </p>
-
-          <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
-            {product?.batches[0]?.retailPrice ? (
-              <span className="text-xs font-semibold text-gold-500 md:text-sm">
-                Tích lũy{" "}
-                {CalculatePointEarned(
-                  rank,
-                  product?.batches[0]?.retailPrice,
-                  product?.discountPercentage
-                )}{" "}
-                Xu
-              </span>
-            ) : (
-              <span className="text-xs font-semibold text-gold-500 md:text-sm">
-                Tích lũy 0 Xu
-              </span>
-            )}
-            <div>
-              <span className="inline-flex align-[-0.175em] justify-center max-h-full max-w-full h-3 w-3 items-center text-neutral-700 md:h-4 md:w-4">
-                <svg
-                  viewBox="0 0 25 25"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12.5 2.5C7 2.5 2.5 7 2.5 12.5C2.5 18 7 22.5 12.5 22.5C18 22.5 22.5 18 22.5 12.5C22.5 7 18 2.5 12.5 2.5ZM12.5 18.75C11.81 18.75 11.25 18.19 11.25 17.5C11.25 16.81 11.81 16.25 12.5 16.25C13.19 16.25 13.75 16.81 13.75 17.5C13.75 18.19 13.19 18.75 12.5 18.75ZM14.5288 12.615C13.9075 13.1488 13.75 13.3287 13.75 13.75C13.75 14.4412 13.19 15 12.5 15C11.81 15 11.25 14.4412 11.25 13.75C11.25 12.1325 12.2437 11.28 12.9025 10.7162C13.5237 10.185 13.6812 10.0037 13.6812 9.58375C13.6812 9.355 13.6813 8.75 12.5013 8.75C11.9563 8.78 11.375 9.03 10.9288 9.45125C10.4275 9.92375 9.635 9.9 9.16125 9.4C8.6875 8.8975 8.71 8.10625 9.2125 7.6325C10.09 6.80625 11.2337 6.315 12.4362 6.2525H12.44C14.705 6.2525 16.1812 7.59125 16.1812 9.585C16.1812 11.2013 15.1875 12.0538 14.53 12.6163L14.5288 12.615Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </span>
-            </div>
-          </div>
-
-          {/* <div className="flex content-center justify-between mb-3 md:mb-4">
-            <div className="flex items-center justify-start space-x-1 ">
-              <div className="flex items-center justify-start">
-                <div className="h-6 w-6 ">
-                  <span className="inline-flex align-[-0.125em] justify-center max-h-full max-w-full w-4 h-4 text-neutral-700">
+              <div className="flex items-center justify-start space-x-1 md:space-x-2 mb-3 md:mb-1">
+                {product?.batches[0]?.retailPrice ? (
+                  <span className="text-xs font-semibold text-gold-500 md:text-sm">
+                    Tích lũy{" "}
+                    {CalculatePointEarned(
+                      rank,
+                      product?.batches[0]?.retailPrice,
+                      product?.discountPercentage
+                    )}{" "}
+                    Xu
+                  </span>
+                ) : (
+                  <span className="text-xs font-semibold text-gold-500 md:text-sm">
+                    Tích lũy 0 Xu
+                  </span>
+                )}
+                <div>
+                  <span className="inline-flex align-[-0.175em] justify-center max-h-full max-w-full h-3 w-3 items-center text-neutral-700 md:h-4 md:w-4">
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="25"
-                      height="24"
+                      viewBox="0 0 25 25"
                       fill="none"
-                      viewBox="0 0 25 24"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
+                        d="M12.5 2.5C7 2.5 2.5 7 2.5 12.5C2.5 18 7 22.5 12.5 22.5C18 22.5 22.5 18 22.5 12.5C22.5 7 18 2.5 12.5 2.5ZM12.5 18.75C11.81 18.75 11.25 18.19 11.25 17.5C11.25 16.81 11.81 16.25 12.5 16.25C13.19 16.25 13.75 16.81 13.75 17.5C13.75 18.19 13.19 18.75 12.5 18.75ZM14.5288 12.615C13.9075 13.1488 13.75 13.3287 13.75 13.75C13.75 14.4412 13.19 15 12.5 15C11.81 15 11.25 14.4412 11.25 13.75C11.25 12.1325 12.2437 11.28 12.9025 10.7162C13.5237 10.185 13.6812 10.0037 13.6812 9.58375C13.6812 9.355 13.6813 8.75 12.5013 8.75C11.9563 8.78 11.375 9.03 10.9288 9.45125C10.4275 9.92375 9.635 9.9 9.16125 9.4C8.6875 8.8975 8.71 8.10625 9.2125 7.6325C10.09 6.80625 11.2337 6.315 12.4362 6.2525H12.44C14.705 6.2525 16.1812 7.59125 16.1812 9.585C16.1812 11.2013 15.1875 12.0538 14.53 12.6163L14.5288 12.615Z"
                         fill="currentColor"
-                        d="M17.22 2a6.2 6.2 0 0 0-4.72 2.16A6.2 6.2 0 0 0 7.78 2a6.26 6.26 0 0 0-4.55 10.58l8.55 8.9a1 1 0 0 0 1.44 0l8.55-8.9h.01A6.26 6.26 0 0 0 17.22 2Z"
                       ></path>
                     </svg>
                   </span>
                 </div>
-                <div className="flex items-center justify-start space-x-1 text-sm">
-                  <p className="text-neutral-900">40.9k</p>
+              </div>
+            </>
+          ) : (
+            // Thông báo thuốc kê đơn thay thế cho giá
+            <div className="mb-5 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm font-medium text-blue-800">
+                Thuốc kê đơn - Yêu cầu tư vấn
+              </p>
+              <p className="text-sm text-blue-600 mt-1">
+                Sản phẩm này cần có đơn thuốc của bác sĩ. Vui lòng liên hệ tư vấn để được hỗ trợ.
+              </p>
+            </div>
+          )}
+
+          {/* Phần chọn số lượng - ẩn khi là thuốc kê đơn */}
+          {!product?.isRx && (
+            <div className="flex flex-col space-y-4 mb-5">
+              <div className="flex gap-10 items-center">
+                <label className="font-medium text-lg">Sẵn có:</label>
+                <span className="text-left text-green-400 font-semibold text-lg">
+                  {product?.quantityStock > 0 ? "Còn hàng" : "Hết hàng"}
+                </span>
+              </div>
+              <div className="flex gap-10">
+                <label className="font-medium text-lg">Số lượng:</label>
+                <div className="w-36 flex">
+                  <Button
+                    disabled={!(product?.quantityStock > 0)}
+                    className="rounded-l-full rounded-r-none bg-green-500 hover:bg-green-600"
+                    onClick={handleDecrease}
+                  >
+                    <FaMinus style={{ width: "12px", height: "12px" }} />
+                  </Button>
+                  <Input
+                    disabled={!(product?.quantityStock > 0)}
+                    className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
+                    value={qty}
+                    min={1}
+                    onChange={(e) => handleQuantityChange(e.target.value)}
+                  />
+                  <Button
+                    disabled={!(product?.quantityStock > 0)}
+                    className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
+                    onClick={handleIncrease}
+                  >
+                    <FaPlus style={{ width: "12px", height: "12px" }} />
+                  </Button>
                 </div>
               </div>
-              <span className="h-[12px] w-[1px] bg-neutral-500"></span>
-              <p className="text-sm text-neutral-900">Đã bán 6.6k</p>
             </div>
-          </div> */}
+          )}
 
-          <div className="flex flex-col space-y-4 mb-5">
-            <div className="flex gap-10 items-center">
-              <label className="font-medium text-lg">Sẵn có:</label>
-              <span className="text-left text-green-400 font-semibold text-lg">
-                {product?.quantityStock > 0 ? "Còn hàng" : "Hết hàng"}
-              </span>
-            </div>
-            <div className="flex gap-10">
-              <label className="font-medium text-lg">Số lượng:</label>
-              <div className="w-36 flex">
-                <Button
-                  disabled={!(product?.quantityStock > 0)}
-                  className="rounded-l-full rounded-r-none bg-green-500 hover:bg-green-600"
-                  onClick={handleDecrease}
-                >
-                  <FaMinus style={{ width: "12px", height: "12px" }} />
-                </Button>
-                <Input
-                  disabled={!(product?.quantityStock > 0)}
-                  className="rounded-l-none rounded-r-none focus-visible:ring-0 text-center"
-                  value={qty}
-                  min={1}
-                  onChange={(e) => handleQuantityChange(e.target.value)}
-                />
-                <Button
-                  disabled={!(product?.quantityStock > 0)}
-                  className="rounded-l-none rounded-r-full bg-green-500 hover:bg-green-600"
-                  onClick={handleIncrease}
-                >
-                  <FaPlus style={{ width: "12px", height: "12px" }} />
-                </Button>
-              </div>
-            </div>
-          </div>
+          {/* Phần nút thêm giỏ hàng/tư vấn */}
           <div className="mb-5">
-            <Button
-              className="w-full bg-green-500 hover:bg-green-600 disabled:text-neutral-200 disabled:bg-neutral-500"
-              onClick={() => {
-                if (qty > 0) {
-                  userInfo ? AddToCart(product?.id, qty) : setShowLogin(true);
-                } else {
-                  showNotification(
-                    "warning",
-                    "Lỗi",
-                    "Số lượng phải lớn hơn không"
-                  );
-                }
-              }}
-              disabled={!(product?.quantityStock > 0)}
-            >
-              <span className="text-sm font-semibold text-white ">
-                {product?.quantityStock > 0
-                  ? "Thêm vào giỏ hàng"
-                  : "Tạm hết hàng"}
-              </span>
-            </Button>
+            {product?.isRx ? (
+              // Nút tư vấn cho thuốc kê đơn
+              <a
+                href="https://zalo.me/84866554764"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center bg-[#0068ff] hover:bg-[#0054cc] text-white py-2 px-4 rounded-md font-medium h-10"
+              >
+                <span className="text-sm font-semibold">Tư vấn bác sĩ</span>
+              </a>
+            ) : (
+              // Nút thêm vào giỏ hàng cho thuốc thông thường
+              <Button
+                className="w-full bg-green-500 hover:bg-green-600 disabled:text-neutral-200 disabled:bg-neutral-500"
+                onClick={() => {
+                  if (qty > 0) {
+                    userInfo ? AddToCart(product?.id, qty) : setShowLogin(true);
+                  } else {
+                    showNotification(
+                      "warning",
+                      "Lỗi",
+                      "Số lượng phải lớn hơn không"
+                    );
+                  }
+                }}
+                disabled={!(product?.quantityStock > 0)}
+              >
+                <span className="text-sm font-semibold text-white ">
+                  {product?.quantityStock > 0
+                    ? "Thêm vào giỏ hàng"
+                    : "Tạm hết hàng"}
+                </span>
+              </Button>
+            )}
           </div>
 
           <Separator />

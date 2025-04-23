@@ -181,7 +181,16 @@ const Item = ({ product, setIsLoading, setViewedProducts, setShowLogin }) => {
               )}
             </div>
             <div className="flex justify-center items-center my-2 md:my-3">
-              {product?.batches.length > 0 && product?.quantityStock > 0 ? (
+              {product?.isRx ? (
+                <a
+                  href="https://zalo.me/84866554764"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-5/6 text-center bg-[#0068ff] hover:bg-[#0054cc] text-white text-xs md:text-sm py-2 rounded-md font-medium"
+                >
+                  Tư vấn trực tuyến
+                </a>
+              ) : product?.batches.length > 0 && product?.quantityStock > 0 ? (
                 <Button
                   className="w-5/6 bg-[#26773d] hover:bg-[#0e562e] text-xs md:text-sm py-1 md:py-2"
                   onClick={() =>
