@@ -215,6 +215,40 @@ export const EditComment = asyncHandler(async (req, res) => {
   }
 });
 
+export const deleteComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  const { userId } = req.body;
+  console.log(userId);
+
+  if (!userId) {
+    return res.json(
+      jsonGenerate(StatusCode.UNAUTHORIZED, "Bạn cần đăng nhập để xóa!")
+    );
+  }
+
+  try {
+    const comment = await Comment.findOne({ _id: commentId, userId });
+
+    if (!comment) {
+      return res.json(
+        jsonGenerate(StatusCode.NOT_FOUND, "Không tìm thấy bình luận")
+      );
+    }
+
+    // Xóa ảnh cũ trong mọi trường hợp
+    await deleteOldImages(comment.images);
+
+    await Comment.deleteOne({ _id: commentId });
+
+    return res.json(jsonGenerate(StatusCode.OK, "Xóa bình luận thành công"));
+  } catch (error) {
+    console.error(error);
+    return res.json(
+      jsonGenerate(StatusCode.INTERNAL_SERVER_ERROR, error.message)
+    );
+  }
+});
+
 const validate = (data) => {
   const schema = Joi.object({
     text: Joi.string().required().label("Nội dung bình luận"),

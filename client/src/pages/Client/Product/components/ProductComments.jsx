@@ -10,7 +10,7 @@ import {
   EDIT_COMMENT_ROUTE,
   GET_COMMENTS_ROUTE,
   GET_USER_INFO,
-  // DELETE_COMMENT_ROUTE,
+  DELETE_COMMENT_ROUTE,
 } from "@/API/index.api.js";
 import axios from "axios";
 import { useAppStore } from "@/store/index.js";
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Edit, Trash } from "lucide-react";
 import { useNotification } from "@/context/NotificationContext.jsx";
+import Loading from "@/pages/component/Loading.jsx";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MAX_FILES = 5;
@@ -308,24 +309,39 @@ const ProductComments = ({ productId }) => {
   const handleDeleteComment = async () => {
     if (!commentToDelete) return;
 
-    // try {
-    //   const response = await apiClient.delete(
-    //     `${DELETE_COMMENT_ROUTE}/${commentToDelete._id}`
-    //   );
-    //   if (response.status === 200) {
-    //     setComments(comments.filter((c) => c._id !== commentToDelete._id));
-    //     if (userComment && userComment._id === commentToDelete._id) {
-    //       setUserComment(null);
-    //     }
-    //     toast.success("Đã xóa đánh giá thành công");
-    //   }
-    // } catch (error) {
-    //   console.error("Error deleting comment:", error);
-    //   toast.error("Không thể xóa đánh giá");
-    // } finally {
-    //   setIsDeleteDialogOpen(false);
-    //   setCommentToDelete(null);
-    // }
+    try {
+      setIsLoading(true);
+      const response = await apiClient.delete(
+        `${DELETE_COMMENT_ROUTE}/${commentToDelete._id}`,
+        {
+          data: { userId: userData._id },
+        }
+      );
+      console.log(response);
+
+      if (response.status === 200) {
+        setComments(comments.filter((c) => c._id !== commentToDelete._id));
+        if (userComment && userComment._id === commentToDelete._id) {
+          setUserComment(null);
+        }
+        showNotification(
+          "success",
+          "Thành công",
+          "Đánh giá đã được xóa thành công!"
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      showNotification(
+        "error",
+        "Lỗi",
+        error.response?.data?.message || "Đã xảy ra lỗi khi xóa bình luận."
+      );
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setCommentToDelete(null);
+      setIsLoading(false);
+    }
   };
 
   const confirmDeleteComment = (comment) => {
@@ -809,6 +825,8 @@ const ProductComments = ({ productId }) => {
         isEditing={!!editCommentId}
         isLoading={isLoading}
       />
+
+      {isLoading && <Loading />}
     </div>
   );
 };

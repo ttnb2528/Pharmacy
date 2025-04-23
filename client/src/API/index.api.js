@@ -71,6 +71,7 @@ export const CREATE_COMMENT_ROUTE = `${COMMENT_ROUTES}/createComment`;
 export const GET_COMMENTS_ROUTE = `${COMMENT_ROUTES}/getCommentByProductId`;
 export const GET_COMMENT_PRODUCT_CURRENT_USER_ROUTE = `${COMMENT_ROUTES}/getCommentProductCurrentUser`;
 export const EDIT_COMMENT_ROUTE = `${COMMENT_ROUTES}/editComment`;
+export const DELETE_COMMENT_ROUTE = `${COMMENT_ROUTES}/deleteComment`;
 
 export const SLIDER_BANNER_ROUTES = "/api/v1/sliderBanner";
 export const GET_ALL_SLIDER_BANNER_ROUTE = `${SLIDER_BANNER_ROUTES}/getAllSliderBanner`;
