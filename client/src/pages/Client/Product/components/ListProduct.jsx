@@ -155,6 +155,8 @@ const ProductList = ({ products }) => {
               products={displayedProducts}
               setIsLoading={setIsLoading}
               isMobile={isMobile}
+              hasMoreProducts={hasMoreProducts}
+              loadMoreProducts={loadMoreProducts}
             />
           ) : (
             isFilterApplied && (

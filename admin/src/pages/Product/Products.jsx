@@ -47,10 +47,12 @@ import ImportMedicineDialog from "./components/ImportMedicineDialog.jsx";
 import * as XLSX from "xlsx";
 import { Label } from "@/components/ui/label.jsx";
 import CustomPagination from "../component/Pagination.jsx";
+import { useAppStore } from "@/store/index.js";
 
 export default function Products() {
   const { medicines, categories, setMedicines } = useContext(MedicineContext);
   const filterCategories = [{ _id: "all", name: "Tất cả" }, ...categories];
+  const { userInfo } = useAppStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isImport, setIsImport] = useState(false);
@@ -400,9 +402,9 @@ export default function Products() {
                   <TableCell>{medicine.quantityStock}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
+                      {/* Nút xem luôn hiển thị */}
                       <Dialog>
                         <DialogTrigger asChild>
-                          {/* view product */}
                           <Button
                             variant="outline"
                             size="icon"
@@ -420,29 +422,33 @@ export default function Products() {
                         </DialogContent>
                       </Dialog>
 
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleEdit(medicine)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      {userInfo.isAdmin && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEdit(medicine)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
 
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleImport(medicine)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleImport(medicine)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
 
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleOpenConfirm(medicine)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleOpenConfirm(medicine)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
