@@ -146,7 +146,16 @@ const Item = ({ product, setIsLoading, setViewedProducts, setShowLogin }) => {
                   {product?.name}
                 </h3>
               </div>
-              {product?.batches.length > 0 && product?.quantityStock > 0 ? (
+              {product?.isRx ? (
+                // Hiển thị thông báo cần tư vấn thay vì giá cho thuốc kê đơn
+                <div className="my-1 items-center whitespace-nowrap">
+                  <div className="h-4 md:h-5"></div>
+                  <span className="mt-1 block h-5 md:h-6 text-xs md:text-sm font-medium text-blue-600">
+                    Thuốc kê đơn - Cần tư vấn
+                  </span>
+                </div>
+              ) : product?.batches.length > 0 && product?.quantityStock > 0 ? (
+                // Hiển thị giá cho sản phẩm thông thường
                 <div className="my-1 items-center whitespace-nowrap">
                   {product?.isDiscount ? (
                     <>
@@ -172,6 +181,7 @@ const Item = ({ product, setIsLoading, setViewedProducts, setShowLogin }) => {
                   )}
                 </div>
               ) : (
+                // Hiển thị thông báo hết hàng
                 <div className="my-1 items-center whitespace-nowrap">
                   <div className="h-4 md:h-5"></div>
                   <span className="mt-1 block h-5 md:h-6 text-sm md:text-base font-bold text-red-600">

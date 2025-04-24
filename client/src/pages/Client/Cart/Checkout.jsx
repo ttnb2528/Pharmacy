@@ -1,19 +1,16 @@
 import CheckoutInfo from "./components/CheckoutInfo.jsx";
 import { LuTicketPercent, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useContext, useState } from "react";
 
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useModalNotification } from "@/pages/component/Notification.jsx";
 import SelectCoupon from "./components/SelectCoupon.jsx";
@@ -38,7 +35,6 @@ import MobileCheckoutDelivery from "./components/MobileCheckoutDelivery.jsx";
 import MobileCheckoutProducts from "./components/MobileCheckoutProducts.jsx";
 import MobileCheckoutNote from "./components/MobileCheckoutNote.jsx";
 import MobileCheckoutPayment from "./components/MobileCheckoutPayment.jsx";
-// import MobileCheckoutCoupon from "./components/MobileCheckoutCoupon.jsx";
 import MobileCheckoutCoins from "./components/MobileCheckoutCoins.jsx";
 import MobileCheckoutSummary from "./components/MobileCheckoutSummary.jsx";
 import MobileCheckoutFooter from "./components/MobileCheckoutFooter.jsx";
@@ -60,7 +56,6 @@ const Checkout = () => {
 
   const handleApplyCoin = () => {
     const coinValue = parseInt(tempCoinInput) || 0;
-    // const coinValue = Number.parseInt(tempCoinInput) || 0
     const totalPrice = CalculateTotalPrice();
     const maxCoinAllowed = Math.floor(totalPrice * 0.5); // Giới hạn 50% giá trị đơn hàng
     const availableCoins = userInfo?.accountId?.loyaltyProgramId?.points || 0;
@@ -313,13 +308,6 @@ const Checkout = () => {
                 setPaymentMethod={setPaymentMethod}
               />
 
-              {/* <MobileCheckoutCoupon
-                selectedCoupon={selectedCoupon}
-                setSelectedCoupon={setSelectedCoupon}
-                handleApplyCoupon={handleApplyCoupon}
-                handleRemoveCoupon={handleRemoveCoupon}
-              /> */}
-
               <MobileCheckoutCoins
                 coinUsed={coinUsed}
                 setCoinUsed={setCoinUsed}
@@ -553,6 +541,47 @@ const Checkout = () => {
           </>
         )}
       </div>
+
+      {/* Dialog cho nhập xu trên desktop */}
+      <Dialog open={isOpenCoinGold} onOpenChange={setIsOpenCoinGold}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Sử dụng Xu Vàng</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="col-span-4">
+                <p className="text-sm text-neutral-700 mb-2">
+                  Bạn có {formatNumber(userInfo?.accountId?.loyaltyProgramId?.points || 0)} xu
+                </p>
+                <p className="text-xs text-neutral-500 mb-4">
+                  Có thể sử dụng tối đa {formatNumber(Math.floor(CalculateTotalPrice() * 0.5))} xu (50% giá trị đơn hàng)
+                </p>
+                <Input
+                  id="coinInput"
+                  type="number"
+                  placeholder="Nhập số xu bạn muốn sử dụng"
+                  value={tempCoinInput}
+                  onChange={(e) => setTempCoinInput(e.target.value)}
+                  className="col-span-3"
+                />
+                <p className="text-xs text-neutral-500 mt-1">
+                  Số xu phải là bội số của 1000
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsOpenCoinGold(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleApplyCoin} className="bg-green-500 hover:bg-green-600">
+              Áp dụng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {ModalNotificationComponent}
     </>
   );
