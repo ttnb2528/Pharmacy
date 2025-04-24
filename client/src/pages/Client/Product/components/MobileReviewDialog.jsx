@@ -27,6 +27,8 @@ const MobileReviewDialog = ({
   const [rating, setRating] = useState(initialRating);
   const [text, setText] = useState(initialText);
   const [images, setImages] = useState([]);
+  const [localError, setLocalError] = useState("");
+  const [localText, setLocalText] = useState(initialText);
 
   // Cập nhật state khi có thay đổi từ prop
   useEffect(() => {
@@ -34,8 +36,28 @@ const MobileReviewDialog = ({
       setRating(initialRating);
       setText(initialText);
       setImages([]);
+      setLocalText(initialText);
+      setLocalError("");
     }
   }, [isOpen, initialRating, initialText]);
+
+  // Hàm đếm từ
+  const countWords = (text) => {
+    return text.trim().split(/\s+/).length;
+  };
+
+  // Hàm xử lý thay đổi nội dung đánh giá
+  const handleTextChange = (text) => {
+    const wordCount = countWords(text);
+
+    if (wordCount > 150) {
+      setLocalError("Đánh giá không được vượt quá 150 từ");
+      return;
+    }
+
+    setLocalError("");
+    setLocalText(text);
+  };
 
   // Cập nhật hàm handleImageChange để kiểm tra kích thước và số lượng file
   const handleImageChange = (e) => {
@@ -78,7 +100,7 @@ const MobileReviewDialog = ({
       return;
     }
 
-    if (!text.trim()) {
+    if (!localText.trim()) {
       toast.error("Vui lòng nhập nội dung đánh giá");
       return;
     }
@@ -92,7 +114,7 @@ const MobileReviewDialog = ({
 
     onSubmit({
       rating,
-      text,
+      text: localText,
       images,
     });
   };
@@ -112,6 +134,8 @@ const MobileReviewDialog = ({
     ));
   };
 
+  const wordCount = countWords(localText);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -130,12 +154,20 @@ const MobileReviewDialog = ({
             <label className="block text-sm font-medium mb-1">
               Nội dung đánh giá
             </label>
+            <div className="text-xs text-right mb-1">
+              <span className={wordCount > 150 ? "text-red-500" : "text-gray-500"}>
+                {wordCount}/150 từ
+              </span>
+            </div>
             <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              value={localText}
+              onChange={(e) => handleTextChange(e.target.value)}
               placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
               className="min-h-[100px]"
             />
+            {localError && (
+              <p className="text-red-500 text-sm mt-1">{localError}</p>
+            )}
           </div>
 
           <div>

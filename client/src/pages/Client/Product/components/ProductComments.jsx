@@ -40,6 +40,11 @@ import Loading from "@/pages/component/Loading.jsx";
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MAX_FILES = 5;
 
+// Thêm hàm đếm số từ (thêm ở đầu component ProductComments)
+const countWords = (text) => {
+  return text.trim() ? text.trim().split(/\s+/).length : 0;
+};
+
 const ProductComments = ({ productId }) => {
   const { userInfo } = useAppStore();
   const { setShowLogin } = useContext(HomeContext);
@@ -58,6 +63,8 @@ const ProductComments = ({ productId }) => {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const [commentToDelete, setCommentToDelete] = useState(null);
   const { showNotification } = useNotification();
+  // Thêm state theo dõi lỗi về độ dài
+  const [textLengthError, setTextLengthError] = useState("");
 
   const fetchComments = async () => {
     try {
@@ -175,6 +182,19 @@ const ProductComments = ({ productId }) => {
     return urls;
   };
 
+  // Cập nhật hàm xử lý thay đổi text
+  const handleTextChange = (e) => {
+    const newText = e.target.value;
+    const wordCount = countWords(newText);
+    
+    if (wordCount > 150) {
+      setTextLengthError("Đánh giá không được vượt quá 150 từ");
+    } else {
+      setTextLengthError("");
+      setText(newText);
+    }
+  };
+
   const handleSubmitComment = async (mobileReviewData) => {
     if (!userInfo) {
       setShowLogin(true);
@@ -217,6 +237,11 @@ const ProductComments = ({ productId }) => {
         "Lỗi",
         "Vui lòng đảm bảo mỗi ảnh có kích thước nhỏ hơn 2MB!"
       );
+      return;
+    }
+
+    if (countWords(reviewText) > 150) {
+      showNotification("error", "Lỗi", "Đánh giá không được vượt quá 150 từ");
       return;
     }
 
@@ -666,11 +691,16 @@ const ProductComments = ({ productId }) => {
                   <div className="flex gap-1">{renderStars(rating)}</div>
                   <Input
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    onChange={handleTextChange}
                     placeholder="Viết đánh giá của bạn..."
-                    className="w-full border-gray-300 focus:border-green-500"
+                    className={`w-full border-gray-300 focus:border-green-500 ${textLengthError ? "border-red-500" : ""}`}
                     disabled={isLoading}
                   />
+                  <div className="flex justify-between text-xs">
+                    <span className={`${textLengthError ? "text-red-500" : "text-gray-500"}`}>
+                      {textLengthError || `${countWords(text)}/150 từ`}
+                    </span>
+                  </div>
                   {/* Cập nhật phần hiển thị ảnh */}
                   <label
                     className={`flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:bg-gray-200 transition ${
